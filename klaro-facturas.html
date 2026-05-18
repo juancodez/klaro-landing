@@ -644,6 +644,8 @@
     row.className = 'flex items-center gap-3 px-3.5 py-3 rounded-xl transition-all hover:shadow-sm';
     row.style.cssText = 'background:#fff;border:1px solid rgba(164,55,0,0.08)';
 
+    const dateStr = inv.date ? fmtDateShort(inv.date) : '—';
+
     row.innerHTML =
       '<div class="flex-1 min-w-0">' +
         '<div class="flex items-center gap-2 mb-0.5">' +
@@ -651,9 +653,9 @@
           '<button onclick="cycleStatus(\'' + inv.id + '\',\'' + nextSt + '\')" ' +
                   'style="' + style + '" ' +
                   'class="text-[10px] font-semibold px-1.5 py-0.5 rounded-lg cursor-pointer hover:opacity-75 transition-opacity" ' +
-                  'title="Cambiar estado">' + label + '</button>' +
+                  'title="Cambiar estado · clic para avanzar">' + label + '</button>' +
         '</div>' +
-        '<p class="text-xs truncate" style="color:#594139">' + escHtml(inv.client_name || '—') + '</p>' +
+        '<p class="text-xs truncate" style="color:#594139">' + escHtml(inv.client_name || '—') + ' · ' + dateStr + '</p>' +
       '</div>' +
       '<div class="text-right flex-shrink-0 mr-1">' +
         '<p class="text-sm font-bold text-navy">' + fmtEur(gross) + '</p>' +
@@ -708,11 +710,11 @@
     const amtStr = document.getElementById('inv-amount').value;
     const amount = parseFloat(amtStr);
 
-    if (!client) { alert('Añade el nombre del cliente antes de guardar.'); return false; }
-    if (!amount || isNaN(amount) || amount <= 0) { alert('Añade un importe válido.'); return false; }
+    if (!client) { showToast('Añade el nombre del cliente antes de guardar.', 'error'); return false; }
+    if (!amount || isNaN(amount) || amount <= 0) { showToast('Añade un importe válido.', 'error'); return false; }
 
     const { data: { user } } = await sb.auth.getUser();
-    if (!user) { alert('Sesión expirada. Por favor, inicia sesión de nuevo.'); return false; }
+    if (!user) { showToast('Sesión expirada. Por favor, inicia sesión de nuevo.', 'error'); return false; }
 
     const taxRate = ivaRate === 'rc' ? 0 : Math.round((ivaRate || 0) * 100);
 
@@ -731,7 +733,7 @@
     };
 
     const { error } = await sb.from('invoices').insert(payload);
-    if (error) { alert('Error al guardar: ' + error.message); return false; }
+    if (error) { showToast('Error al guardar: ' + error.message, 'error'); return false; }
 
     /* refresh list and regenerate next number */
     await loadInvoices();
@@ -744,22 +746,26 @@
   /* ─── Status cycle ─── */
   async function cycleStatus(id, newStatus) {
     const { error } = await sb.from('invoices').update({ status: newStatus }).eq('id', id);
-    if (error) { alert('Error al actualizar: ' + error.message); return; }
+    if (error) { showToast('Error al actualizar: ' + error.message, 'error'); return; }
     const inv = allInvoices.find(i => i.id === id);
     if (inv) {
       inv.status = newStatus;
+      const STATUS_LABELS = { draft:'Borrador', sent:'Enviada', paid:'Pagada', overdue:'Vencida' };
+      showToast('Estado actualizado a ' + (STATUS_LABELS[newStatus] || newStatus));
       renderInvoiceList();
+      updateRevenueTotal();
     }
   }
 
   /* ─── Delete invoice ─── */
   async function deleteInvoice(id) {
-    if (!confirm('¿Eliminar esta factura? Esta acción no se puede deshacer.')) return;
+    if (!confirm('¿Eliminar esta factura?')) return;
     const { error } = await sb.from('invoices').delete().eq('id', id);
-    if (error) { alert('Error al eliminar: ' + error.message); return; }
+    if (error) { showToast('Error al eliminar: ' + error.message, 'error'); return; }
     allInvoices = allInvoices.filter(i => i.id !== id);
     renderInvoiceList();
     updateRevenueTotal();
+    showToast('Factura eliminada');
   }
 
   /* ─── Toast ─── */
@@ -877,6 +883,14 @@
     return d + ' de ' + months[m-1] + ' de ' + y;
   }
 
+  /* DD MMM YYYY — short Spanish months for invoice rows */
+  function fmtDateShort(str) {
+    if (!str) return '—';
+    const [y, m, d] = str.split('-').map(Number);
+    const months = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
+    return String(d).padStart(2,'0') + ' ' + months[m-1] + ' ' + y;
+  }
+
   /* ─ Live preview update ─ */
   function updatePreview() {
     const number  = document.getElementById('inv-number').value.trim() || 'KL-2026-001';
@@ -937,7 +951,7 @@
     btn.style.opacity = '';
 
     if (ok) {
-      showToast('Borrador guardado');
+      showToast('Borrador guardado', 'success');
       document.getElementById('prev-status').textContent = 'BORRADOR';
       document.getElementById('prev-status').style.background = 'rgba(255,184,48,.2)';
       document.getElementById('prev-status').style.color = '#FFB830';
@@ -955,7 +969,7 @@
     btn.style.opacity = '';
 
     if (ok) {
-      showToast('Factura enviada');
+      showToast('Factura enviada', 'success');
       document.getElementById('prev-status').textContent = 'ENVIADA';
       document.getElementById('prev-status').style.background = 'rgba(5,150,105,.15)';
       document.getElementById('prev-status').style.color = '#059669';
