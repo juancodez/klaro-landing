@@ -725,6 +725,104 @@
     });
   })();
 </script>
+<script>
+  // ── JS-only toast (no HTML element dependency) ───────────────────────
+  function showToast(msg, ok) {
+    var t = document.createElement('div');
+    t.textContent = msg;
+    Object.assign(t.style, {
+      position: 'fixed', top: '24px', right: '24px', zIndex: '9999',
+      padding: '12px 18px', borderRadius: '12px',
+      fontSize: '14px', fontWeight: '600', color: '#fff',
+      background: ok ? '#16a34a' : '#dc2626',
+      boxShadow: '0 4px 20px rgba(0,0,0,.18)',
+      opacity: '1', transition: 'opacity .3s ease',
+      fontFamily: 'Plus Jakarta Sans, sans-serif',
+    });
+    document.body.appendChild(t);
+    setTimeout(function () {
+      t.style.opacity = '0';
+      setTimeout(function () { t.remove(); }, 320);
+    }, 3000);
+  }
+
+  // ── Load profile on open ─────────────────────────────────────────────
+  (async function () {
+    var s = await _sb.auth.getSession();
+    var session = s.data.session;
+    if (!session) return;
+
+    // [data-user-email] elements
+    document.querySelectorAll('[data-user-email]').forEach(function (el) {
+      el.textContent = session.user.email;
+    });
+
+    // email input
+    var emailEl = document.getElementById('profile-email-input');
+    if (emailEl) emailEl.value = session.user.email;
+
+    // "Miembro desde …"
+    var MESES = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+    var ca = new Date(session.user.created_at);
+    var ms = document.getElementById('member-since');
+    if (ms) ms.textContent = 'Miembro desde ' + MESES[ca.getMonth()] + ' ' + ca.getFullYear();
+
+    // profiles row
+    var res = await _sb.from('profiles').select('*').eq('id', session.user.id).single();
+    var p = res.data;
+    if (!p) return;
+
+    if (p.full_name) {
+      var parts = p.full_name.trim().split(/\s+/);
+      var n = document.getElementById('prof-name');
+      var a = document.getElementById('prof-apellido');
+      if (n) n.value = parts[0] || '';
+      if (a) a.value = parts.slice(1).join(' ') || '';
+    }
+
+    var MAP = {
+      'prof-phone':   p.phone,
+      'prof-tax':     p.tax_number,
+      'prof-iban':    p.iban,
+      'prof-address': p.address,
+      'prof-city':    p.city,
+      'prof-postal':  p.postal_code,
+    };
+    Object.keys(MAP).forEach(function (id) {
+      var el = document.getElementById(id);
+      if (el && MAP[id] != null) el.value = MAP[id];
+    });
+  })();
+
+  // ── Save (overrides previous handleSave definition) ──────────────────
+  async function handleSave() {
+    var s = await _sb.auth.getSession();
+    var session = s.data.session;
+    if (!session) return;
+
+    var first = (document.getElementById('prof-name')?.value    || '').trim();
+    var last  = (document.getElementById('prof-apellido')?.value || '').trim();
+    var full_name   = [first, last].filter(Boolean).join(' ') || null;
+    var phone       = document.getElementById('prof-phone')?.value    || null;
+    var tax_number  = document.getElementById('prof-tax')?.value      || null;
+    var iban        = document.getElementById('prof-iban')?.value     || null;
+    var address     = document.getElementById('prof-address')?.value  || null;
+    var city        = document.getElementById('prof-city')?.value     || null;
+    var postal_code = document.getElementById('prof-postal')?.value   || null;
+
+    var result = await _sb.from('profiles').upsert({
+      id: session.user.id,
+      full_name, phone, tax_number, iban, address, city, postal_code,
+      updated_at: new Date().toISOString(),
+    });
+
+    if (result.error) {
+      showToast('Error al guardar', false);
+    } else {
+      showToast('Perfil guardado ✓', true);
+    }
+  }
+</script>
 </body>
 </html>
 
