@@ -282,13 +282,13 @@
             <div class="field-row">
               <div>
                 <label class="block text-xs font-semibold mb-1.5" style="color:#594139">Nombre</label>
-                <input type="text" value="Ana"
+                <input id="prof-name" type="text" value="Ana"
                        class="klaro-input w-full rounded-xl px-3.5 py-2.5 text-sm"
                        style="background:#f4ede5;border:1px solid rgba(164,55,0,0.15);color:#1e1b17" />
               </div>
               <div>
                 <label class="block text-xs font-semibold mb-1.5" style="color:#594139">Apellido</label>
-                <input type="text" value="García"
+                <input id="prof-apellido" type="text" value="García"
                        class="klaro-input w-full rounded-xl px-3.5 py-2.5 text-sm"
                        style="background:#f4ede5;border:1px solid rgba(164,55,0,0.15);color:#1e1b17" />
               </div>
@@ -304,13 +304,13 @@
             <div class="field-row">
               <div>
                 <label class="block text-xs font-semibold mb-1.5" style="color:#594139">Teléfono</label>
-                <input type="tel" value="+49 176 12345678"
+                <input id="prof-phone" type="tel" value="+49 176 12345678"
                        class="klaro-input w-full rounded-xl px-3.5 py-2.5 text-sm"
                        style="background:#f4ede5;border:1px solid rgba(164,55,0,0.15);color:#1e1b17" />
               </div>
               <div>
                 <label class="block text-xs font-semibold mb-1.5" style="color:#594139">Ciudad</label>
-                <input type="text" value="Berlin"
+                <input id="prof-city" type="text" value="Berlin"
                        class="klaro-input w-full rounded-xl px-3.5 py-2.5 text-sm"
                        style="background:#f4ede5;border:1px solid rgba(164,55,0,0.15);color:#1e1b17" />
               </div>
@@ -360,7 +360,7 @@
             <div class="field-row">
               <div>
                 <label class="block text-xs font-semibold mb-1.5" style="color:#594139">Steuernummer</label>
-                <input type="text" value="12/345/67890" placeholder="XX/XXX/XXXXX"
+                <input id="prof-tax" type="text" value="12/345/67890" placeholder="XX/XXX/XXXXX"
                        class="klaro-input w-full rounded-xl px-3.5 py-2.5 text-sm font-mono"
                        style="background:#f4ede5;border:1px solid rgba(164,55,0,0.15);color:#1e1b17" />
               </div>
@@ -568,38 +568,99 @@
 </a>
 
 <!-- Toast notification -->
-<div id="toast" class="hidden fixed bottom-24 right-6 z-50 px-4 py-3 rounded-xl text-sm font-semibold text-white shadow-lg"
+<div id="toast" class="hidden fixed top-6 right-6 z-50 px-4 py-3 rounded-xl text-sm font-semibold text-white shadow-lg transition-opacity"
      style="background:#15803d">
-  ✓ Cambios guardados
+  Perfil guardado ✓
 </div>
 
 <script>
+  // ── VAT radio styling ────────────────────────────────────────────────
+  function updateVat() {
+    const klein = document.querySelector('input[value="klein"]').checked;
+    document.getElementById('lbl-klein').style.background   = klein  ? 'rgba(164,55,0,.07)' : 'rgba(89,65,57,.04)';
+    document.getElementById('lbl-klein').style.borderColor  = klein  ? '#a43700'             : 'rgba(164,55,0,.15)';
+    document.getElementById('lbl-normal').style.background  = !klein ? 'rgba(164,55,0,.07)' : 'rgba(89,65,57,.04)';
+    document.getElementById('lbl-normal').style.borderColor = !klein ? '#a43700'             : 'rgba(164,55,0,.15)';
+  }
+
+  // ── Toast helper ─────────────────────────────────────────────────────
+  function showToast(msg, ok = true) {
+    const toast = document.getElementById('toast');
+    toast.textContent = msg;
+    toast.style.background = ok ? '#15803d' : '#dc2626';
+    toast.classList.remove('hidden');
+    setTimeout(() => toast.classList.add('hidden'), 3000);
+  }
+
+  // ── Load profile on page open ────────────────────────────────────────
   (async () => {
     const { data: { session } } = await _sb.auth.getSession();
     if (!session) return;
 
-    // Populate email input
+    // Email input + member-since
     const emailInput = document.getElementById('profile-email-input');
     if (emailInput) emailInput.value = session.user.email;
 
-    // Populate "Miembro desde mes año"
     const meses = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
     const createdAt = new Date(session.user.created_at);
-    const memberSinceEl = document.getElementById('member-since');
-    if (memberSinceEl) memberSinceEl.textContent = `Miembro desde ${meses[createdAt.getMonth()]} ${createdAt.getFullYear()}`;
+    const memberEl = document.getElementById('member-since');
+    if (memberEl) memberEl.textContent = `Miembro desde ${meses[createdAt.getMonth()]} ${createdAt.getFullYear()}`;
+
+    // Profiles table
+    const { data } = await _sb.from('profiles').select('*').eq('id', session.user.id).single();
+    if (!data) return;
+
+    // full_name → split into first / last
+    if (data.full_name) {
+      const parts = data.full_name.trim().split(/\s+/);
+      const nameEl = document.getElementById('prof-name');
+      const apellEl = document.getElementById('prof-apellido');
+      if (nameEl)  nameEl.value  = parts[0] || '';
+      if (apellEl) apellEl.value = parts.slice(1).join(' ') || '';
+    }
+
+    // Flat field map
+    const map = {
+      'prof-phone':   data.phone,
+      'prof-tax':     data.tax_number,
+      'prof-iban':    data.iban,
+      'prof-address': data.address,
+      'prof-city':    data.city,
+      'prof-postal':  data.postal_code,
+    };
+    for (const [id, val] of Object.entries(map)) {
+      const el = document.getElementById(id);
+      if (el && val != null) el.value = val;
+    }
   })();
 
-    const klein = document.querySelector('input[value="klein"]').checked;
-    document.getElementById('lbl-klein').style.background  = klein ? 'rgba(164,55,0,.07)' : 'rgba(89,65,57,.04)';
-    document.getElementById('lbl-klein').style.borderColor = klein ? '#a43700' : 'rgba(164,55,0,.15)';
-    document.getElementById('lbl-normal').style.background  = !klein ? 'rgba(164,55,0,.07)' : 'rgba(89,65,57,.04)';
-    document.getElementById('lbl-normal').style.borderColor = !klein ? '#a43700' : 'rgba(164,55,0,.15)';
-  }
+  // ── Save profile ─────────────────────────────────────────────────────
+  async function handleSave() {
+    const { data: { session } } = await _sb.auth.getSession();
+    if (!session) return;
 
-  function handleSave() {
-    const toast = document.getElementById('toast');
-    toast.classList.remove('hidden');
-    setTimeout(() => toast.classList.add('hidden'), 2800);
+    const firstName = (document.getElementById('prof-name')?.value    || '').trim();
+    const lastName  = (document.getElementById('prof-apellido')?.value || '').trim();
+    const full_name = [firstName, lastName].filter(Boolean).join(' ') || null;
+
+    const phone       = document.getElementById('prof-phone')?.value   || null;
+    const tax_number  = document.getElementById('prof-tax')?.value     || null;
+    const iban        = document.getElementById('prof-iban')?.value    || null;
+    const address     = document.getElementById('prof-address')?.value || null;
+    const city        = document.getElementById('prof-city')?.value    || null;
+    const postal_code = document.getElementById('prof-postal')?.value  || null;
+
+    const { error } = await _sb.from('profiles').upsert({
+      id: session.user.id,
+      full_name, phone, tax_number, iban, address, city, postal_code,
+      updated_at: new Date().toISOString(),
+    });
+
+    if (error) {
+      showToast('Error al guardar', false);
+    } else {
+      showToast('Perfil guardado ✓', true);
+    }
   }
 </script>
 
