@@ -528,6 +528,142 @@
     </div>
     <!-- END TWO-COLUMN -->
 
+    <!-- ── DOCUMENTOS FISCALES ──────────────────────────────────── -->
+    <div class="bento-card bg-[#fff8f1] rounded-2xl p-6" style="border:1px solid rgba(164,55,0,0.08)">
+
+      <!-- Header -->
+      <div class="flex items-center justify-between mb-5">
+        <h3 class="font-bold text-[#1e1b17] text-sm flex items-center gap-2">
+          <svg class="w-4 h-4" style="color:#a43700" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+            <polyline points="14 2 14 8 20 8"/>
+            <line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>
+          </svg>
+          Documentos Fiscales
+        </h3>
+        <button onclick="document.getElementById('doc-file-input').click()"
+          class="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold text-white transition-all active:scale-95 hover:opacity-90"
+          style="background:#a43700">
+          <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+            <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+          </svg>
+          Subir documento
+        </button>
+      </div>
+
+      <!-- Drop zone -->
+      <div id="drop-zone"
+        class="relative rounded-2xl mb-5 transition-all cursor-pointer"
+        style="border:2px dashed rgba(164,55,0,0.22);background:#f4ede5"
+        onclick="document.getElementById('doc-file-input').click()"
+        ondragover="handleDragOver(event)"
+        ondragleave="handleDragLeave(event)"
+        ondrop="handleDrop(event)">
+
+        <!-- Default state -->
+        <div id="drop-default" class="flex flex-col items-center justify-center py-7 gap-2.5">
+          <div class="w-11 h-11 rounded-xl flex items-center justify-center" style="background:rgba(164,55,0,0.08)">
+            <svg class="w-5 h-5" style="color:#a43700" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <polyline points="16 16 12 12 8 16"/>
+              <line x1="12" y1="12" x2="12" y2="21"/>
+              <path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/>
+            </svg>
+          </div>
+          <div class="text-center">
+            <p class="text-sm font-semibold" style="color:#1e1b17">Arrastra aquí tu documento</p>
+            <p class="text-xs mt-0.5" style="color:#594139">o haz clic para seleccionar · PDF, JPG, PNG · máx. 10 MB</p>
+          </div>
+        </div>
+
+        <!-- Uploading state -->
+        <div id="drop-uploading" class="hidden flex-col items-center justify-center py-7 gap-3">
+          <svg class="w-6 h-6 animate-spin" style="color:#a43700" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"/>
+          </svg>
+          <p class="text-sm font-semibold" style="color:#a43700">Subiendo documento…</p>
+        </div>
+
+        <input type="file" id="doc-file-input" class="hidden" accept=".pdf,.jpg,.jpeg,.png"
+          onchange="handleFileSelect(event)" />
+      </div>
+
+      <!-- Upload confirm form (shown after file selected) -->
+      <div id="upload-form" class="hidden mb-5 p-4 rounded-2xl" style="background:#f4ede5;border:1px solid rgba(164,55,0,0.1)">
+        <div class="flex items-center gap-2 mb-3">
+          <svg class="w-4 h-4 flex-shrink-0" style="color:#a43700" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+            <polyline points="14 2 14 8 20 8"/>
+          </svg>
+          <p id="selected-filename" class="text-sm font-semibold text-[#1e1b17] truncate"></p>
+        </div>
+        <div class="grid grid-cols-2 gap-3 mb-3">
+          <div>
+            <label class="block text-[10px] font-bold uppercase tracking-wider mb-1.5" style="color:#594139">Tipo de documento</label>
+            <select id="doc-type" class="w-full rounded-xl px-3 py-2.5 text-xs font-medium outline-none"
+              style="background:#fff8f1;border:1px solid rgba(164,55,0,0.18);color:#1e1b17">
+              <option value="lohnsteuerbescheinigung">Lohnsteuerbescheinigung</option>
+              <option value="steuerbescheid">Steuerbescheid</option>
+              <option value="usterbescheid">UStVA / Steuerbescheid IVA</option>
+              <option value="rentenbescheid">Rentenbescheid</option>
+              <option value="kontoauszug">Kontoauszug (extracto)</option>
+              <option value="rechnung">Rechnung (factura recibida)</option>
+              <option value="sonstiges">Otro documento fiscal</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-[10px] font-bold uppercase tracking-wider mb-1.5" style="color:#594139">Año fiscal</label>
+            <select id="doc-year" class="w-full rounded-xl px-3 py-2.5 text-xs font-medium outline-none"
+              style="background:#fff8f1;border:1px solid rgba(164,55,0,0.18);color:#1e1b17">
+              <option value="2026">2026</option>
+              <option value="2025" selected>2025</option>
+              <option value="2024">2024</option>
+              <option value="2023">2023</option>
+            </select>
+          </div>
+        </div>
+        <div class="flex gap-2">
+          <button onclick="cancelUpload()" class="flex-1 py-2.5 rounded-xl text-xs font-bold transition-all"
+            style="background:rgba(164,55,0,0.08);color:#594139">Cancelar</button>
+          <button onclick="confirmUpload()" class="flex-1 py-2.5 rounded-xl text-xs font-bold text-white transition-all active:scale-95"
+            style="background:#a43700">Subir ahora</button>
+        </div>
+      </div>
+
+      <!-- Feedback banners -->
+      <div id="doc-error" class="hidden mb-4 rounded-xl px-4 py-3 text-xs font-medium"
+        style="background:rgba(220,38,38,0.08);color:#dc2626;border:1px solid rgba(220,38,38,0.15)"></div>
+      <div id="doc-success" class="hidden mb-4 rounded-xl px-4 py-3 text-xs font-medium items-center gap-2"
+        style="background:#F0FDF4;color:#059669;border:1px solid rgba(5,150,105,.2)">
+        <svg class="w-3.5 h-3.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+        <span id="doc-success-text"></span>
+      </div>
+
+      <!-- Document list -->
+      <div id="docs-loading" class="flex items-center justify-center py-8 gap-2" style="color:#594139">
+        <svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"/>
+        </svg>
+        <span class="text-xs font-medium">Cargando documentos…</span>
+      </div>
+
+      <div id="docs-empty" class="hidden flex-col items-center justify-center py-8 gap-2 text-center">
+        <div class="w-12 h-12 rounded-2xl flex items-center justify-center mx-auto" style="background:rgba(164,55,0,0.06)">
+          <svg class="w-6 h-6" style="color:rgba(164,55,0,0.3)" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+            <polyline points="14 2 14 8 20 8"/>
+          </svg>
+        </div>
+        <p class="text-sm font-semibold text-[#1e1b17]">Sin documentos todavía</p>
+        <p class="text-xs" style="color:#594139">Sube tu primera declaración o documento fiscal</p>
+      </div>
+
+      <div id="docs-items" class="hidden space-y-2"></div>
+
+    </div>
+    <!-- END DOCUMENTOS FISCALES -->
+
     <!-- ── BOTTOM: Optimización Fiscal ───────────────────────────── -->
     <div class="bento-card bg-[#fff8f1] rounded-2xl p-6" style="border:1px solid rgba(164,55,0,0.08)">
       <div class="grid grid-cols-12 gap-6">
@@ -629,6 +765,230 @@
 
 </div>
 <!-- END MAIN -->
+
+<!-- ── DOCUMENTOS SCRIPT ────────────────────────────────────── -->
+<script>
+  const _SUPA_URL = 'https://rhyobhcgvrqobouqymqr.supabase.co';
+  const _SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJoeW9iaGNndnJxb2JvdXF5bXFyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYzNjY0MDQsImV4cCI6MjA5MTk0MjQwNH0.Yc7wiTJ8_66uzqusGTU4dEele5B4C6ZCMlYNMf3w_3U';
+  const db = supabase.createClient(_SUPA_URL, _SUPA_KEY);
+  const BUCKET = 'klaro-documents';
+
+  let selectedFile = null;
+  let currentUserId = null;
+
+  const DOC_TYPES = {
+    lohnsteuerbescheinigung: { label: 'Lohnsteuerbescheinigung', icon: '📋', color: '#3B82F6' },
+    steuerbescheid:          { label: 'Steuerbescheid',          icon: '🏛️', color: '#8B5CF6' },
+    usterbescheid:           { label: 'UStVA / IVA',             icon: '💶', color: '#059669' },
+    rentenbescheid:          { label: 'Rentenbescheid',          icon: '🏦', color: '#D97706' },
+    kontoauszug:             { label: 'Kontoauszug',             icon: '🏦', color: '#0EA5E9' },
+    rechnung:                { label: 'Rechnung',                icon: '🧾', color: '#a43700' },
+    sonstiges:               { label: 'Otro documento',          icon: '📄', color: '#6B7280' },
+  };
+
+  // Init — get user and load docs
+  (async () => {
+    const { data: { session } } = await db.auth.getSession();
+    if (session) { currentUserId = session.user.id; loadDocuments(); }
+    else { document.getElementById('docs-loading').classList.add('hidden'); }
+  })();
+
+  // ── Drag & drop ──────────────────────────────────────────────
+  function handleDragOver(e) {
+    e.preventDefault();
+    document.getElementById('drop-zone').style.background = 'rgba(164,55,0,0.05)';
+    document.getElementById('drop-zone').style.borderColor = '#a43700';
+  }
+  function handleDragLeave() {
+    document.getElementById('drop-zone').style.background = '#f4ede5';
+    document.getElementById('drop-zone').style.borderColor = 'rgba(164,55,0,0.22)';
+  }
+  function handleDrop(e) {
+    e.preventDefault();
+    handleDragLeave();
+    const file = e.dataTransfer.files[0];
+    if (file) selectFile(file);
+  }
+  function handleFileSelect(e) {
+    const file = e.target.files[0];
+    if (file) selectFile(file);
+  }
+
+  function selectFile(file) {
+    if (file.size > 10 * 1024 * 1024) { showDocError('El archivo supera el límite de 10 MB.'); return; }
+    selectedFile = file;
+    document.getElementById('selected-filename').textContent = file.name;
+    document.getElementById('upload-form').classList.remove('hidden');
+    hideDocFeedback();
+  }
+  function cancelUpload() {
+    selectedFile = null;
+    document.getElementById('upload-form').classList.add('hidden');
+    document.getElementById('doc-file-input').value = '';
+  }
+
+  // ── Upload ───────────────────────────────────────────────────
+  async function confirmUpload() {
+    if (!selectedFile || !currentUserId) return;
+    const docType = document.getElementById('doc-type').value;
+    const docYear = parseInt(document.getElementById('doc-year').value);
+    const safeName = selectedFile.name.replace(/[^a-zA-Z0-9._-]/g, '_');
+    const storagePath = `${currentUserId}/${Date.now()}-${safeName}`;
+
+    // Show spinner
+    document.getElementById('upload-form').classList.add('hidden');
+    document.getElementById('drop-default').classList.add('hidden');
+    const upState = document.getElementById('drop-uploading');
+    upState.classList.remove('hidden');
+    upState.classList.add('flex');
+
+    const { error: storErr } = await db.storage.from(BUCKET).upload(storagePath, selectedFile, { upsert: false });
+    if (storErr) { resetDropZone(); showDocError('Error al subir: ' + storErr.message); return; }
+
+    const { error: dbErr } = await db.from('documents').insert({
+      user_id: currentUserId,
+      name: selectedFile.name,
+      type: docType,
+      storage_path: storagePath,
+      year: docYear,
+      size_bytes: selectedFile.size,
+    });
+    if (dbErr) {
+      await db.storage.from(BUCKET).remove([storagePath]);
+      resetDropZone();
+      showDocError('Error al guardar: ' + dbErr.message);
+      return;
+    }
+
+    resetDropZone();
+    selectedFile = null;
+    document.getElementById('doc-file-input').value = '';
+    showDocSuccess('Documento subido correctamente.');
+    loadDocuments();
+  }
+
+  function resetDropZone() {
+    document.getElementById('drop-default').classList.remove('hidden');
+    const upState = document.getElementById('drop-uploading');
+    upState.classList.add('hidden');
+    upState.classList.remove('flex');
+  }
+
+  // ── Load & render docs ────────────────────────────────────────
+  async function loadDocuments() {
+    document.getElementById('docs-loading').classList.remove('hidden');
+    document.getElementById('docs-empty').classList.add('hidden');
+    document.getElementById('docs-items').classList.add('hidden');
+
+    const { data, error } = await db.from('documents').select('*').order('created_at', { ascending: false });
+
+    document.getElementById('docs-loading').classList.add('hidden');
+    if (error || !data || data.length === 0) {
+      const el = document.getElementById('docs-empty');
+      el.classList.remove('hidden');
+      el.classList.add('flex');
+      return;
+    }
+    renderDocuments(data);
+  }
+
+  function formatBytes(b) {
+    if (b < 1024) return b + ' B';
+    if (b < 1024 * 1024) return Math.round(b / 1024) + ' KB';
+    return (b / (1024 * 1024)).toFixed(1) + ' MB';
+  }
+  function formatDate(ts) {
+    return new Date(ts).toLocaleDateString('es-DE', { day: '2-digit', month: 'short', year: 'numeric' });
+  }
+
+  function renderDocuments(docs) {
+    const container = document.getElementById('docs-items');
+    container.innerHTML = docs.map(doc => {
+      const info = DOC_TYPES[doc.type] || DOC_TYPES.sonstiges;
+      const safePath = doc.storage_path.replace(/'/g, "\\'");
+      const safeName = doc.name.replace(/'/g, "\\'");
+      return `
+        <div class="flex items-center gap-3 p-3.5 rounded-xl transition-all"
+          style="border:1px solid rgba(164,55,0,0.07);background:#fff8f1">
+          <div class="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 text-lg" style="background:#f4ede5">${info.icon}</div>
+          <div class="flex-1 min-w-0">
+            <p class="text-sm font-semibold text-[#1e1b17] truncate leading-tight">${doc.name}</p>
+            <div class="flex items-center gap-2 mt-1 flex-wrap">
+              <span class="text-[10px] font-bold px-1.5 py-0.5 rounded-md"
+                style="background:${info.color}18;color:${info.color}">${info.label}</span>
+              <span class="text-[10px] font-semibold px-1.5 py-0.5 rounded-md"
+                style="background:rgba(164,55,0,0.07);color:#594139">${doc.year}</span>
+              ${doc.size_bytes ? `<span class="text-[10px]" style="color:rgba(89,65,57,.5)">${formatBytes(doc.size_bytes)}</span>` : ''}
+              <span class="text-[10px]" style="color:rgba(89,65,57,.4)">${formatDate(doc.created_at)}</span>
+            </div>
+          </div>
+          <div class="flex items-center gap-1 flex-shrink-0">
+            <button onclick="downloadDocument('${safePath}','${safeName}')"
+              class="w-8 h-8 rounded-xl flex items-center justify-center transition-all hover:bg-[#a43700]/10"
+              title="Descargar">
+              <svg class="w-4 h-4" style="color:#a43700" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <polyline points="8 17 12 21 16 17"/>
+                <line x1="12" y1="12" x2="12" y2="21"/>
+                <path d="M20.88 18.09A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/>
+              </svg>
+            </button>
+            <button onclick="deleteDocument('${doc.id}','${safePath}')"
+              class="w-8 h-8 rounded-xl flex items-center justify-center transition-all hover:bg-red-50"
+              title="Eliminar">
+              <svg class="w-4 h-4" style="color:#DC2626" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <polyline points="3 6 5 6 21 6"/>
+                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
+              </svg>
+            </button>
+          </div>
+        </div>`;
+    }).join('');
+    container.classList.remove('hidden');
+  }
+
+  // ── Download ─────────────────────────────────────────────────
+  async function downloadDocument(path, name) {
+    const { data, error } = await db.storage.from(BUCKET).createSignedUrl(path, 60);
+    if (error) { showDocError('No se pudo generar el enlace de descarga.'); return; }
+    const a = document.createElement('a');
+    a.href = data.signedUrl;
+    a.download = name;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  }
+
+  // ── Delete ───────────────────────────────────────────────────
+  async function deleteDocument(id, path) {
+    if (!confirm('¿Eliminar este documento? Esta acción no se puede deshacer.')) return;
+    const { error: sErr } = await db.storage.from(BUCKET).remove([path]);
+    if (sErr) { showDocError('Error al eliminar el archivo.'); return; }
+    const { error: dErr } = await db.from('documents').delete().eq('id', id);
+    if (dErr) { showDocError('Error al eliminar los datos.'); return; }
+    showDocSuccess('Documento eliminado.');
+    loadDocuments();
+  }
+
+  // ── Feedback helpers ─────────────────────────────────────────
+  function hideDocFeedback() {
+    document.getElementById('doc-error').classList.add('hidden');
+    document.getElementById('doc-success').classList.add('hidden');
+    document.getElementById('doc-success').classList.remove('flex');
+  }
+  function showDocError(msg) {
+    const el = document.getElementById('doc-error');
+    el.textContent = msg;
+    el.classList.remove('hidden');
+    setTimeout(() => el.classList.add('hidden'), 6000);
+  }
+  function showDocSuccess(msg) {
+    document.getElementById('doc-success-text').textContent = msg;
+    const el = document.getElementById('doc-success');
+    el.classList.remove('hidden');
+    el.classList.add('flex');
+    setTimeout(() => { el.classList.add('hidden'); el.classList.remove('flex'); }, 3500);
+  }
+</script>
 
 <!-- ── FAB ── -->
 <a href="klaro-clara.html"
