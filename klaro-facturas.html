@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Nueva Factura — Klaro · Facturas</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=DM+Serif+Display&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            navy:   '#1e1b17',
+            orange: '#a43700',
+            amber:  '#FFB830',
+            cream:  '#fff8f1',
+            muted:  '#594139',
+            soft:   '#e0bfb4',
+          },
+          fontFamily: {
+            sans:  ['Plus Jakarta Sans', 'sans-serif'],
+          },
+          aspectRatio: {
+            'a4': '210 / 297',
+          },
+        },
+      },
+    };
+  </script>
+  <style>
+    * { font-family: 'Plus Jakarta Sans', sans-serif; }
+    .font-serif { font-family: 'DM Serif Display', serif !important; }
+
+    /* Scrollbar */
+    .thin-scroll::-webkit-scrollbar { width: 4px; }
+    .thin-scroll::-webkit-scrollbar-track { background: transparent; }
+    .thin-scroll::-webkit-scrollbar-thumb { background: #e0bfb4; border-radius: 10px; }
+
+    /* Active nav */
+    .nav-active { background: #a43700 !important; color: #fff !important; }
+    .nav-active svg { color: #fff !important; }
+
+    /* IVA toggle */
+    .iva-btn { transition: all .15s ease; }
+    .iva-btn.active { background: #a43700; color: #fff; border-color: #a43700; }
+    .iva-btn:not(.active):hover { background: rgba(164,55,0,.08); border-color: rgba(164,55,0,.3); color: #a43700; }
+
+    /* Payment toggle */
+    .pay-btn { transition: all .15s ease; }
+    .pay-btn.active { background: #a43700; color: #fff; border-color: #a43700; }
+    .pay-btn:not(.active):hover { background: rgba(164,55,0,.05); }
+
+    /* Input focus */
+    .klaro-input:focus { outline: none; border-color: #a43700; box-shadow: 0 0 0 3px rgba(164,55,0,.12); }
+    .klaro-input { transition: border-color .15s, box-shadow .15s; }
+
+    /* FAB glow */
+    @keyframes pulse-glow {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(164,55,0,.4), 0 8px 24px rgba(164,55,0,.35); }
+      50%       { box-shadow: 0 0 0 8px rgba(164,55,0,0), 0 8px 24px rgba(164,55,0,.5); }
+    }
+    .fab-glow { animation: pulse-glow 2.4s ease-in-out infinite; }
+
+    /* Preview table */
+    .preview-table th { font-weight: 600; font-size: 10px; text-transform: uppercase; letter-spacing: .05em; color: #594139; border-bottom: 1.5px solid rgba(164,55,0,0.1); padding: 6px 0; }
+    .preview-table td { font-size: 12px; padding: 7px 0; border-bottom: 1px solid rgba(164,55,0,0.06); color: #1e1b17; }
+    .preview-table tr:last-child td { border-bottom: none; }
+
+    /* Bento card hover */
+    .bento-card { transition: box-shadow .15s, transform .15s; }
+    .bento-card:hover { box-shadow: 0 4px 20px rgba(0,0,0,.09); transform: translateY(-1px); }
+
+    /* Fade-in */
+    @keyframes fade-in { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+    .fade-in { animation: fade-in .3s ease-out both; }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="/auth.js"></script>
+</head>
+<body class="bg-cream text-navy overflow-hidden h-screen flex">
+
+<!-- ─── SIDEBAR ──────────────────────────────────────────────────── -->
+<aside class="hidden md:flex flex-col w-64 h-screen flex-shrink-0 bg-[#fff8f1] z-40" style="border-right:1px solid rgba(164,55,0,0.08)">
+
+  <!-- Logo -->
+  <div class="flex items-center gap-3 px-6 py-6">
+    <div class="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style="background:#a43700">
+      <span style="font-size:18px;font-weight:900;color:white;font-family:'Plus Jakarta Sans',sans-serif;letter-spacing:-0.03em;">K</span>
+    </div>
+    <div>
+      <h1 class="text-xl font-black text-[#1e1b17] leading-none">Klaro</h1>
+    </div>
+  </div>
+
+  <!-- User chip -->
+  <div class="mx-4 mb-5 px-3.5 py-3 rounded-2xl flex items-center gap-3"
+       style="background:rgba(164,55,0,0.06);border:1px solid rgba(164,55,0,0.08)">
+    <div class="w-9 h-9 rounded-full flex-shrink-0 flex items-center justify-center font-bold text-xs text-white"
+         style="background:linear-gradient(135deg,#a43700,#FFB830)">AG</div>
+    <div class="min-w-0">
+      <p class="text-[#1e1b17] text-sm font-semibold truncate leading-tight">Ana García</p>
+      <p class="text-xs truncate leading-tight" style="color:#594139">Freiberuflerin · Berlín</p>
+    </div>
+  </div>
+
+  <!-- Nav -->
+  <nav class="flex-1 overflow-y-auto px-3 space-y-0.5 thin-scroll">
+
+    <a href="klaro-dashboard.html" class="flex items-center gap-3 px-4 py-3 rounded-xl text-[#594139] font-medium hover:bg-[#a43700]/5 transition-all text-sm">
+      <svg class="w-[18px] h-[18px] flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+      Dashboard
+    </a>
+
+    <!-- Facturas ACTIVE -->
+    <a href="klaro-facturas.html" class="nav-active flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm transition-all">
+      <svg class="w-[18px] h-[18px] flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+      Facturas
+    </a>
+
+    <a href="klaro-gastos.html" class="flex items-center gap-3 px-4 py-3 rounded-xl text-[#594139] font-medium hover:bg-[#a43700]/5 transition-all text-sm">
+      <svg class="w-[18px] h-[18px] flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+      Gastos
+    </a>
+
+    <a href="klaro-impuestos.html" class="flex items-center gap-3 px-4 py-3 rounded-xl text-[#594139] font-medium hover:bg-[#a43700]/5 transition-all text-sm">
+      <svg class="w-[18px] h-[18px] flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+      Impuestos
+    </a>
+
+    <a href="klaro-clara.html" class="flex items-center gap-3 px-4 py-3 rounded-xl text-[#594139] font-medium hover:bg-[#a43700]/5 transition-all text-sm">
+      <svg class="w-[18px] h-[18px] flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      Clara
+    </a>
+
+  </nav>
+
+  <!-- Bottom -->
+  <div class="px-3 pb-5 pt-3 space-y-0.5" style="border-top:1px solid rgba(164,55,0,0.08)">
+    <a href="#" class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-[#594139] font-medium hover:bg-[#a43700]/5 transition-all text-sm">
+      <svg class="w-[17px] h-[17px] flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      Perfil
+    </a>
+    <a href="#" class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-[#594139] font-medium hover:bg-[#a43700]/5 transition-all text-sm">
+      <svg class="w-[17px] h-[17px] flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93A10 10 0 0 0 4.93 19.07M4.93 4.93A10 10 0 0 1 19.07 19.07"/></svg>
+      Configuración
+    </a>
+    <p class="text-center text-[9px] px-4 pt-2" style="color:rgba(89,65,57,.38)">Klaro Beta · v1.0 · 2026</p>
+  </div>
+</aside>
+
+<!-- ─── MAIN AREA ─────────────────────────────────────────────────── -->
+<div class="flex flex-col flex-1 min-w-0 h-screen overflow-hidden">
+
+  <!-- Top Bar -->
+  <header class="flex-shrink-0 h-16 bg-[#fff8f1] flex items-center justify-between px-6" style="border-bottom:1px solid rgba(164,55,0,0.08)">
+    <div class="flex items-center gap-3">
+      <!-- Breadcrumb -->
+      <a href="#" class="text-muted text-sm hover:text-navy transition-colors">Facturas</a>
+      <svg class="w-4 h-4 text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+      <h1 class="text-sm font-semibold text-navy">Nueva Factura</h1>
+    </div>
+    <div class="flex items-center gap-2.5">
+      <!-- Bell -->
+      <button class="relative w-9 h-9 rounded-xl flex items-center justify-center text-muted hover:bg-cream transition-colors">
+        <svg class="w-[17px] h-[17px]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+        <span class="absolute top-1.5 right-1.5 w-1.5 h-1.5 rounded-full bg-orange"></span>
+      </button>
+      <!-- Guardar borrador -->
+      <button onclick="saveDraft()" class="hidden sm:flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-medium text-[#594139] transition-all hover:bg-[#a43700]/5" style="border:1.5px solid rgba(164,55,0,0.2)">
+        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+        Guardar borrador
+      </button>
+      <!-- Enviar Factura -->
+      <button onclick="sendInvoice()" class="flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-semibold text-white transition-all hover:opacity-90 active:scale-95" style="background:#a43700">
+        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+        Enviar Factura
+      </button>
+      <!-- Avatar -->
+      <div class="w-8 h-8 rounded-full flex items-center justify-center text-white font-semibold text-xs cursor-pointer"
+           style="background:linear-gradient(135deg,#a43700,#FFB830)">AG</div>
+    </div>
+  </header>
+
+  <!-- Content -->
+  <div class="flex-1 overflow-y-auto thin-scroll">
+    <div class="p-6 flex gap-6 min-h-full" style="align-items:flex-start">
+
+      <!-- ── LEFT: FORM ──────────────────────────────────────────────── -->
+      <div class="flex flex-col gap-5 w-full max-w-md xl:max-w-lg flex-shrink-0">
+
+        <!-- Section title -->
+        <div class="fade-in">
+          <h2 class="font-serif text-2xl text-navy leading-tight">Nueva Factura</h2>
+          <p class="text-sm text-muted mt-0.5">Rellena los datos y genera tu Rechnung al instante.</p>
+        </div>
+
+        <!-- ── Card 1: Basic info ── -->
+        <div class="bg-[#fff8f1] rounded-2xl p-5 fade-in" style="border:1px solid rgba(164,55,0,0.08);box-shadow:0 0 0 3px rgba(164,55,0,.04);animation-delay:.05s">
+          <h3 class="text-xs font-semibold uppercase tracking-widest text-muted mb-4">Datos principales</h3>
+
+          <div class="space-y-4">
+            <!-- Invoice number + Date row -->
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="block text-xs font-medium text-navy mb-1.5">Nº Factura</label>
+                <input
+                  id="inv-number"
+                  type="text"
+                  value="REC-2026-001"
+                  class="klaro-input w-full px-3.5 py-2.5 rounded-xl text-sm text-navy font-medium"
+                  style="background:#fff8f1;border:1.5px solid rgba(164,55,0,0.12)"
+                  oninput="updatePreview()"
+                />
+              </div>
+              <div>
+                <label class="block text-xs font-medium text-navy mb-1.5">Fecha</label>
+                <input
+                  id="inv-date"
+                  type="date"
+                  value="2026-04-16"
+                  class="klaro-input w-full px-3.5 py-2.5 rounded-xl text-sm text-navy"
+                  style="background:#fff8f1;border:1.5px solid rgba(164,55,0,0.12)"
+                  oninput="updatePreview()"
+                />
+              </div>
+            </div>
+
+            <!-- Client name -->
+            <div>
+              <label class="block text-xs font-medium text-navy mb-1.5">Cliente</label>
+              <input
+                id="inv-client"
+                type="text"
+                placeholder="ej. Acme GmbH, Berlín"
+                class="klaro-input w-full px-3.5 py-2.5 rounded-xl text-sm text-navy"
+                style="background:#fff8f1;border:1.5px solid rgba(164,55,0,0.12)"
+                oninput="updatePreview()"
+              />
+            </div>
+
+            <!-- Amount + Currency row -->
+            <div>
+              <label class="block text-xs font-medium text-navy mb-1.5">Importe neto (€)</label>
+              <div class="relative">
+                <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-sm font-semibold text-muted">€</span>
+                <input
+                  id="inv-amount"
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  placeholder="0,00"
+                  class="klaro-input w-full pl-8 pr-3.5 py-2.5 rounded-xl text-sm text-navy font-semibold"
+                  style="background:#fff8f1;border:1.5px solid rgba(164,55,0,0.12)"
+                  oninput="updatePreview()"
+                />
+              </div>
+            </div>
+
+            <!-- Description -->
+            <div>
+              <label class="block text-xs font-medium text-navy mb-1.5">Descripción del servicio</label>
+              <textarea
+                id="inv-desc"
+                rows="2"
+                placeholder="ej. Diseño UX — sprint Q1 2026"
+                class="klaro-input w-full px-3.5 py-2.5 rounded-xl text-sm text-navy resize-none"
+                style="background:#fff8f1;border:1.5px solid rgba(164,55,0,0.12)"
+                oninput="updatePreview()"
+              ></textarea>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── Card 2: IVA ── -->
+        <div class="bg-[#fff8f1] rounded-2xl p-5 fade-in" style="border:1px solid rgba(164,55,0,0.08);box-shadow:0 0 0 3px rgba(164,55,0,.04);animation-delay:.1s">
+          <div class="flex items-center justify-between mb-3">
+            <h3 class="text-xs font-semibold uppercase tracking-widest text-muted">IVA / Umsatzsteuer</h3>
+            <span id="iva-label" class="text-xs font-bold px-2 py-0.5 rounded-lg" style="background:rgba(164,55,0,.1);color:#a43700">19 %</span>
+          </div>
+
+          <div class="grid grid-cols-4 gap-2">
+            <button class="iva-btn active rounded-xl py-2.5 text-sm font-semibold border" style="border-color:#a43700"
+                    data-rate="0.19" data-label="19 %" onclick="setIva(this)">
+              19 %
+              <span class="block text-[10px] font-normal mt-0.5 opacity-75">General</span>
+            </button>
+            <button class="iva-btn rounded-xl py-2.5 text-sm font-semibold border text-navy" style="border-color:rgba(164,55,0,0.12)"
+                    data-rate="0.07" data-label="7 %" onclick="setIva(this)">
+              7 %
+              <span class="block text-[10px] font-normal mt-0.5 opacity-75">Reducido</span>
+            </button>
+            <button class="iva-btn rounded-xl py-2.5 text-sm font-semibold border text-navy" style="border-color:rgba(164,55,0,0.12)"
+                    data-rate="0" data-label="Exento" onclick="setIva(this)">
+              0 %
+              <span class="block text-[10px] font-normal mt-0.5 opacity-75">Exento</span>
+            </button>
+            <button class="iva-btn rounded-xl py-2.5 text-sm font-semibold border text-navy" style="border-color:rgba(164,55,0,0.12)"
+                    data-rate="rc" data-label="RC" onclick="setIva(this)">
+              RC
+              <span class="block text-[10px] font-normal mt-0.5 opacity-75">Reverse</span>
+            </button>
+          </div>
+
+          <p id="iva-hint" class="mt-3 text-xs text-muted leading-snug" style="background:#fff8f1;border-radius:10px;padding:8px 10px">
+            IVA general alemán (19 %). Se aplica cuando el cliente está en Alemania.
+          </p>
+        </div>
+
+        <!-- ── Bento grid: Payment + Due Date + Notes ── -->
+        <div class="grid grid-cols-2 gap-3 fade-in" style="animation-delay:.15s">
+
+          <!-- Payment method card -->
+          <div class="bg-[#fff8f1] rounded-2xl p-4 bento-card col-span-2" style="border:1px solid rgba(164,55,0,0.08);box-shadow:0 0 0 3px rgba(164,55,0,.04)">
+            <h3 class="text-xs font-semibold uppercase tracking-widest text-muted mb-3">Método de pago</h3>
+            <div class="flex gap-2">
+              <button class="pay-btn flex-1 flex flex-col items-center gap-1.5 py-2.5 rounded-xl border text-navy text-xs font-semibold active"
+                      style="border-color:rgba(164,55,0,0.12)" data-pay="SEPA" onclick="setPay(this)">
+                <!-- Bank icon -->
+                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><line x1="9" y1="22" x2="9" y2="12"/><line x1="15" y1="22" x2="15" y2="12"/></svg>
+                SEPA
+              </button>
+              <button class="pay-btn flex-1 flex flex-col items-center gap-1.5 py-2.5 rounded-xl border text-navy text-xs font-semibold"
+                      style="border-color:rgba(164,55,0,0.12)" data-pay="PayPal" onclick="setPay(this)">
+                <!-- Paypal-like icon -->
+                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M8 12h8M12 8v8"/></svg>
+                PayPal
+              </button>
+              <button class="pay-btn flex-1 flex flex-col items-center gap-1.5 py-2.5 rounded-xl border text-navy text-xs font-semibold"
+                      style="border-color:rgba(164,55,0,0.12)" data-pay="Efectivo" onclick="setPay(this)">
+                <!-- Cash icon -->
+                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="3"/><path d="M6 6v-.5a.5.5 0 0 0-.5-.5H4"/><path d="M18 18v.5a.5.5 0 0 0 .5.5H21"/></svg>
+                Efectivo
+              </button>
+            </div>
+          </div>
+
+          <!-- Due date card -->
+          <div class="bg-[#fff8f1] rounded-2xl p-4 bento-card" style="border:1px solid rgba(164,55,0,0.08);box-shadow:0 0 0 3px rgba(164,55,0,.04)">
+            <div class="flex items-center gap-1.5 mb-2">
+              <svg class="w-3.5 h-3.5 text-orange" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              <h3 class="text-xs font-semibold uppercase tracking-widest text-muted">Vencimiento</h3>
+            </div>
+            <input
+              id="inv-due"
+              type="date"
+              value="2026-05-16"
+              class="klaro-input w-full px-2.5 py-2 rounded-xl text-xs text-navy font-medium"
+              style="background:#fff8f1;border:1.5px solid rgba(164,55,0,0.12)"
+              oninput="updatePreview()"
+            />
+            <div class="mt-2 flex gap-1">
+              <button onclick="setDueOffset(14)" class="flex-1 text-[10px] font-medium px-1.5 py-1 rounded-lg text-muted hover:bg-orange/10 hover:text-orange transition-colors" style="background:#fff8f1">14d</button>
+              <button onclick="setDueOffset(30)" class="flex-1 text-[10px] font-medium px-1.5 py-1 rounded-lg text-muted hover:bg-orange/10 hover:text-orange transition-colors" style="background:#fff8f1">30d</button>
+              <button onclick="setDueOffset(45)" class="flex-1 text-[10px] font-medium px-1.5 py-1 rounded-lg text-muted hover:bg-orange/10 hover:text-orange transition-colors" style="background:#fff8f1">45d</button>
+            </div>
+          </div>
+
+          <!-- Attachments card -->
+          <div class="bg-[#fff8f1] rounded-2xl p-4 bento-card" style="border:1px solid rgba(164,55,0,0.08);box-shadow:0 0 0 3px rgba(164,55,0,.04)">
+            <div class="flex items-center gap-1.5 mb-2">
+              <svg class="w-3.5 h-3.5 text-orange" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
+              <h3 class="text-xs font-semibold uppercase tracking-widest text-muted">Adjuntos</h3>
+            </div>
+            <label class="flex flex-col items-center justify-center gap-1.5 w-full py-4 rounded-xl cursor-pointer transition-colors hover:bg-orange/5"
+                   style="background:rgba(164,55,0,0.04);border:1.5px dashed rgba(164,55,0,0.18)">
+              <svg class="w-5 h-5 text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+              <span class="text-[10px] font-medium text-muted">Subir archivo</span>
+              <input type="file" class="hidden" accept=".pdf,.jpg,.png" />
+            </label>
+          </div>
+
+          <!-- Notes card — full width -->
+          <div class="bg-[#fff8f1] rounded-2xl p-4 bento-card col-span-2" style="border:1px solid rgba(164,55,0,0.08);box-shadow:0 0 0 3px rgba(164,55,0,.04)">
+            <div class="flex items-center gap-1.5 mb-2">
+              <svg class="w-3.5 h-3.5 text-orange" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="14" y1="17" x2="8" y2="17"/></svg>
+              <h3 class="text-xs font-semibold uppercase tracking-widest text-muted">Notas (opcional)</h3>
+            </div>
+            <textarea
+              id="inv-notes"
+              rows="2"
+              placeholder="ej. Incluye revisiones ilimitadas durante 30 días…"
+              class="klaro-input w-full px-3 py-2.5 rounded-xl text-xs text-navy resize-none"
+              style="background:#fff8f1;border:1.5px solid rgba(164,55,0,0.12)"
+              oninput="updatePreview()"
+            ></textarea>
+          </div>
+        </div>
+
+      </div><!-- /left form -->
+
+      <!-- ── RIGHT: A4 PREVIEW ─────────────────────────────────────────── -->
+      <div class="hidden lg:flex flex-col flex-1 min-w-0 fade-in" style="animation-delay:.2s">
+        <div class="flex items-center justify-between mb-4">
+          <p class="text-xs font-semibold uppercase tracking-widest text-muted">Vista previa · Rechnung</p>
+          <button onclick="window.print()" class="flex items-center gap-1.5 text-xs font-medium text-muted hover:text-navy transition-colors">
+            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+            Imprimir / PDF
+          </button>
+        </div>
+
+        <!-- A4 card -->
+        <div id="a4-preview" class="bg-white rounded-2xl overflow-hidden"
+             style="box-shadow:0 20px 60px rgba(164,55,0,.1),0 4px 16px rgba(164,55,0,.06);border:1px solid rgba(164,55,0,0.12);max-width:640px">
+
+          <!-- Invoice header stripe -->
+          <div style="background:linear-gradient(135deg,#1e1b17,#33221a);padding:28px 32px 24px">
+            <div class="flex items-start justify-between">
+              <!-- Brand -->
+              <div class="flex items-center gap-2.5">
+                <div class="w-9 h-9 rounded-lg bg-orange flex items-center justify-center flex-shrink-0">
+                  <span class="text-white font-bold text-lg font-serif leading-none">K</span>
+                </div>
+                <div>
+                  <p class="text-white font-serif text-xl leading-tight">Klaro</p>
+                  <p style="color:rgba(255,255,255,.45);font-size:10px">Fiscal · Facturas</p>
+                </div>
+              </div>
+              <!-- Invoice badge -->
+              <div class="text-right">
+                <p class="text-white font-bold text-lg leading-tight" id="prev-number">REC-2026-001</p>
+                <p style="color:rgba(255,255,255,.5);font-size:11px" id="prev-date">16 de abril de 2026</p>
+                <span id="prev-status" class="inline-block mt-1.5 text-[10px] font-bold px-2 py-0.5 rounded-full" style="background:rgba(255,184,48,.2);color:#FFB830">BORRADOR</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Body -->
+          <div style="padding:28px 32px">
+
+            <!-- From / To row -->
+            <div class="grid grid-cols-2 gap-8 mb-7">
+              <div>
+                <p class="text-[10px] font-bold uppercase tracking-widest mb-2" style="color:#594139">DE</p>
+                <p class="font-semibold text-navy text-sm">Ana García</p>
+                <p class="text-xs text-muted leading-relaxed mt-0.5">Freiberuflerin<br/>Musterstraße 12, 10115 Berlín<br/>Steuernummer: 12/345/67890<br/>ana@anagarcia.design</p>
+              </div>
+              <div>
+                <p class="text-[10px] font-bold uppercase tracking-widest mb-2" style="color:#594139">PARA</p>
+                <p class="font-semibold text-navy text-sm" id="prev-client">— Cliente —</p>
+                <p class="text-xs text-muted mt-0.5">Cliente · Alemania</p>
+              </div>
+            </div>
+
+            <!-- Line items table -->
+            <table class="preview-table w-full mb-5">
+              <thead>
+                <tr>
+                  <th class="text-left" style="width:45%">Descripción</th>
+                  <th class="text-right">Precio neto</th>
+                  <th class="text-right">IVA</th>
+                  <th class="text-right">Total</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td id="prev-desc" class="text-navy" style="font-size:12px">—</td>
+                  <td class="text-right" id="prev-net">€ 0,00</td>
+                  <td class="text-right" id="prev-iva-cell">€ 0,00</td>
+                  <td class="text-right font-semibold" id="prev-total-line">€ 0,00</td>
+                </tr>
+              </tbody>
+            </table>
+
+            <!-- Totals box -->
+            <div class="ml-auto" style="max-width:220px">
+              <div class="flex justify-between py-1.5 text-xs" style="border-bottom:1px solid #F0F0EE">
+                <span class="text-muted">Subtotal</span>
+                <span id="prev-subtotal" class="font-medium text-navy">€ 0,00</span>
+              </div>
+              <div class="flex justify-between py-1.5 text-xs" style="border-bottom:1px solid #F0F0EE">
+                <span id="prev-iva-label-tot" class="text-muted">IVA (19 %)</span>
+                <span id="prev-iva-amount" class="font-medium text-navy">€ 0,00</span>
+              </div>
+              <div class="flex justify-between py-2.5">
+                <span class="font-bold text-navy text-sm">Total</span>
+                <span id="prev-total" class="font-bold text-orange text-base">€ 0,00</span>
+              </div>
+            </div>
+
+            <!-- Divider -->
+            <div style="border-top:1.5px solid #E8E8E4;margin:20px 0 16px"></div>
+
+            <!-- Payment + Notes info -->
+            <div class="grid grid-cols-2 gap-6">
+              <div>
+                <p class="text-[10px] font-bold uppercase tracking-widest mb-1.5" style="color:#594139">Datos de pago</p>
+                <p class="text-xs text-navy font-medium" id="prev-pay-method">SEPA / Transferencia</p>
+                <p class="text-xs text-muted mt-1">IBAN: DE89 3704 0044 0532 0130 00<br/>BIC: COBADEFFXXX</p>
+              </div>
+              <div>
+                <p class="text-[10px] font-bold uppercase tracking-widest mb-1.5" style="color:#594139">Vencimiento</p>
+                <p class="text-xs text-navy font-medium" id="prev-due">16 de mayo de 2026</p>
+                <p class="text-xs text-muted mt-1" id="prev-notes-label"></p>
+              </div>
+            </div>
+
+            <!-- IVA notice -->
+            <div id="prev-rc-notice" class="hidden mt-4 text-[10px] text-muted p-3 rounded-xl leading-relaxed" style="background:#fff8f1;border:1px solid rgba(164,55,0,0.08)">
+              Steuerfreie innergemeinschaftliche Lieferung gemäß § 4 Nr. 1b UStG i. V. m. § 6a UStG.<br/>
+              <em>Steuerschuldnerschaft des Leistungsempfängers (Reverse Charge).</em>
+            </div>
+          </div>
+
+          <!-- Footer -->
+          <div style="background:#fff8f1;border-top:1px solid rgba(0,0,0,.06);padding:14px 32px;display:flex;align-items:center;justify-content:space-between">
+            <p class="text-[10px] text-muted">Klaro · Fiskalassistenz für Freelancer in Deutschland</p>
+            <p class="text-[10px] font-medium" style="color:#594139">Seite 1 / 1</p>
+          </div>
+        </div><!-- /a4 -->
+      </div><!-- /right -->
+
+    </div><!-- /flex row -->
+  </div><!-- /content scroll -->
+</div><!-- /main area -->
+
+<!-- ─── CLARA FAB ────────────────────────────────────────────────── -->
+<a href="klaro-clara.html"
+   title="Abrir Clara"
+   class="fab-glow fixed bottom-6 right-6 w-14 h-14 rounded-full flex items-center justify-center z-50 transition-transform hover:scale-110 active:scale-95"
+   style="background:linear-gradient(135deg,#a43700,#d4551f)">
+  <svg class="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+  </svg>
+</a>
+
+<!-- ─── SCRIPT ────────────────────────────────────────────────────── -->
+<script>
+  /* ─ State ─ */
+  let ivaRate = 0.19;
+  let ivaLabelStr = '19 %';
+  let payMethod = 'SEPA';
+
+  const IVA_HINTS = {
+    '0.19': 'IVA general alemán (19 %). Se aplica cuando el cliente está en Alemania.',
+    '0.07': 'IVA reducido (7 %). Aplica a libros, alimentación, ciertas actividades culturales.',
+    '0':    'Operación exenta de IVA. Consulta con tu Steuerberater si corresponde.',
+    'rc':   'Reverse Charge (§ 13b UStG). El cliente autoliquida el IVA. Común en servicios B2B intracomunitarios.',
+  };
+
+  /* ─ IVA toggle ─ */
+  function setIva(btn) {
+    document.querySelectorAll('.iva-btn').forEach(b => {
+      b.classList.remove('active');
+      b.style.borderColor = 'rgba(164,55,0,0.12)';
+    });
+    btn.classList.add('active');
+    btn.style.borderColor = '#a43700';
+
+    const rate = btn.dataset.rate;
+    ivaLabelStr = btn.dataset.label;
+    ivaRate = rate === 'rc' ? 'rc' : parseFloat(rate);
+
+    document.getElementById('iva-label').textContent = ivaLabelStr;
+    document.getElementById('iva-hint').textContent = IVA_HINTS[rate] || '';
+
+    updatePreview();
+  }
+
+  /* ─ Payment toggle ─ */
+  function setPay(btn) {
+    document.querySelectorAll('.pay-btn').forEach(b => {
+      b.classList.remove('active');
+      b.style.borderColor = 'rgba(164,55,0,0.12)';
+    });
+    btn.classList.add('active');
+    btn.style.borderColor = '#a43700';
+    payMethod = btn.dataset.pay;
+    updatePreview();
+  }
+
+  /* ─ Due offset ─ */
+  function setDueOffset(days) {
+    const base = new Date(document.getElementById('inv-date').value || Date.now());
+    base.setDate(base.getDate() + days);
+    document.getElementById('inv-due').value = base.toISOString().slice(0, 10);
+    updatePreview();
+  }
+
+  /* ─ Formatting ─ */
+  function fmtEur(n) {
+    return '€ ' + n.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  }
+
+  function fmtDate(str) {
+    if (!str) return '—';
+    const [y, m, d] = str.split('-').map(Number);
+    const months = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+    return `${d} de ${months[m-1]} de ${y}`;
+  }
+
+  /* ─ Live preview update ─ */
+  function updatePreview() {
+    const number  = document.getElementById('inv-number').value.trim() || 'REC-2026-001';
+    const date    = document.getElementById('inv-date').value;
+    const client  = document.getElementById('inv-client').value.trim();
+    const amtRaw  = parseFloat(document.getElementById('inv-amount').value) || 0;
+    const desc    = document.getElementById('inv-desc').value.trim();
+    const due     = document.getElementById('inv-due').value;
+    const notes   = document.getElementById('inv-notes').value.trim();
+
+    // Invoice number / date
+    document.getElementById('prev-number').textContent = number;
+    document.getElementById('prev-date').textContent   = fmtDate(date);
+
+    // Client
+    document.getElementById('prev-client').textContent = client || '— Cliente —';
+
+    // Description
+    document.getElementById('prev-desc').textContent = desc || '—';
+
+    // Amounts
+    const net  = amtRaw;
+    let ivaAmt = 0;
+    let rcText = '';
+
+    if (ivaRate === 'rc') {
+      ivaAmt = 0;
+      rcText = 'Reverse Charge';
+    } else {
+      ivaAmt = net * ivaRate;
+    }
+    const total = net + ivaAmt;
+
+    document.getElementById('prev-net').textContent        = fmtEur(net);
+    document.getElementById('prev-subtotal').textContent   = fmtEur(net);
+    document.getElementById('prev-iva-cell').textContent   = ivaRate === 'rc' ? 'RC' : fmtEur(ivaAmt);
+    document.getElementById('prev-iva-amount').textContent = ivaRate === 'rc' ? '—' : fmtEur(ivaAmt);
+    document.getElementById('prev-total-line').textContent = fmtEur(total);
+    document.getElementById('prev-total').textContent      = fmtEur(total);
+
+    // IVA label in totals
+    const ivaLblTot = ivaRate === 'rc' ? 'IVA (Reverse Charge)' :
+                      ivaRate === 0    ? 'IVA (Exento)'         :
+                      `IVA (${Math.round(ivaRate * 100)} %)`;
+    document.getElementById('prev-iva-label-tot').textContent = ivaLblTot;
+
+    // RC notice
+    document.getElementById('prev-rc-notice').classList.toggle('hidden', ivaRate !== 'rc');
+
+    // Payment / due
+    const payLabels = { SEPA: 'SEPA / Transferencia', PayPal: 'PayPal', Efectivo: 'Efectivo' };
+    document.getElementById('prev-pay-method').textContent = payLabels[payMethod] || payMethod;
+    document.getElementById('prev-due').textContent = fmtDate(due);
+
+    // Notes
+    const notesEl = document.getElementById('prev-notes-label');
+    if (notes) {
+      notesEl.textContent = notes;
+      notesEl.style.display = '';
+    } else {
+      notesEl.textContent = '';
+      notesEl.style.display = 'none';
+    }
+  }
+
+  /* ─ Actions ─ */
+  function saveDraft() {
+    const btn = document.querySelector('button[onclick="saveDraft()"]');
+    const orig = btn.innerHTML;
+    btn.innerHTML = `<svg class="w-4 h-4 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Guardado`;
+    btn.style.borderColor = '#059669';
+    btn.style.color = '#059669';
+    setTimeout(() => { btn.innerHTML = orig; btn.style.borderColor = ''; btn.style.color = ''; }, 2000);
+  }
+
+  function sendInvoice() {
+    const client = document.getElementById('inv-client').value.trim();
+    const amount = document.getElementById('inv-amount').value;
+    if (!client || !amount) {
+      alert('Por favor, completa el nombre del cliente y el importe antes de enviar.');
+      return;
+    }
+    document.getElementById('prev-status').textContent = 'ENVIADA';
+    document.getElementById('prev-status').style.background = 'rgba(5,150,105,.15)';
+    document.getElementById('prev-status').style.color = '#059669';
+
+    const btn = document.querySelector('button[onclick="sendInvoice()"]');
+    btn.innerHTML = `<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Enviada`;
+    btn.style.background = '#059669';
+    setTimeout(() => {
+      btn.innerHTML = `<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg> Enviar Factura`;
+      btn.style.background = '#a43700';
+    }, 3000);
+  }
+
+  /* ─ Init ─ */
+  updatePreview();
+</script>
+
+</body>
+</html>

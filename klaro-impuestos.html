@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Impuestos · Declaraciones — Klaro</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            orange: '#a43700',
+            cream:  '#fff8f1',
+            muted:  '#594139',
+            soft:   '#e0bfb4',
+          },
+          fontFamily: { sans: ['Plus Jakarta Sans', 'sans-serif'] },
+        },
+      },
+    };
+  </script>
+  <style>
+    * { font-family: 'Plus Jakarta Sans', sans-serif; }
+
+    .thin-scroll::-webkit-scrollbar { width: 4px; }
+    .thin-scroll::-webkit-scrollbar-track { background: transparent; }
+    .thin-scroll::-webkit-scrollbar-thumb { background: #e0bfb4; border-radius: 10px; }
+
+    /* Bento card hover */
+    .bento-card { transition: box-shadow .18s, transform .18s; }
+    .bento-card:hover { box-shadow: 0 6px 28px rgba(164,55,0,.1); transform: translateY(-1px); }
+
+    /* Timeline line */
+    .tl-line { position: absolute; left: 13px; top: 24px; bottom: 0; width: 2px; background: rgba(164,55,0,0.1); }
+
+    /* Progress bar shimmer */
+    @keyframes shimmer {
+      0%   { background-position: -200% 0; }
+      100% { background-position:  200% 0; }
+    }
+    .progress-bar {
+      background: linear-gradient(90deg, #a43700 0%, #c94c13 40%, #a43700 100%);
+      background-size: 200% 100%;
+      animation: shimmer 2.5s ease-in-out infinite;
+    }
+
+    /* FAB pulse */
+    @keyframes fab-pulse {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(164,55,0,.45), 0 8px 24px rgba(164,55,0,.35); }
+      50%       { box-shadow: 0 0 0 10px rgba(164,55,0,0), 0 8px 24px rgba(164,55,0,.5); }
+    }
+    .fab { animation: fab-pulse 2.6s ease-in-out infinite; }
+
+    /* Fade-in */
+    @keyframes fade-in { from { opacity: 0; transform: translateY(7px); } to { opacity: 1; transform: translateY(0); } }
+    .fade-in { animation: fade-in .32s ease-out both; }
+
+    /* Status badges */
+    .badge-red    { background: #FEF2F2; color: #DC2626; border: 1px solid rgba(220,38,38,.18); }
+    .badge-amber  { background: #FFFBEB; color: #D97706; border: 1px solid rgba(217,119,6,.2);  }
+    .badge-green  { background: #F0FDF4; color: #059669; border: 1px solid rgba(5,150,105,.18); }
+    .badge-gray   { background: #F3F4F6; color: #6B7280; border: 1px solid rgba(107,114,128,.18); }
+
+    /* Gradient big card text */
+    .big-card-amount { font-size: 2.4rem; font-weight: 800; letter-spacing: -.04em; line-height: 1; }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="/auth.js"></script>
+</head>
+<body class="bg-[#f4ede5] text-[#1e1b17] h-screen flex overflow-hidden">
+
+<!-- ─── SIDEBAR ────────────────────────────────────────────────── -->
+<aside class="hidden md:flex flex-col w-64 h-screen flex-shrink-0 bg-[#fff8f1] z-40" style="border-right:1px solid rgba(164,55,0,0.08)">
+
+  <!-- Logo -->
+  <div class="flex items-center gap-3 px-6 py-6">
+    <div class="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style="background:#a43700">
+      <span style="font-size:18px;font-weight:900;color:white;font-family:'Plus Jakarta Sans',sans-serif;letter-spacing:-0.03em;">K</span>
+    </div>
+    <div>
+      <h1 class="text-xl font-black text-[#1e1b17] leading-none">Klaro</h1>
+    </div>
+  </div>
+
+  <!-- Nav -->
+  <nav class="flex-1 overflow-y-auto px-3 space-y-0.5">
+    <!-- Dashboard -->
+    <a href="klaro-dashboard.html" class="flex items-center gap-3 px-4 py-3 rounded-xl text-[#594139] font-medium hover:bg-[#a43700]/5 transition-all text-sm">
+      <svg class="w-[18px] h-[18px] flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/>
+        <rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>
+      </svg>
+      Dashboard
+    </a>
+    <!-- Facturas -->
+    <a href="klaro-facturas.html" class="flex items-center gap-3 px-4 py-3 rounded-xl text-[#594139] font-medium hover:bg-[#a43700]/5 transition-all text-sm">
+      <svg class="w-[18px] h-[18px] flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+        <polyline points="14 2 14 8 20 8"/>
+        <line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>
+      </svg>
+      Facturas
+    </a>
+    <!-- Gastos -->
+    <a href="klaro-gastos.html" class="flex items-center gap-3 px-4 py-3 rounded-xl text-[#594139] font-medium hover:bg-[#a43700]/5 transition-all text-sm">
+      <svg class="w-[18px] h-[18px] flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <rect x="1" y="4" width="22" height="16" rx="2" ry="2"/>
+        <line x1="1" y1="10" x2="23" y2="10"/>
+      </svg>
+      Gastos
+    </a>
+    <!-- Impuestos — ACTIVE -->
+    <a href="klaro-impuestos.html" class="flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm transition-all" style="background:#a43700;color:#fff">
+      <svg class="w-[18px] h-[18px] flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="10"/>
+        <path d="M12 8v4l3 3"/>
+      </svg>
+      Impuestos
+    </a>
+    <!-- Clara -->
+    <a href="klaro-clara.html" class="flex items-center gap-3 px-4 py-3 rounded-xl text-[#594139] font-medium hover:bg-[#a43700]/5 transition-all text-sm">
+      <svg class="w-[18px] h-[18px] flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+      </svg>
+      Clara
+    </a>
+  </nav>
+
+  <!-- Bottom -->
+  <div class="px-3 pb-6 pt-4 space-y-1" style="border-top:1px solid rgba(164,55,0,0.08)">
+    <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-xl text-[#594139] font-medium hover:bg-[#a43700]/5 transition-all text-sm">
+      <svg class="w-[18px] h-[18px] flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="7" r="4"/>
+        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+      </svg>
+      Perfil
+    </a>
+    <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-xl text-[#594139] font-medium hover:bg-[#a43700]/5 transition-all text-sm">
+      <svg class="w-[18px] h-[18px] flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="10"/>
+        <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+      </svg>
+      Ayuda
+    </a>
+    <p class="text-center text-[9px] px-4 pt-1" style="color:rgba(89,65,57,.4)">Klaro Beta · v1.0 · 2026</p>
+  </div>
+</aside>
+
+<!-- ─── MAIN ─────────────────────────────────────────────────────── -->
+<div class="flex flex-col flex-1 min-w-0 h-screen overflow-hidden">
+
+  <!-- Top Bar -->
+  <header class="flex-shrink-0 h-16 bg-[#fff8f1] flex items-center justify-between px-6" style="border-bottom:1px solid rgba(164,55,0,0.08)">
+    <div>
+      <h2 class="text-base font-bold text-[#1e1b17] leading-tight">Impuestos · Declaraciones</h2>
+      <p class="text-xs" style="color:#594139/70">Finanzamt &amp; ELSTER</p>
+    </div>
+    <div class="flex items-center gap-3">
+      <!-- Bell -->
+      <button class="relative w-9 h-9 rounded-xl flex items-center justify-center transition-colors hover:bg-[#a43700]/5" style="color:#594139">
+        <svg class="w-[17px] h-[17px]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+          <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+        </svg>
+        <span class="absolute top-1.5 right-1.5 w-1.5 h-1.5 rounded-full" style="background:#DC2626"></span>
+      </button>
+      <!-- Avatar -->
+      <div class="w-8 h-8 rounded-full flex items-center justify-center text-white font-bold text-xs" style="background:linear-gradient(135deg,#a43700,#c94c13)">AG</div>
+    </div>
+  </header>
+
+  <!-- Scrollable content area -->
+  <div class="flex-1 overflow-y-auto thin-scroll p-5 space-y-5 fade-in">
+
+    <!-- ── BENTO SUMMARY GRID ─────────────────────────────────────── -->
+    <div class="grid grid-cols-12 gap-4">
+
+      <!-- Big card: IVA a pagar Q2 — col-span-5 -->
+      <div class="col-span-12 lg:col-span-5 bento-card rounded-2xl p-6 relative overflow-hidden" style="background:linear-gradient(135deg,#a43700 0%,#c94c13 100%);min-height:160px">
+        <!-- subtle radial glow -->
+        <div class="absolute -right-8 -top-8 w-40 h-40 rounded-full opacity-10" style="background:rgba(255,255,255,.1)"></div>
+        <div class="relative z-10 flex flex-col h-full justify-between">
+          <div class="flex items-start justify-between">
+            <div>
+              <p class="text-xs font-semibold uppercase tracking-widest mb-1" style="color:rgba(255,255,255,.7)">IVA a Pagar · Q2 2026</p>
+              <p class="big-card-amount text-white">€1.254,50</p>
+            </div>
+            <!-- Cálculo Verificado badge -->
+            <span class="flex items-center gap-1 text-[10px] font-bold px-2.5 py-1 rounded-full flex-shrink-0" style="background:rgba(255,255,255,.18);color:#fff;border:1px solid rgba(255,255,255,.25)">
+              <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              Cálculo Verificado
+            </span>
+          </div>
+          <div>
+            <p class="text-xs mt-3" style="color:rgba(255,255,255,.75)">Umsatzsteuervoranmeldung — Abr–Jun 2026</p>
+            <div class="flex items-center gap-2 mt-3">
+              <span class="text-xs font-semibold px-2.5 py-1 rounded-lg" style="background:rgba(255,255,255,.15);color:rgba(255,255,255,.9)">Vence 10 jul 2026</span>
+              <span class="text-xs font-semibold px-2.5 py-1 rounded-lg" style="background:rgba(255,255,255,.15);color:rgba(255,255,255,.9)">85 días</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Retenciones IRPF — col-span-3 -->
+      <div class="col-span-12 sm:col-span-6 lg:col-span-3 bento-card rounded-2xl p-5 bg-[#fff8f1]" style="border:1px solid rgba(164,55,0,0.08)">
+        <div class="flex items-center justify-between mb-3">
+          <p class="text-xs font-semibold text-[#594139] uppercase tracking-widest">Retenciones IRPF</p>
+          <svg class="w-4 h-4 text-[#594139]/40" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"/>
+            <line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+          </svg>
+        </div>
+        <p class="text-3xl font-extrabold text-[#1e1b17] leading-none tracking-tight">€0</p>
+        <p class="text-xs font-medium mt-1" style="color:#594139">Freiberuflerin · no aplica</p>
+        <div class="mt-3 p-2.5 rounded-xl text-[11px] leading-snug" style="background:rgba(164,55,0,0.05);color:#594139;border:1px solid rgba(164,55,0,0.07)">
+          Como Freiberuflerin no aplica retención en origen.
+        </div>
+      </div>
+
+      <!-- Próxima declaración — col-span-4 -->
+      <div class="col-span-12 sm:col-span-6 lg:col-span-4 bento-card rounded-2xl p-5 bg-[#fff8f1]" style="border:1px solid rgba(164,55,0,0.08)">
+        <p class="text-xs font-semibold text-[#594139] uppercase tracking-widest mb-3">Próxima Declaración</p>
+        <div class="flex items-end gap-2">
+          <p class="text-5xl font-extrabold leading-none tracking-tight" style="color:#a43700">85</p>
+          <p class="text-sm font-semibold text-[#594139] mb-1">días</p>
+        </div>
+        <p class="text-sm font-semibold text-[#1e1b17] mt-1">UStVA Q2 2026</p>
+        <p class="text-xs mt-0.5" style="color:#594139">Vence el <span class="font-bold">10 de julio 2026</span></p>
+        <div class="mt-3 flex items-center gap-1.5">
+          <span class="w-2 h-2 rounded-full flex-shrink-0" style="background:#D97706"></span>
+          <span class="text-xs font-medium badge-amber px-2 py-0.5 rounded-full">Pendiente · Abr–Jun</span>
+        </div>
+      </div>
+    </div>
+    <!-- END BENTO -->
+
+    <!-- ── TWO-COLUMN LAYOUT ──────────────────────────────────────── -->
+    <div class="grid grid-cols-12 gap-5">
+
+      <!-- LEFT COLUMN — col-span-7 -->
+      <div class="col-span-12 xl:col-span-7 space-y-4">
+
+        <!-- UStVA Q1 2026 — Vencido -->
+        <div class="bento-card bg-[#fff8f1] rounded-2xl p-5" style="border:1px solid rgba(220,38,38,.15)">
+          <div class="flex items-start justify-between mb-4">
+            <div>
+              <div class="flex items-center gap-2 mb-1">
+                <p class="text-sm font-bold text-[#1e1b17]">UStVA Q1 2026</p>
+                <span class="badge-red text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
+                  <svg class="w-2.5 h-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                  Vencido
+                </span>
+              </div>
+              <p class="text-xs" style="color:#594139">IVA Trimestral · Umsatzsteuervoranmeldung</p>
+            </div>
+            <div class="text-right flex-shrink-0">
+              <p class="text-xl font-extrabold text-[#1e1b17] leading-none">€1.254,50</p>
+              <p class="text-[10px] mt-0.5" style="color:#594139">IVA facturado</p>
+            </div>
+          </div>
+          <!-- Meta row -->
+          <div class="flex flex-wrap gap-3 mb-4">
+            <div class="flex items-center gap-1.5 text-xs" style="color:#594139">
+              <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              Periodo: <span class="font-semibold text-[#1e1b17]">Ene–Mar 2026</span>
+            </div>
+            <div class="flex items-center gap-1.5 text-xs" style="color:#DC2626">
+              <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+              Venció: <span class="font-semibold">10 abril 2026</span>
+            </div>
+          </div>
+          <!-- Alert bar -->
+          <div class="flex items-center gap-2 p-3 rounded-xl mb-4 text-xs font-medium" style="background:#FEF2F2;border:1px solid rgba(220,38,38,.15);color:#991B1B">
+            <svg class="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            Esta declaración está vencida. Preséntala cuanto antes para evitar recargos del Finanzamt.
+          </div>
+          <!-- CTA -->
+          <button class="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-bold text-white transition-all active:scale-95 hover:opacity-90" style="background:#DC2626">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            Presentar en ELSTER →
+          </button>
+        </div>
+
+        <!-- UStVA Q2 2026 — Pendiente -->
+        <div class="bento-card bg-[#fff8f1] rounded-2xl p-5" style="border:1px solid rgba(164,55,0,0.08)">
+          <div class="flex items-start justify-between mb-4">
+            <div>
+              <div class="flex items-center gap-2 mb-1">
+                <p class="text-sm font-bold text-[#1e1b17]">UStVA Q2 2026</p>
+                <span class="badge-amber text-[10px] font-bold px-2 py-0.5 rounded-full">Pendiente</span>
+              </div>
+              <p class="text-xs" style="color:#594139">IVA Trimestral · Umsatzsteuervoranmeldung</p>
+            </div>
+            <div class="text-right flex-shrink-0">
+              <p class="text-xl font-extrabold text-[#1e1b17] leading-none">€1.254,50</p>
+              <p class="text-[10px] mt-0.5" style="color:#594139">estimado</p>
+            </div>
+          </div>
+          <!-- Meta -->
+          <div class="flex flex-wrap gap-3 mb-4">
+            <div class="flex items-center gap-1.5 text-xs" style="color:#594139">
+              <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              Periodo: <span class="font-semibold text-[#1e1b17]">Abr–Jun 2026</span>
+            </div>
+            <div class="flex items-center gap-1.5 text-xs" style="color:#D97706">
+              <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+              Vence: <span class="font-semibold">10 julio 2026</span>
+            </div>
+          </div>
+          <!-- Progress -->
+          <div class="mb-4">
+            <div class="flex justify-between text-[11px] mb-1.5">
+              <span style="color:#594139">Progreso trimestre</span>
+              <span class="font-bold" style="color:#a43700">2 de 3 meses completados</span>
+            </div>
+            <div class="h-2 rounded-full overflow-hidden" style="background:rgba(164,55,0,0.1)">
+              <div class="progress-bar h-2 rounded-full" style="width:45%"></div>
+            </div>
+            <div class="flex justify-between text-[10px] mt-1" style="color:#594139/60">
+              <span>Abril</span><span>Mayo</span><span>Junio</span>
+            </div>
+          </div>
+          <!-- CTA -->
+          <button class="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-bold transition-all active:scale-95 hover:opacity-90" style="background:rgba(164,55,0,0.08);color:#a43700;border:1px solid rgba(164,55,0,0.15)">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            Preparar declaración
+          </button>
+        </div>
+
+        <!-- Einkommensteuer 2025 -->
+        <div class="bento-card bg-[#fff8f1] rounded-2xl p-5" style="border:1px solid rgba(164,55,0,0.08)">
+          <div class="flex items-start justify-between mb-4">
+            <div>
+              <div class="flex items-center gap-2 mb-1">
+                <p class="text-sm font-bold text-[#1e1b17]">Einkommensteuer 2025</p>
+                <span class="badge-gray text-[10px] font-bold px-2 py-0.5 rounded-full">Pendiente</span>
+              </div>
+              <p class="text-xs" style="color:#594139">Renta Anual · Steuererklärung</p>
+            </div>
+            <div class="text-right flex-shrink-0">
+              <p class="text-xl font-extrabold leading-none" style="color:#6B7280">106 días</p>
+              <p class="text-[10px] mt-0.5" style="color:#594139">hasta el vencimiento</p>
+            </div>
+          </div>
+          <!-- Meta -->
+          <div class="flex flex-wrap gap-3 mb-4">
+            <div class="flex items-center gap-1.5 text-xs" style="color:#594139">
+              <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              Ejercicio: <span class="font-semibold text-[#1e1b17]">año 2025</span>
+            </div>
+            <div class="flex items-center gap-1.5 text-xs" style="color:#594139">
+              <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+              Vence: <span class="font-semibold">31 julio 2026</span>
+            </div>
+          </div>
+          <!-- Note -->
+          <div class="flex items-start gap-2 p-3 rounded-xl mb-4 text-xs" style="background:rgba(164,55,0,0.04);border:1px solid rgba(164,55,0,0.07);color:#594139">
+            <svg class="w-3.5 h-3.5 flex-shrink-0 mt-0.5" style="color:#a43700" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            Incluye todos los ingresos y gastos de 2025. Clara puede ayudarte a organizar los datos.
+          </div>
+          <!-- CTA -->
+          <button class="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-bold transition-all active:scale-95 hover:opacity-90" style="background:rgba(164,55,0,0.08);color:#a43700;border:1px solid rgba(164,55,0,0.15)">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            Consultar con Clara
+          </button>
+        </div>
+
+        <!-- Garantía Klaro -->
+        <div class="bento-card rounded-2xl p-5" style="background:linear-gradient(135deg,#f0fdf4,#dcfce7);border:1px solid rgba(5,150,105,.18)">
+          <div class="flex items-start gap-4">
+            <div class="w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0" style="background:linear-gradient(135deg,#059669,#10b981)">
+              <svg class="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                <polyline points="9 12 11 14 15 10"/>
+              </svg>
+            </div>
+            <div>
+              <p class="text-sm font-bold text-[#1e1b17] mb-1">Garantía Klaro</p>
+              <p class="text-xs leading-relaxed" style="color:#594139">Cubrimos errores hasta <span class="font-bold text-[#059669]">10.000 €</span>. Conexión cifrada con ELSTER. Tus datos nunca se comparten con el Finanzamt sin tu aprobación explícita.</p>
+              <div class="flex flex-wrap gap-2 mt-3">
+                <span class="text-[10px] font-bold px-2.5 py-1 rounded-full" style="background:rgba(5,150,105,.12);color:#059669;border:1px solid rgba(5,150,105,.2)">
+                  SSL/TLS 256-bit
+                </span>
+                <span class="text-[10px] font-bold px-2.5 py-1 rounded-full" style="background:rgba(5,150,105,.12);color:#059669;border:1px solid rgba(5,150,105,.2)">
+                  ELSTER Certificado
+                </span>
+                <span class="text-[10px] font-bold px-2.5 py-1 rounded-full" style="background:rgba(5,150,105,.12);color:#059669;border:1px solid rgba(5,150,105,.2)">
+                  GDPR Compliant
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+      <!-- END LEFT -->
+
+      <!-- RIGHT COLUMN — col-span-5 -->
+      <div class="col-span-12 xl:col-span-5">
+        <!-- Sticky timeline card -->
+        <div class="bg-[#fff8f1] rounded-2xl p-5 xl:sticky xl:top-0" style="border:1px solid rgba(164,55,0,0.08)">
+          <h3 class="font-bold text-[#1e1b17] text-sm mb-5 flex items-center gap-2">
+            <svg class="w-4 h-4" style="color:#a43700" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="4" width="18" height="18" rx="2"/>
+              <line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/>
+              <line x1="3" y1="10" x2="21" y2="10"/>
+            </svg>
+            Timeline Fiscal 2026
+          </h3>
+
+          <!-- Timeline items -->
+          <div class="relative">
+            <!-- Connecting line -->
+            <div class="tl-line"></div>
+            <div class="space-y-0">
+
+              <!-- Item 1 — Completado (greyed out) -->
+              <div class="relative flex gap-4 pb-6">
+                <div class="relative z-10 flex-shrink-0">
+                  <div class="w-7 h-7 rounded-full flex items-center justify-center" style="background:#F3F4F6;border:2px solid #D1D5DB">
+                    <svg class="w-3.5 h-3.5" style="color:#9CA3AF" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                  </div>
+                </div>
+                <div class="flex-1 pt-0.5 opacity-50">
+                  <div class="flex items-center justify-between">
+                    <p class="text-sm font-semibold line-through" style="color:#6B7280">10 Enero 2026</p>
+                    <span class="badge-green text-[10px] font-bold px-2 py-0.5 rounded-full">Completado</span>
+                  </div>
+                  <p class="text-xs mt-0.5" style="color:#9CA3AF">UStVA Q4 2025 · IVA trimestral</p>
+                </div>
+              </div>
+
+              <!-- Item 2 — Vencido (red) -->
+              <div class="relative flex gap-4 pb-6">
+                <div class="relative z-10 flex-shrink-0">
+                  <div class="w-7 h-7 rounded-full flex items-center justify-center" style="background:#FEF2F2;border:2px solid #FECACA">
+                    <svg class="w-3 h-3" style="color:#DC2626" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                  </div>
+                </div>
+                <div class="flex-1 pt-0.5">
+                  <div class="flex items-center justify-between">
+                    <p class="text-sm font-bold" style="color:#DC2626">10 Abril 2026</p>
+                    <span class="badge-red text-[10px] font-bold px-2 py-0.5 rounded-full">Vencido</span>
+                  </div>
+                  <p class="text-xs font-semibold text-[#1e1b17] mt-0.5">UStVA Q1 2026</p>
+                  <p class="text-xs" style="color:#594139">IVA trimestral · €1.254,50</p>
+                </div>
+              </div>
+
+              <!-- Item 3 — Próximo (amber) -->
+              <div class="relative flex gap-4 pb-6">
+                <div class="relative z-10 flex-shrink-0">
+                  <div class="w-7 h-7 rounded-full flex items-center justify-center" style="background:#FFFBEB;border:2px solid #FDE68A">
+                    <svg class="w-3 h-3" style="color:#D97706" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+                  </div>
+                </div>
+                <div class="flex-1 pt-0.5">
+                  <div class="flex items-center justify-between">
+                    <p class="text-sm font-bold" style="color:#D97706">10 Julio 2026</p>
+                    <span class="badge-amber text-[10px] font-bold px-2 py-0.5 rounded-full">Próximo</span>
+                  </div>
+                  <p class="text-xs font-semibold text-[#1e1b17] mt-0.5">UStVA Q2 2026</p>
+                  <p class="text-xs" style="color:#594139">IVA trimestral · 85 días</p>
+                </div>
+              </div>
+
+              <!-- Item 4 — Julio (blue/teal) -->
+              <div class="relative flex gap-4 pb-6">
+                <div class="relative z-10 flex-shrink-0">
+                  <div class="w-7 h-7 rounded-full flex items-center justify-center" style="background:#EFF6FF;border:2px solid #BFDBFE">
+                    <svg class="w-3 h-3" style="color:#3B82F6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                  </div>
+                </div>
+                <div class="flex-1 pt-0.5">
+                  <div class="flex items-center justify-between">
+                    <p class="text-sm font-bold" style="color:#3B82F6">31 Julio 2026</p>
+                    <span class="text-[10px] font-bold px-2 py-0.5 rounded-full" style="background:#EFF6FF;color:#3B82F6;border:1px solid rgba(59,130,246,.2)">106 días</span>
+                  </div>
+                  <p class="text-xs font-semibold text-[#1e1b17] mt-0.5">Einkommensteuer 2025</p>
+                  <p class="text-xs" style="color:#594139">Declaración renta anual</p>
+                </div>
+              </div>
+
+              <!-- Item 5 — Q3 (grey) -->
+              <div class="relative flex gap-4 pb-1">
+                <div class="relative z-10 flex-shrink-0">
+                  <div class="w-7 h-7 rounded-full flex items-center justify-center" style="background:#F9FAFB;border:2px solid #E5E7EB">
+                    <svg class="w-3 h-3" style="color:#9CA3AF" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                  </div>
+                </div>
+                <div class="flex-1 pt-0.5">
+                  <div class="flex items-center justify-between">
+                    <p class="text-sm font-semibold" style="color:#9CA3AF">10 Octubre 2026</p>
+                    <span class="badge-gray text-[10px] font-bold px-2 py-0.5 rounded-full">Futuro</span>
+                  </div>
+                  <p class="text-xs font-semibold text-[#1e1b17] mt-0.5">UStVA Q3 2026</p>
+                  <p class="text-xs" style="color:#594139">IVA trimestral · Jul–Sep 2026</p>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- Divider -->
+          <div class="my-4" style="border-top:1px solid rgba(164,55,0,0.07)"></div>
+
+          <!-- CTA button -->
+          <button class="w-full flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-bold text-white transition-all active:scale-95 hover:opacity-90" style="background:linear-gradient(135deg,#a43700,#c94c13)">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+              <polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/>
+            </svg>
+            Revisar y enviar al Finanzamt
+          </button>
+          <!-- ELSTER note -->
+          <div class="flex items-center justify-center gap-1.5 mt-2.5">
+            <svg class="w-3.5 h-3.5 flex-shrink-0" style="color:#059669" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            <p class="text-[10px]" style="color:#594139">Enviado directamente a ELSTER con cifrado de extremo a extremo</p>
+          </div>
+        </div>
+      </div>
+      <!-- END RIGHT -->
+
+    </div>
+    <!-- END TWO-COLUMN -->
+
+    <!-- ── BOTTOM: Optimización Fiscal ───────────────────────────── -->
+    <div class="bento-card bg-[#fff8f1] rounded-2xl p-6" style="border:1px solid rgba(164,55,0,0.08)">
+      <div class="grid grid-cols-12 gap-6">
+
+        <!-- Left text side -->
+        <div class="col-span-12 lg:col-span-7">
+          <div class="flex items-start gap-3 mb-4">
+            <div class="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style="background:linear-gradient(135deg,#a43700,#c94c13)">
+              <!-- sparkles icon -->
+              <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17 5.8 21.3l2.4-7.4L2 9.4h7.6L12 2z"/>
+              </svg>
+            </div>
+            <div>
+              <h4 class="font-bold text-[#1e1b17] text-sm">Deducciones identificadas este trimestre</h4>
+              <p class="text-xs mt-0.5" style="color:#594139">Clara ha analizado tus gastos y encontrado oportunidades</p>
+            </div>
+          </div>
+          <p class="text-sm leading-relaxed mb-4" style="color:#594139">
+            Klaro ha detectado <span class="font-bold text-[#1e1b17]">€990 en gastos deducibles</span> (Betriebsausgaben) este trimestre: software, equipos y gastos de home office. Aplicar estas deducciones puede reducir tu base imponible en el Einkommensteuer 2026.
+          </p>
+          <div class="flex flex-wrap gap-2">
+            <span class="flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-full" style="background:#F0FDF4;color:#059669;border:1px solid rgba(5,150,105,.2)">
+              <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              Betriebsausgaben: OK
+            </span>
+            <span class="flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-full" style="background:#FFFBEB;color:#D97706;border:1px solid rgba(217,119,6,.2)">
+              <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+              IVA Vorsteuer: calculando
+            </span>
+            <span class="flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-full" style="background:rgba(164,55,0,0.06);color:#a43700;border:1px solid rgba(164,55,0,0.15)">
+              <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+              Home Office: €630
+            </span>
+          </div>
+        </div>
+
+        <!-- Right breakdown side -->
+        <div class="col-span-12 lg:col-span-5">
+          <div class="rounded-2xl p-4 h-full" style="background:#f4ede5;border:1px solid rgba(164,55,0,0.07)">
+            <p class="text-xs font-bold text-[#1e1b17] mb-3 uppercase tracking-widest">Resumen IVA Q2 2026</p>
+
+            <!-- IVA cobrado -->
+            <div class="flex justify-between items-center py-2.5" style="border-bottom:1px solid rgba(164,55,0,0.08)">
+              <div class="flex items-center gap-2">
+                <div class="w-2 h-2 rounded-full" style="background:#a43700"></div>
+                <span class="text-xs font-medium" style="color:#594139">IVA cobrado (Umsatzsteuer)</span>
+              </div>
+              <span class="text-sm font-bold text-[#1e1b17]">€1.254,50</span>
+            </div>
+
+            <!-- IVA pagado (Vorsteuer) -->
+            <div class="flex justify-between items-center py-2.5" style="border-bottom:1px solid rgba(164,55,0,0.08)">
+              <div class="flex items-center gap-2">
+                <div class="w-2 h-2 rounded-full" style="background:#D97706"></div>
+                <span class="text-xs font-medium" style="color:#594139">IVA pagado (Vorsteuer)</span>
+              </div>
+              <span class="text-sm font-bold" style="color:#D97706">− €188,10</span>
+            </div>
+
+            <!-- Net -->
+            <div class="flex justify-between items-center pt-3 mt-0.5">
+              <span class="text-xs font-bold text-[#1e1b17]">A pagar al Finanzamt</span>
+              <span class="text-base font-extrabold" style="color:#a43700">€1.066,40</span>
+            </div>
+
+            <!-- Mini bar chart -->
+            <div class="mt-4 space-y-2">
+              <div>
+                <div class="flex justify-between text-[10px] mb-1" style="color:#594139">
+                  <span>Umsatzsteuer</span><span class="font-semibold">100%</span>
+                </div>
+                <div class="h-1.5 rounded-full overflow-hidden" style="background:rgba(164,55,0,0.1)">
+                  <div class="h-1.5 rounded-full" style="width:100%;background:#a43700"></div>
+                </div>
+              </div>
+              <div>
+                <div class="flex justify-between text-[10px] mb-1" style="color:#594139">
+                  <span>Vorsteuer</span><span class="font-semibold">15%</span>
+                </div>
+                <div class="h-1.5 rounded-full overflow-hidden" style="background:rgba(164,55,0,0.1)">
+                  <div class="h-1.5 rounded-full" style="width:15%;background:#D97706"></div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+    </div>
+    <!-- END BOTTOM -->
+
+    <!-- Bottom spacer for FAB -->
+    <div class="h-6"></div>
+
+  </div>
+  <!-- END scrollable content -->
+
+</div>
+<!-- END MAIN -->
+
+<!-- ── FAB ── -->
+<a href="klaro-clara.html"
+  class="fab fixed bottom-6 right-6 w-14 h-14 rounded-full flex items-center justify-center z-50 transition-all active:scale-90 hover:scale-105"
+  style="background:linear-gradient(135deg,#a43700,#c94c13)"
+  title="Hablar con Clara">
+  <svg class="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+  </svg>
+</a>
+
+</body>
+</html>

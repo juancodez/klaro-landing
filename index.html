@@ -1,0 +1,1355 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Klaro — Al fin, los impuestos claros</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,300;1,400&display=swap" rel="stylesheet" />
+  <style>
+    :root { --p: 0; }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Plus Jakarta Sans', sans-serif; background: #fff8f1; color: #1e1b17; overflow-x: hidden; }
+
+    /* ── NAV ── */
+    #nav {
+      position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
+      z-index: 100;
+      padding: 10px 20px 10px 16px;
+      display: flex; align-items: center; gap: 32px; width: max-content;
+      background: rgba(255,248,241,0.96);
+      border-radius: 100px;
+      border: 1px solid rgba(164,55,0,0.10);
+      box-shadow: 0 4px 24px rgba(164,55,0,0.08), inset 0 1px 0 rgba(255,255,255,0.6);
+      transition: box-shadow 0.4s;
+    }
+    #nav.scrolled {
+      box-shadow: 0 8px 32px rgba(164,55,0,0.12), inset 0 1px 0 rgba(255,255,255,0.6);
+    }
+    .nav-links { display: flex; align-items: center; gap: 24px; }
+    .nav-links a {
+      font-size: 13px; font-weight: 500; color: #594139; text-decoration: none;
+      transition: color 0.2s; position: relative; padding-bottom: 2px;
+    }
+    .nav-links a::after {
+      content: ''; position: absolute; bottom: -1px; left: 0;
+      width: 0; height: 1px; background: #a43700;
+      transition: width 0.3s cubic-bezier(0.16,1,0.3,1);
+    }
+    .nav-links a:hover { color: #a43700; }
+    .nav-links a:hover::after { width: 100%; }
+    .nav-pill {
+      background: #1e1b17; color: #fff8f1;
+      font-size: 12.5px; font-weight: 700; padding: 8px 18px;
+      border-radius: 100px; text-decoration: none;
+      transition: opacity 0.2s, transform 0.15s cubic-bezier(0.16,1,0.3,1);
+      white-space: nowrap;
+    }
+    .nav-pill:hover { opacity: 0.82; transform: translateY(-1px); }
+    .nav-logo { display: flex; align-items: center; gap: 9px; text-decoration: none; }
+    .nav-wordmark { font-size: 16px; font-weight: 800; color: #1e1b17; letter-spacing: -0.03em; }
+    .nav-icon { width: 30px; height: 30px; border-radius: 8px; background: #a43700; display: flex; align-items: center; justify-content: center; }
+
+    /* ── HERO WRAPPER — sticky scroll ── */
+    #hero-wrapper { height: 300vh; position: relative; }
+    #hero-sticky {
+      position: sticky; top: 0; min-height: 100dvh;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      overflow: hidden; text-align: center;
+    }
+
+    /* Background overlay */
+    #hero-bg {
+      position: absolute; inset: 0; pointer-events: none;
+      background: radial-gradient(ellipse 80% 60% at 50% 85%, rgba(255,185,60,0.06) 0%, rgba(232,98,42,0.03) 40%, transparent 70%);
+      transition: opacity 0.3s;
+    }
+
+    /* Sun — absolute centered */
+    #sun {
+      position: absolute; left: 50%; top: 58%;
+      width: 480px; height: 480px; border-radius: 50%;
+      background: radial-gradient(circle, #fffdf0 0%, #ffe566 20%, #ffb030 50%, rgba(200,60,10,0.5) 78%, transparent 100%);
+      transform: translate(-50%, -50%) scale(0.06); opacity: 0.08;
+      will-change: transform, opacity, box-shadow; pointer-events: none;
+    }
+    #sun-rays {
+      position: absolute; left: 50%; top: 58%;
+      width: 700px; height: 700px; border-radius: 50%;
+      background: radial-gradient(circle, rgba(255,200,80,0.14) 0%, rgba(232,98,42,0.06) 50%, transparent 70%);
+      transform: translate(-50%, -50%) scale(0.06); opacity: 0;
+      will-change: transform, opacity; pointer-events: none;
+    }
+
+    /* Overline */
+    .overline {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-size: 10.5px; font-weight: 700; letter-spacing: 0.2em;
+      text-transform: uppercase; color: #a43700; margin-bottom: 32px;
+      background: rgba(164,55,0,0.05); border: 1px solid rgba(164,55,0,0.12);
+      border-radius: 100px; padding: 5px 14px;
+    }
+
+    .hero-h1 {
+      font-size: clamp(52px, 9vw, 104px);
+      font-weight: 800; line-height: 0.97; letter-spacing: -0.04em;
+      color: #1e1b17;
+    }
+    .hero-h1 em { font-style: italic; font-weight: 300; color: #a43700; }
+
+    .hero-phase {
+      position: relative; z-index: 10;
+      display: flex; flex-direction: column; align-items: center;
+      padding: 0 32px; max-width: 960px;
+      transition: opacity 0.6s cubic-bezier(0.16,1,0.3,1), transform 0.6s cubic-bezier(0.16,1,0.3,1);
+    }
+    #phase-noon { position: absolute; opacity: 0; transform: translateY(12px); }
+
+    .hero-sub {
+      margin-top: 28px; font-size: 18px; font-weight: 400; color: #594139;
+      line-height: 1.7; max-width: 44ch; text-align: center;
+    }
+    .hero-actions { margin-top: 48px; display: flex; align-items: center; gap: 16px; justify-content: center; }
+
+    /* Ghost button (hero secondary) */
+    .btn-ghost {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-size: 14px; font-weight: 600; color: #594139;
+      text-decoration: none; padding: 14px 24px;
+      border-radius: 100px; border: 1.5px solid rgba(164,55,0,0.18);
+      transition: border-color 0.2s, color 0.2s, transform 0.15s;
+    }
+    .btn-ghost:hover { border-color: #a43700; color: #a43700; transform: translateY(-1px); }
+
+    /* Scroll hint */
+    #scroll-hint {
+      position: absolute; bottom: 36px; left: 50%; transform: translateX(-50%);
+      font-size: 9.5px; font-weight: 700; letter-spacing: 0.22em; text-transform: uppercase;
+      color: #c0a898; display: flex; flex-direction: column; align-items: center; gap: 10px;
+      opacity: calc(1 - var(--p) * 5); pointer-events: none;
+    }
+    .scroll-line {
+      width: 1px; height: 48px;
+      background: linear-gradient(to bottom, #a43700 0%, transparent 100%);
+      animation: scroll-breathe 2.4s ease-in-out infinite;
+    }
+    @keyframes scroll-breathe { 0%,100% { opacity: 0.25; } 50% { opacity: 0.9; } }
+
+    /* ── BTN ── */
+    .btn-primary {
+      display: inline-flex; align-items: center; gap: 10px;
+      background: #a43700; color: white;
+      font-size: 14px; font-weight: 700; padding: 14px 28px;
+      border-radius: 100px; text-decoration: none;
+      box-shadow: 0 4px 20px rgba(164,55,0,0.28), inset 0 1px 0 rgba(255,255,255,0.15);
+      transition: transform 0.25s cubic-bezier(0.16,1,0.3,1), box-shadow 0.25s;
+      position: relative; overflow: hidden;
+    }
+    /* Shimmer sweep on hover — Yeldra-style */
+    .btn-primary::after {
+      content: '';
+      position: absolute; inset: 0;
+      background: linear-gradient(105deg, transparent 25%, rgba(255,255,255,0.14) 50%, transparent 75%);
+      transform: translateX(-120%);
+      transition: transform 0.55s cubic-bezier(0.16,1,0.3,1);
+      pointer-events: none;
+    }
+    .btn-primary:hover::after { transform: translateX(120%); }
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 36px rgba(164,55,0,0.38), 0 0 0 1px rgba(164,55,0,0.15), inset 0 1px 0 rgba(255,255,255,0.15);
+    }
+    .btn-primary:active { transform: scale(0.98) translateY(0); }
+    .btn-secondary {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-size: 14px; font-weight: 600; color: #594139;
+      text-decoration: none; padding: 13px 22px;
+      border-radius: 100px; border: 1.5px solid rgba(164,55,0,0.18);
+      transition: border-color 0.2s, color 0.2s;
+    }
+    .btn-secondary:hover { border-color: #a43700; color: #a43700; }
+
+    /* Ghost button — directional fill from left */
+    .btn-ghost {
+      position: relative; overflow: hidden;
+    }
+    .btn-ghost::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: rgba(164,55,0,0.06);
+      border-radius: 100px;
+      transform: scaleX(0); transform-origin: left center;
+      transition: transform 0.35s cubic-bezier(0.16,1,0.3,1);
+      pointer-events: none;
+    }
+    .btn-ghost:hover::before { transform: scaleX(1); }
+    .btn-ghost:hover { border-color: rgba(164,55,0,0.3); color: #a43700; transform: translateY(-1px); }
+
+    /* ── PAIN ── */
+    #pain { background: #1e1b17; }
+    .pain-inner {
+      max-width: 1280px; margin: 0 auto;
+      padding: 160px 72px;
+      display: grid; grid-template-columns: 5fr 7fr; gap: 96px; align-items: start;
+    }
+    .pain-label { font-size: 10.5px; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; color: #ffb59a; margin-bottom: 24px; }
+    .pain-h2 { font-size: clamp(36px, 4.5vw, 58px); font-weight: 800; line-height: 1.06; letter-spacing: -0.035em; color: #fff8f1; }
+    .pain-h2 em { font-style: italic; font-weight: 300; color: #ffb59a; }
+    .pain-body { margin-top: 24px; font-size: 16px; color: rgba(255,248,241,0.45); line-height: 1.75; max-width: 38ch; }
+    .pain-cards { display: flex; flex-direction: column; gap: 0; }
+    .pain-card {
+      padding: 28px 0; border-bottom: 1px solid rgba(255,248,241,0.06);
+      display: flex; align-items: flex-start; gap: 20px;
+      cursor: default;
+      transition: padding-left 0.35s cubic-bezier(0.16,1,0.3,1);
+    }
+    .pain-card:first-child { border-top: 1px solid rgba(255,248,241,0.06); }
+    .pain-card:hover { padding-left: 10px; }
+    .pain-card-icon {
+      width: 40px; height: 40px; flex-shrink: 0; border-radius: 11px;
+      background: rgba(255,181,154,0.07); display: flex; align-items: center; justify-content: center;
+      margin-top: 2px;
+      transition: background 0.3s, box-shadow 0.3s, transform 0.3s cubic-bezier(0.16,1,0.3,1);
+    }
+    .pain-card:hover .pain-card-icon {
+      background: rgba(255,181,154,0.14);
+      box-shadow: 0 0 20px rgba(255,181,154,0.12);
+      transform: scale(1.08);
+    }
+    .pain-card-icon svg { width: 18px; height: 18px; stroke: #ffb59a; fill: none; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+    .pain-card-title {
+      font-size: 15px; font-weight: 700; color: rgba(255,248,241,0.82);
+      margin-bottom: 5px; letter-spacing: -0.01em;
+      transition: color 0.25s;
+    }
+    .pain-card:hover .pain-card-title { color: #fff8f1; }
+    .pain-card-desc { font-size: 13px; color: rgba(255,248,241,0.35); line-height: 1.6; transition: color 0.25s; }
+    .pain-card:hover .pain-card-desc { color: rgba(255,248,241,0.48); }
+
+    /* ── CLARA ── */
+    .clara-wrap {
+      max-width: 1280px; margin: 0 auto;
+      padding: 160px 72px;
+      display: grid; grid-template-columns: 1fr 1fr; gap: 96px; align-items: center;
+    }
+
+    /* Chat card — spotlight border */
+    .chat-card {
+      background: white; border-radius: 28px;
+      box-shadow: 0 32px 80px rgba(164,55,0,0.10), 0 0 0 1px rgba(164,55,0,0.06), inset 0 1px 0 rgba(255,255,255,0.9);
+      overflow: hidden; position: relative;
+    }
+    .chat-card::before {
+      content: ''; position: absolute; inset: -1px; border-radius: 26px;
+      background: radial-gradient(600px circle at var(--mx,50%) var(--my,50%), rgba(164,55,0,0.12), transparent 60%);
+      pointer-events: none; z-index: 0; opacity: 0;
+      transition: opacity 0.3s;
+    }
+    .chat-card:hover::before { opacity: 1; }
+    .chat-hd {
+      background: #fff8f1; border-bottom: 1px solid rgba(164,55,0,0.08);
+      padding: 14px 18px; display: flex; align-items: center; gap: 10px;
+      position: relative; z-index: 1;
+    }
+    .chat-avatar {
+      width: 34px; height: 34px; border-radius: 50%;
+      background: linear-gradient(135deg,#a43700,#e8622a);
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .chat-avatar svg { width: 14px; height: 14px; fill: white; }
+    .chat-nm { font-size: 13.5px; font-weight: 700; color: #1e1b17; }
+    .chat-st { font-size: 10.5px; color: #556338; font-weight: 600; display: flex; align-items: center; gap: 4px; }
+    .online { width: 5px; height: 5px; border-radius: 50%; background: #556338; }
+    .chat-msgs { padding: 18px; display: flex; flex-direction: column; gap: 14px; position: relative; z-index: 1; }
+    .bubble-c {
+      background: #fff8f1; border: 1px solid rgba(164,55,0,0.08);
+      border-radius: 16px 16px 16px 3px; padding: 11px 14px;
+      font-size: 13px; line-height: 1.55; color: #1e1b17; max-width: 88%; align-self: flex-start;
+    }
+    .bubble-c strong { color: #a43700; font-weight: 700; }
+    .bubble-u {
+      background: #a43700; color: white;
+      border-radius: 16px 16px 3px 16px; padding: 11px 14px;
+      font-size: 13px; line-height: 1.55; max-width: 80%; align-self: flex-end;
+    }
+    .chat-chips { padding: 0 18px 14px; display: flex; flex-wrap: wrap; gap: 7px; position: relative; z-index: 1; }
+    .chip {
+      font-size: 11.5px; font-weight: 600; color: #a43700;
+      background: rgba(164,55,0,0.05); border: 1px solid rgba(164,55,0,0.14);
+      border-radius: 100px; padding: 5px 12px; cursor: pointer;
+      transition: background 0.2s;
+    }
+    .chip:hover { background: rgba(164,55,0,0.1); }
+    .chat-input {
+      border-top: 1px solid rgba(164,55,0,0.08); padding: 11px 14px;
+      display: flex; align-items: center; gap: 9px; position: relative; z-index: 1;
+    }
+    .chat-fake-input {
+      flex: 1; background: #f9f3eb; border-radius: 100px; padding: 9px 14px;
+      font-size: 12.5px; color: #8c7168; font-family: inherit;
+    }
+    .chat-send-btn {
+      width: 34px; height: 34px; border-radius: 50%; background: #a43700;
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+      cursor: pointer; transition: opacity 0.2s;
+    }
+    .chat-send-btn:hover { opacity: 0.85; }
+    .chat-send-btn svg { width: 13px; height: 13px; fill: white; }
+
+    /* Clara copy */
+    .clara-copy { display: flex; flex-direction: column; gap: 28px; }
+    .clara-tag {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-size: 10.5px; font-weight: 700; letter-spacing: 0.15em;
+      text-transform: uppercase; color: #a43700;
+      background: rgba(164,55,0,0.06); border: 1px solid rgba(164,55,0,0.12);
+      border-radius: 100px; padding: 5px 14px; width: fit-content;
+    }
+    .section-label {
+      font-size: 10px; font-weight: 700; letter-spacing: 0.2em;
+      text-transform: uppercase; color: #a43700; margin-bottom: 16px;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .section-label::before {
+      content: '';
+      display: inline-block; height: 1px; background: #a43700;
+      width: 0; transition: width 0.6s cubic-bezier(0.16,1,0.3,1);
+      flex-shrink: 0;
+    }
+    .reveal.in .section-label::before { width: 24px; }
+    .pain-label {
+      display: flex; align-items: center; gap: 10px;
+    }
+    .pain-label::before {
+      content: ''; display: inline-block; height: 1px; background: #ffb59a;
+      width: 0; transition: width 0.6s cubic-bezier(0.16,1,0.3,1);
+      flex-shrink: 0;
+    }
+    .reveal.in .pain-label::before { width: 24px; }
+    .section-h2 {
+      font-size: clamp(36px, 5vw, 64px); font-weight: 800;
+      line-height: 1.05; letter-spacing: -0.035em; color: #1e1b17;
+    }
+    .section-h2 em { font-style: italic; font-weight: 300; color: #a43700; }
+    .section-body { font-size: 16px; color: #594139; line-height: 1.75; max-width: 44ch; margin-top: 20px; }
+    .feature-list { display: flex; flex-direction: column; gap: 10px; }
+    .feature-row {
+      display: flex; align-items: flex-start; gap: 12px;
+      padding: 14px 16px; border-radius: 12px;
+      border: 1px solid rgba(164,55,0,0.07);
+      transition: border-color 0.3s, transform 0.3s cubic-bezier(0.16,1,0.3,1), background 0.3s;
+    }
+    .feature-row:hover {
+      border-color: rgba(164,55,0,0.18);
+      transform: translateX(6px);
+      background: rgba(164,55,0,0.02);
+    }
+    .feature-row-icon {
+      width: 32px; height: 32px; flex-shrink: 0; border-radius: 8px;
+      background: rgba(164,55,0,0.07); display: flex; align-items: center; justify-content: center;
+      transition: background 0.3s, transform 0.3s cubic-bezier(0.16,1,0.3,1);
+    }
+    .feature-row:hover .feature-row-icon {
+      background: rgba(164,55,0,0.13);
+      transform: scale(1.12) rotate(-3deg);
+    }
+    .feature-row-icon svg { width: 15px; height: 15px; stroke: #a43700; fill: none; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+    .feature-row-title { font-size: 13.5px; font-weight: 700; color: #1e1b17; transition: color 0.2s; }
+    .feature-row:hover .feature-row-title { color: #a43700; }
+    .feature-row-desc { font-size: 12px; color: #8c7168; line-height: 1.4; }
+
+    /* ── HOW ── */
+    #how { background: #f4ede5; }
+    .how-inner { max-width: 1280px; margin: 0 auto; padding: 160px 72px; }
+    .how-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 96px; gap: 48px; }
+    .steps-zigzag { display: flex; flex-direction: column; }
+    .step-row {
+      padding: 40px 0; display: flex; gap: 48px; align-items: flex-start;
+      border-bottom: 1px solid rgba(164,55,0,0.08);
+      transition: padding-left 0.35s cubic-bezier(0.16,1,0.3,1);
+      position: relative; overflow: hidden;
+    }
+    .step-row:first-child { border-top: 1px solid rgba(164,55,0,0.08); }
+    .step-row:hover { padding-left: 12px; }
+    .step-num {
+      font-size: 60px; font-weight: 800; line-height: 1;
+      letter-spacing: -0.06em; color: rgba(164,55,0,0.08);
+      min-width: 64px; align-self: center;
+      transition: color 0.4s cubic-bezier(0.16,1,0.3,1);
+    }
+    .step-row:hover .step-num { color: rgba(164,55,0,0.22); }
+    .step-icon-wrap {
+      width: 44px; height: 44px; border-radius: 12px;
+      background: rgba(164,55,0,0.07); display: flex; align-items: center; justify-content: center;
+      margin-bottom: 12px;
+      transition: background 0.3s, transform 0.35s cubic-bezier(0.16,1,0.3,1);
+    }
+    .step-row:hover .step-icon-wrap {
+      background: rgba(164,55,0,0.13);
+      transform: scale(1.1);
+    }
+    .step-icon-wrap svg { width: 20px; height: 20px; stroke: #a43700; fill: none; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+    .step-title { font-size: 18px; font-weight: 800; color: #1e1b17; letter-spacing: -0.025em; margin-bottom: 8px; transition: color 0.2s; }
+    .step-row:hover .step-title { color: #a43700; }
+    .step-desc { font-size: 14px; color: #594139; line-height: 1.65; max-width: 56ch; }
+
+    /* ── BENTO ── */
+    .bento-outer { max-width: 1280px; margin: 0 auto; padding: 160px 72px; }
+    .bento-grid { display: grid; grid-template-columns: 7fr 5fr; gap: 16px; margin-top: 72px; }
+    .bento-cell {
+      background: white; border-radius: 28px; padding: 40px;
+      border: 1px solid rgba(164,55,0,0.06);
+      box-shadow: 0 4px 24px rgba(164,55,0,0.04), 0 1px 0 rgba(255,255,255,0.8);
+      position: relative; overflow: hidden;
+      transition: box-shadow 0.4s, border-color 0.4s, transform 0.4s cubic-bezier(0.16,1,0.3,1);
+    }
+    /* Cursor spotlight — same as chat-card */
+    .bento-cell::before {
+      content: ''; position: absolute; inset: 0; border-radius: 28px;
+      background: radial-gradient(480px circle at var(--mx,50%) var(--my,50%), rgba(164,55,0,0.06), transparent 70%);
+      pointer-events: none; z-index: 0; opacity: 0; transition: opacity 0.35s;
+    }
+    .bento-cell:hover::before { opacity: 1; }
+    .bento-cell:hover { box-shadow: 0 20px 56px rgba(164,55,0,0.11); border-color: rgba(164,55,0,0.14); transform: translateY(-4px); }
+    .bento-cell > * { position: relative; z-index: 1; }
+    .bento-cell-icon {
+      width: 44px; height: 44px; border-radius: 12px; background: rgba(164,55,0,0.06);
+      display: flex; align-items: center; justify-content: center; margin-bottom: 20px;
+      transition: background 0.3s, transform 0.3s cubic-bezier(0.16,1,0.3,1);
+    }
+    .bento-cell:hover .bento-cell-icon { background: rgba(164,55,0,0.11); transform: scale(1.08); }
+    .bento-cell-icon svg { width: 18px; height: 18px; stroke: #a43700; fill: none; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+    .bento-cell-title { font-size: 17px; font-weight: 800; color: #1e1b17; letter-spacing: -0.025em; margin-bottom: 8px; }
+    .bento-cell-desc { font-size: 13px; color: #594139; line-height: 1.6; }
+
+    /* Hero bento cell */
+    .bento-hero { background: linear-gradient(135deg, #a43700 0%, #cc4d15 100%); min-height: 280px; }
+    .bento-hero::before { content: ''; position: absolute; right: -80px; bottom: -80px; width: 280px; height: 280px; border-radius: 50%; background: rgba(255,255,255,0.05); pointer-events: none; }
+    .bento-hero .bento-cell-title { color: white; font-size: 20px; }
+    .bento-hero .bento-cell-desc { color: rgba(255,255,255,0.7); font-size: 14px; }
+    .bento-hero .bento-cell-icon { background: rgba(255,255,255,0.12); }
+    .bento-hero .bento-cell-icon svg { stroke: white; }
+    .bento-metrics { display: flex; gap: 36px; margin-top: 32px; }
+    .bento-metric-val { font-size: 34px; font-weight: 800; color: white; letter-spacing: -0.045em; }
+    .bento-metric-lbl { font-size: 10px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: rgba(255,255,255,0.45); margin-top: 3px; }
+
+    /* Calendar mini */
+    .mini-cal { margin-top: 16px; display: flex; flex-direction: column; gap: 6px; }
+    .mini-cal-row { display: flex; gap: 5px; }
+    .mcd { width: 30px; height: 30px; border-radius: 7px; font-size: 10.5px; font-weight: 600; color: #594139; background: #f9f3eb; display: flex; align-items: center; justify-content: center; }
+    .mcd.urgent { background: #ffdad6; color: #ba1a1a; font-weight: 800; }
+    .mcd.today { background: #a43700; color: white; font-weight: 800; }
+    .mcd.ok { background: #d6e6af; color: #556338; }
+    .cal-warning { font-size: 10.5px; font-weight: 700; color: #ba1a1a; margin-top: 10px; display: flex; align-items: center; gap: 5px; }
+
+    /* Bottom bento row */
+    .bento-bottom { grid-column: span 2; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+
+    /* ── TESTIMONIALS — marquee ── */
+    #testi { overflow: hidden; padding: 120px 0; background: #fff8f1; }
+    .testi-header { max-width: 1280px; margin: 0 auto; padding: 0 72px 64px; }
+    .marquee-track { display: flex; gap: 20px; width: max-content; animation: marquee 28s linear infinite; }
+    .marquee-track:hover { animation-play-state: paused; }
+    @keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+    .testi-card { width: 360px; flex-shrink: 0; background: white; border: 1px solid rgba(164,55,0,0.07); border-radius: 24px; padding: 32px; display: flex; flex-direction: column; gap: 16px; box-shadow: 0 2px 16px rgba(164,55,0,0.03); }
+    .testi-stars { color: #a43700; font-size: 12px; letter-spacing: 1.5px; }
+    .testi-quote { font-size: 14px; line-height: 1.65; color: #1e1b17; flex: 1; }
+    .testi-quote strong { font-weight: 700; color: #a43700; }
+    .testi-author { display: flex; align-items: center; gap: 10px; }
+    .testi-av { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 800; color: white; flex-shrink: 0; }
+    .testi-name { font-size: 12.5px; font-weight: 700; color: #1e1b17; }
+    .testi-role { font-size: 11px; color: #8c7168; }
+
+    /* ── CTA ── */
+    #cta { padding: 100px 72px 160px; text-align: left; max-width: 1280px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 96px; align-items: center; }
+    .cta-sun-orb { width: 100%; aspect-ratio: 1; border-radius: 50%; background: radial-gradient(circle, rgba(255,220,120,0.5) 0%, rgba(255,140,50,0.2) 45%, transparent 70%); filter: blur(32px); }
+    .cta-h2 { font-size: clamp(40px, 5.5vw, 72px); font-weight: 800; line-height: 1.03; letter-spacing: -0.04em; color: #1e1b17; }
+    .cta-h2 em { font-style: italic; font-weight: 300; color: #a43700; }
+    .cta-sub { font-size: 16px; color: #594139; margin-top: 22px; line-height: 1.75; max-width: 44ch; }
+    .cta-row { display: flex; gap: 14px; margin-top: 36px; flex-wrap: wrap; }
+    .cta-note { font-size: 11px; color: #8c7168; margin-top: 18px; }
+
+    /* ── FOOTER ── */
+    footer { border-top: 1px solid rgba(164,55,0,0.08); padding: 40px 72px; max-width: 1280px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; }
+    .footer-brand { font-size: 15px; font-weight: 800; color: #1e1b17; letter-spacing: -0.025em; }
+    .footer-links { display: flex; gap: 20px; }
+    .footer-links a { font-size: 12px; color: #8c7168; text-decoration: none; transition: color 0.2s; }
+    .footer-links a:hover { color: #a43700; }
+    .footer-note { font-size: 11.5px; color: #8c7168; }
+
+    /* ── CLARA FLOAT WIDGET ── */
+    #clara-fab {
+      position: fixed; bottom: 28px; right: 28px; z-index: 200;
+      width: 56px; height: 56px; border-radius: 50%;
+      background: linear-gradient(135deg,#a43700,#e8622a);
+      box-shadow: 0 8px 24px rgba(164,55,0,0.32);
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; border: none;
+      transition: transform 0.2s cubic-bezier(0.16,1,0.3,1), box-shadow 0.2s;
+    }
+    #clara-fab:hover { transform: scale(1.08); box-shadow: 0 12px 32px rgba(164,55,0,0.42); }
+    #clara-fab:active { transform: scale(0.96); }
+    #clara-fab svg { width: 22px; height: 22px; fill: white; }
+
+    #clara-drawer {
+      position: fixed; bottom: 96px; right: 28px; z-index: 199;
+      width: 380px; height: 560px;
+      background: white; border-radius: 24px;
+      box-shadow: 0 24px 80px rgba(0,0,0,0.18), 0 0 0 1px rgba(164,55,0,0.08);
+      display: flex; flex-direction: column; overflow: hidden;
+      transform: translateY(16px) scale(0.97); opacity: 0; pointer-events: none;
+      transition: transform 0.3s cubic-bezier(0.16,1,0.3,1), opacity 0.3s;
+    }
+    #clara-drawer.open { transform: translateY(0) scale(1); opacity: 1; pointer-events: all; }
+    .drawer-hd {
+      background: #fff8f1; border-bottom: 1px solid rgba(164,55,0,0.08);
+      padding: 14px 18px; display: flex; align-items: center; justify-content: space-between;
+      flex-shrink: 0;
+    }
+    .drawer-hd-left { display: flex; align-items: center; gap: 10px; }
+    .drawer-avatar { width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg,#a43700,#e8622a); display: flex; align-items: center; justify-content: center; }
+    .drawer-avatar svg { width: 13px; height: 13px; fill: white; }
+    .drawer-name { font-size: 13px; font-weight: 700; color: #1e1b17; }
+    .drawer-status { font-size: 10.5px; color: #556338; font-weight: 600; display: flex; align-items: center; gap: 3px; }
+    .drawer-close {
+      width: 28px; height: 28px; border-radius: 8px; border: none; background: transparent;
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+      color: #8c7168; transition: background 0.15s;
+    }
+    .drawer-close:hover { background: rgba(164,55,0,0.06); color: #a43700; }
+    .drawer-close svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; }
+
+    #drawer-msgs {
+      flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 12px;
+      background: #fafaf8;
+      scrollbar-width: thin; scrollbar-color: rgba(164,55,0,0.15) transparent;
+    }
+    .dm-clara {
+      background: white; border: 1px solid rgba(164,55,0,0.08);
+      border-radius: 14px 14px 14px 3px; padding: 10px 13px;
+      font-size: 12.5px; line-height: 1.55; color: #1e1b17; max-width: 88%; align-self: flex-start;
+    }
+    .dm-clara strong { color: #a43700; }
+    .dm-user {
+      background: #a43700; color: white;
+      border-radius: 14px 14px 3px 14px; padding: 10px 13px;
+      font-size: 12.5px; line-height: 1.55; max-width: 80%; align-self: flex-end;
+    }
+    .dm-chips { display: flex; flex-wrap: wrap; gap: 6px; align-self: flex-start; }
+    .dm-chip { font-size: 11px; font-weight: 600; color: #a43700; background: rgba(164,55,0,0.06); border: 1px solid rgba(164,55,0,0.15); border-radius: 100px; padding: 5px 11px; cursor: pointer; transition: background 0.15s; }
+    .dm-chip:hover { background: rgba(164,55,0,0.12); }
+    .dm-typing { display: flex; align-items: center; gap: 5px; padding: 10px 13px; background: white; border: 1px solid rgba(164,55,0,0.08); border-radius: 14px; width: fit-content; }
+    .dm-dot { width: 5px; height: 5px; border-radius: 50%; background: #c0a898; animation: bounce 1.2s ease-in-out infinite; }
+    .dm-dot:nth-child(2) { animation-delay: 0.15s; }
+    .dm-dot:nth-child(3) { animation-delay: 0.3s; }
+    @keyframes bounce { 0%,80%,100%{transform:scale(0.7);opacity:0.5} 40%{transform:scale(1);opacity:1} }
+
+    /* no-key banner */
+    .no-key-banner { margin: 10px; border-radius: 10px; background: #fffbeb; border: 1px solid #fcd34d; padding: 10px 14px; font-size: 11.5px; color: #92400e; display: flex; align-items: center; gap: 8px; }
+    .no-key-banner svg { width: 14px; height: 14px; stroke: #d97706; fill: none; stroke-width: 2; stroke-linecap: round; flex-shrink: 0; }
+    .no-key-link { color: #a43700; font-weight: 700; cursor: pointer; text-decoration: underline; }
+
+    .key-input-row { display: flex; gap: 6px; margin-top: 8px; }
+    .key-input-row input {
+      flex: 1; border: 1px solid #fcd34d; border-radius: 8px;
+      padding: 6px 10px; font-size: 11.5px; font-family: monospace; background: white;
+      outline: none;
+    }
+    .key-input-row input:focus { border-color: #a43700; }
+    .key-save { background: #a43700; color: white; border: none; border-radius: 8px; padding: 6px 12px; font-size: 11.5px; font-weight: 700; cursor: pointer; font-family: inherit; }
+
+    #drawer-input-bar {
+      border-top: 1px solid rgba(164,55,0,0.08);
+      padding: 10px 12px; display: flex; align-items: flex-end; gap: 8px;
+      background: white; flex-shrink: 0;
+    }
+    #drawer-input {
+      flex: 1; resize: none; border: 1px solid rgba(164,55,0,0.12); border-radius: 14px;
+      padding: 9px 13px; font-size: 12.5px; color: #1e1b17; font-family: inherit;
+      background: #fafaf8; outline: none; max-height: 100px;
+      transition: border-color 0.2s;
+    }
+    #drawer-input:focus { border-color: rgba(164,55,0,0.35); }
+    #drawer-send {
+      width: 34px; height: 34px; border-radius: 50%; background: #a43700; border: none;
+      display: flex; align-items: center; justify-content: center; cursor: pointer;
+      transition: opacity 0.2s, transform 0.15s; flex-shrink: 0;
+    }
+    #drawer-send:disabled { opacity: 0.3; }
+    #drawer-send:not(:disabled):hover { transform: scale(1.08); }
+    #drawer-send svg { width: 13px; height: 13px; fill: white; }
+
+    /* ── REVEAL ── */
+    .reveal {
+      opacity: 0; transform: translateY(28px) scale(0.985);
+      transition: opacity 0.85s cubic-bezier(0.16,1,0.3,1), transform 0.85s cubic-bezier(0.16,1,0.3,1);
+    }
+    .reveal.in { opacity: 1; transform: translateY(0) scale(1); }
+    .reveal-d1 { transition-delay: 0.1s; }
+    .reveal-d2 { transition-delay: 0.2s; }
+    .reveal-d3 { transition-delay: 0.3s; }
+
+    /* ── SECTION DIVIDER (Yeldra-style vertical line + dot) ── */
+    .section-divider {
+      display: flex; flex-direction: column; align-items: center;
+      padding: 0; gap: 0; pointer-events: none;
+    }
+    .section-divider-line {
+      width: 1px; height: 72px;
+      background: linear-gradient(to bottom, rgba(164,55,0,0.22), rgba(164,55,0,0.04));
+    }
+    .section-divider-dot {
+      width: 5px; height: 5px; border-radius: 50%;
+      background: #a43700; opacity: 0.5;
+    }
+    /* Dark section divider */
+    .section-divider--dark .section-divider-line {
+      background: linear-gradient(to bottom, rgba(255,181,154,0.3), rgba(255,181,154,0.04));
+    }
+    .section-divider--dark .section-divider-dot { background: #ffb59a; }
+
+    @media (max-width: 960px) {
+      #nav { width: calc(100vw - 32px); padding: 10px 16px; gap: 16px; }
+      .nav-links { display: none; }
+      .pain-inner, .clara-wrap, #cta { grid-template-columns: 1fr; gap: 56px; padding: 100px 24px; }
+      .how-inner { padding: 100px 24px; }
+      .how-header { flex-direction: column; align-items: flex-start; margin-bottom: 56px; }
+      .bento-grid, .bento-bottom { grid-template-columns: 1fr; }
+      .bento-hero { min-height: auto; }
+      .bento-outer { padding: 100px 24px; }
+      #clara-drawer { width: calc(100vw - 32px); right: 16px; }
+      footer { padding: 32px 24px; }
+      .hero-h1 { font-size: clamp(44px, 10vw, 72px); }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav id="nav">
+  <a href="#" class="nav-logo">
+    <div class="nav-icon">
+      <span style="font-size:16px;font-weight:900;color:white;font-family:'Plus Jakarta Sans',sans-serif;letter-spacing:-0.03em;">K</span>
+    </div>
+    <span class="nav-wordmark">Klaro</span>
+  </a>
+  <div class="nav-links">
+    <a href="#how">Proceso</a>
+    <a href="#features">Funciones</a>
+    <a href="klaro-clara.html">Clara</a>
+  </div>
+  <a href="klaro-dashboard.html" class="nav-pill">Empezar gratis</a>
+</nav>
+
+<!-- HERO -->
+<div id="hero-wrapper">
+  <div id="hero-sticky">
+    <div id="hero-bg"></div>
+    <div id="sun-rays"></div>
+    <div id="sun"></div>
+
+    <!-- Phase 1: Dawn -->
+    <div class="hero-phase" id="phase-dawn">
+      <span class="overline">Para freelancers hispanohablantes en Alemania</span>
+      <h1 class="hero-h1">La Steuererklärung<br><em>ya no da miedo.</em></h1>
+      <p class="hero-sub">Respira. Clara lo entiende todo por ti — en español.</p>
+    </div>
+
+    <!-- Phase 2: Noon -->
+    <div class="hero-phase" id="phase-noon">
+      <span class="overline">Clara · Tu asesora fiscal</span>
+      <h1 class="hero-h1">Cuentas claras<br><em>con Klaro.</em></h1>
+      <p class="hero-sub">Al fin, los impuestos en Alemania tienen sentido.</p>
+      <div class="hero-actions">
+        <a href="klaro-clara.html" class="btn-primary" onclick="openClara(); return false;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="white"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg>
+          Hablar con Clara
+        </a>
+        <a href="#how" class="btn-ghost">Ver cómo funciona</a>
+      </div>
+    </div>
+
+    <!-- Scroll hint -->
+    <div id="scroll-hint">
+      <span>Descubre</span>
+      <div class="scroll-line"></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- PAIN -->
+<div id="pain">
+  <div class="pain-inner">
+    <div class="reveal">
+      <p class="pain-label">El problema</p>
+      <h2 class="pain-h2">El sistema alemán<br/>es <em>otra lengua.</em></h2>
+      <p class="pain-body">Formularios en alemán burocrático, plazos invisibles, y la angustia constante de si lo estás haciendo bien.</p>
+    </div>
+    <div class="pain-cards">
+      <div class="pain-card reveal reveal-d1">
+        <div class="pain-card-icon">
+          <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14,2 14,8 20,8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+        </div>
+        <div>
+          <p class="pain-card-title">Formularios incomprensibles</p>
+          <p class="pain-card-desc">Fragebogen, EÜR, UStVA… todo en alemán técnico, sin contexto para hispanohablantes.</p>
+        </div>
+      </div>
+      <div class="pain-card reveal reveal-d2">
+        <div class="pain-card-icon">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/></svg>
+        </div>
+        <div>
+          <p class="pain-card-title">Plazos que se te escapan</p>
+          <p class="pain-card-desc">10 de abril, 10 de julio, 31 de julio… Un retraso genera multa automática del Finanzamt.</p>
+        </div>
+      </div>
+      <div class="pain-card reveal reveal-d3">
+        <div class="pain-card-icon">
+          <svg viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+        </div>
+        <div>
+          <p class="pain-card-title">Dinero que dejas en la mesa</p>
+          <p class="pain-card-desc">Home office 6€/día, equipo, Rürup, seguro médico — deducciones que no reclamas por desconocimiento.</p>
+        </div>
+      </div>
+      <div class="pain-card reveal reveal-d3">
+        <div class="pain-card-icon">
+          <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        </div>
+        <div>
+          <p class="pain-card-title">Sin apoyo en tu idioma</p>
+          <p class="pain-card-desc">Un Steuerberater cuesta 500–1.500€/año. Y casi ninguno habla español.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- DIVIDER -->
+<div class="section-divider section-divider--dark" style="background:#1e1b17; padding: 0;">
+  <div class="section-divider-line"></div>
+  <div class="section-divider-dot"></div>
+</div>
+
+<!-- CLARA -->
+<div id="clara-section">
+  <div class="clara-wrap">
+    <!-- Chat preview -->
+    <div class="chat-card reveal" id="spotlight-card">
+      <div class="chat-hd">
+        <div class="chat-avatar"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
+        <div>
+          <div class="chat-nm">Clara</div>
+          <div class="chat-st"><span class="online"></span>Asesora fiscal IA · en línea</div>
+        </div>
+      </div>
+      <div class="chat-msgs">
+        <div class="bubble-c">Hola, soy Clara. Pregúntame lo que necesites sobre tus impuestos en Alemania — en español.</div>
+        <div class="bubble-u">¿Qué pasa si supero los 25.000€ este año?</div>
+        <div class="bubble-c">Si facturaste más de <strong>25.000€ el año pasado</strong>, pierdes la Kleinunternehmerregelung en 2025 — tendrás que cobrar el <strong>19% de IVA</strong> en tus facturas. La buena noticia: también podrás deducir el IVA de tus gastos. ¿Te explico cómo hacer la transición?</div>
+      </div>
+      <div class="chat-chips">
+        <span class="chip" onclick="openClara('¿Cómo facturo a clientes de la UE?')">Facturas UE</span>
+        <span class="chip" onclick="openClara('¿Puedo deducir el home office?')">Home office</span>
+        <span class="chip" onclick="openClara('¿Qué es la EÜR?')">EÜR</span>
+      </div>
+      <div class="chat-input">
+        <div class="chat-fake-input">Pregunta a Clara…</div>
+        <div class="chat-send-btn" onclick="openClara()"><svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg></div>
+      </div>
+    </div>
+    <!-- Copy -->
+    <div class="clara-copy reveal reveal-d2">
+      <span class="clara-tag">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        Clara · Tu asesora
+      </span>
+      <div>
+        <p class="section-label">Tu asesora personal</p>
+        <h2 class="section-h2">Clara te aporta<br/><em>claridad.</em></h2>
+        <p class="section-body">Entrenada con la normativa del BMF 2025 — respuestas en español, con números reales y plazos exactos. Sin rodeos, sin alemán burocrático.</p>
+      </div>
+      <div class="feature-list">
+        <div class="feature-row">
+          <div class="feature-row-icon"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg></div>
+          <div>
+            <p class="feature-row-title">Deducciones que no sabías</p>
+            <p class="feature-row-desc">Home office 6€/día, equipo, software, seguro médico hasta 2.800€/año, Rürup hasta 29.344€.</p>
+          </div>
+        </div>
+        <div class="feature-row">
+          <div class="feature-row-icon"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
+          <div>
+            <p class="feature-row-title">Plazos fiscales en tiempo real</p>
+            <p class="feature-row-desc">UStVA, Einkommensteuer, EÜR — Clara sabe qué vence y cuándo, y te avisa antes.</p>
+          </div>
+        </div>
+        <div class="feature-row">
+          <div class="feature-row-icon"><svg viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
+          <div>
+            <p class="feature-row-title">Reserva fiscal automática</p>
+            <p class="feature-row-desc">Calcula cuánto apartar de cada ingreso para que el 31 de julio no te pille sin fondos.</p>
+          </div>
+        </div>
+      </div>
+      <a href="klaro-clara.html" class="btn-primary" style="width:fit-content;" onclick="openClara(); return false;">Hablar con Clara ahora</a>
+    </div>
+  </div>
+</div>
+
+<!-- DIVIDER -->
+<div class="section-divider" style="padding: 0;">
+  <div class="section-divider-line"></div>
+  <div class="section-divider-dot"></div>
+</div>
+
+<!-- HOW -->
+<div id="how">
+  <div class="how-inner">
+    <div class="how-header">
+      <div class="reveal">
+        <p class="section-label">Proceso</p>
+        <h2 class="section-h2">Tres pasos.<br/><em>Cero burocracia.</em></h2>
+      </div>
+      <p class="reveal reveal-d2" style="font-size:15px;color:#594139;line-height:1.65;max-width:36ch;">Del caos del Finanzamt a tener todo bajo control — en menos tiempo del que crees.</p>
+    </div>
+    <div class="steps-zigzag">
+      <div class="step-row reveal">
+        <div class="step-num">01</div>
+        <div>
+          <div class="step-icon-wrap">
+            <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          </div>
+          <h3 class="step-title">Cuéntale tu situación</h3>
+          <p class="step-desc">Freiberufler o Gewerbe, cuánto facturas, si tienes Steuernummer. Clara recoge tu perfil fiscal en 2 minutos — sin formularios.</p>
+        </div>
+      </div>
+      <div class="step-row reveal reveal-d1">
+        <div class="step-num">02</div>
+        <div>
+          <div class="step-icon-wrap">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#a43700" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          </div>
+          <h3 class="step-title">Clara lo analiza todo</h3>
+          <p class="step-desc">Calcula tus obligaciones, detecta deducciones perdidas, te dice cuánto apartar para el Finanzamt y qué vence cuándo.</p>
+        </div>
+      </div>
+      <div class="step-row reveal reveal-d2">
+        <div class="step-num">03</div>
+        <div>
+          <div class="step-icon-wrap">
+            <svg viewBox="0 0 24 24"><polyline points="20,6 9,17 4,12"/></svg>
+          </div>
+          <h3 class="step-title">Actúa con claridad</h3>
+          <p class="step-desc">Registra ingresos y gastos, genera facturas con el IVA correcto, y llega al 31 de julio sin sorpresas ni multas.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- FEATURES BENTO -->
+<div id="features">
+  <div class="bento-outer">
+    <div class="reveal" style="max-width:520px;">
+      <p class="section-label">Funcionalidades</p>
+      <h2 class="section-h2">Todo lo que necesitas,<br/><em>nada más.</em></h2>
+    </div>
+    <div class="bento-grid">
+      <div class="bento-cell bento-hero reveal">
+        <div class="bento-cell-icon"><svg viewBox="0 0 24 24"><polyline points="22,12 18,12 15,21 9,3 6,12 2,12" stroke="white" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <p class="bento-cell-title">Dashboard fiscal inteligente</p>
+        <p class="bento-cell-desc" style="max-width:32ch;">Ingresos, gastos, beneficio neto y reserva fiscal — en una pantalla, actualizado con cada factura.</p>
+        <div class="bento-metrics">
+          <div>
+            <div class="bento-metric-val">4.247€</div>
+            <div class="bento-metric-lbl">Ingresos mes</div>
+          </div>
+          <div>
+            <div class="bento-metric-val" style="color:rgba(255,255,255,0.6);">1.253€</div>
+            <div class="bento-metric-lbl">Reserva fiscal</div>
+          </div>
+        </div>
+      </div>
+      <div class="bento-cell reveal reveal-d1">
+        <div class="bento-cell-icon"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
+        <p class="bento-cell-title">Calendario fiscal</p>
+        <p class="bento-cell-desc">Nunca más un plazo perdido.</p>
+        <div class="mini-cal">
+          <div class="mini-cal-row">
+            <div class="mcd">8</div><div class="mcd">9</div>
+            <div class="mcd urgent">10</div>
+            <div class="mcd">11</div><div class="mcd">12</div>
+          </div>
+          <div class="mini-cal-row">
+            <div class="mcd">29</div><div class="mcd">30</div>
+            <div class="mcd today">31</div>
+            <div class="mcd ok">1</div><div class="mcd ok">2</div>
+          </div>
+        </div>
+        <p class="cal-warning">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#ba1a1a" stroke-width="2.5" stroke-linecap="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          UStVA vence en 3 días
+        </p>
+      </div>
+      <div class="bento-bottom">
+        <div class="bento-cell reveal">
+          <div class="bento-cell-icon"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14,2 14,8 20,8"/></svg></div>
+          <p class="bento-cell-title">Facturas profesionales</p>
+          <p class="bento-cell-desc">IVA correcto — 19%, 7% o Reverse Charge para clientes UE. PDF listo para enviar.</p>
+        </div>
+        <div class="bento-cell reveal reveal-d1">
+          <div class="bento-cell-icon"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></div>
+          <p class="bento-cell-title">Detector de deducciones</p>
+          <p class="bento-cell-desc">Clara revisa tus gastos y detecta lo que olvidaste declarar — home office, equipo, formación, KSK.</p>
+        </div>
+        <div class="bento-cell reveal reveal-d2">
+          <div class="bento-cell-icon"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+          <p class="bento-cell-title">100% privado</p>
+          <p class="bento-cell-desc">Tus datos nunca salen de tu dispositivo. Sin suscripciones ocultas. Tu API key, tu control.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TESTIMONIALS — marquee -->
+<div id="testi">
+  <div class="testi-header reveal">
+    <p class="section-label">Testimonios</p>
+    <h2 class="section-h2">Lo que dicen<br/><em>nuestros usuarios</em></h2>
+  </div>
+  <div style="overflow:hidden; padding: 8px 0;">
+    <div class="marquee-track">
+      <!-- Set 1 -->
+      <div class="testi-card">
+        <div class="testi-stars">★★★★★</div>
+        <p class="testi-quote">Llevaba 2 años en Berlín sin entender qué declarar. <strong>Clara me lo explicó todo en 10 minutos</strong> y me ahorré casi 800€ en deducciones que no sabía que tenía.</p>
+        <div class="testi-author"><div class="testi-av" style="background:#a43700;">M</div><div><p class="testi-name">Marcos D.</p><p class="testi-role">Diseñador UX · Berlín</p></div></div>
+      </div>
+      <div class="testi-card">
+        <div class="testi-stars">★★★★★</div>
+        <p class="testi-quote">Por fin entiendo la diferencia entre Freiberufler y Gewerbe. <strong>Estaba pagando Gewerbesteuer de más.</strong> Clara me ayudó a corregirlo con el Finanzamt.</p>
+        <div class="testi-author"><div class="testi-av" style="background:#556338;">L</div><div><p class="testi-name">Laura V.</p><p class="testi-role">Traductora · Múnich</p></div></div>
+      </div>
+      <div class="testi-card">
+        <div class="testi-stars">★★★★★</div>
+        <p class="testi-quote">La UStVA del Q1 se me pasó en 2023 y tuve una multa de 150€. Desde Klaro, <strong>el calendario me avisa con una semana de antelación.</strong> Nunca más.</p>
+        <div class="testi-author"><div class="testi-av" style="background:#00628c;">A</div><div><p class="testi-name">Andrés R.</p><p class="testi-role">Desarrollador · Hamburgo</p></div></div>
+      </div>
+      <div class="testi-card">
+        <div class="testi-stars">★★★★★</div>
+        <p class="testi-quote"><strong>El home office nunca lo había declarado</strong> porque no sabía cómo. Clara me explicó los 6€/día y los 210 días máximos. Recuperé 1.260€ en deducciones.</p>
+        <div class="testi-author"><div class="testi-av" style="background:#8c4a00;">C</div><div><p class="testi-name">Carolina M.</p><p class="testi-role">Consultora · Frankfurt</p></div></div>
+      </div>
+      <div class="testi-card">
+        <div class="testi-stars">★★★★★</div>
+        <p class="testi-quote">Me registré como Freiberufler gracias a Klaro. Antes pagaba a un Steuerberater 800€/año. <strong>Ahora lo gestiono yo solo</strong>, con Clara como apoyo.</p>
+        <div class="testi-author"><div class="testi-av" style="background:#4a1942;">R</div><div><p class="testi-name">Rodrigo S.</p><p class="testi-role">Fotógrafo · Stuttgart</p></div></div>
+      </div>
+      <!-- Set 2 — duplicate for seamless loop -->
+      <div class="testi-card">
+        <div class="testi-stars">★★★★★</div>
+        <p class="testi-quote">Llevaba 2 años en Berlín sin entender qué declarar. <strong>Clara me lo explicó todo en 10 minutos</strong> y me ahorré casi 800€ en deducciones que no sabía que tenía.</p>
+        <div class="testi-author"><div class="testi-av" style="background:#a43700;">M</div><div><p class="testi-name">Marcos D.</p><p class="testi-role">Diseñador UX · Berlín</p></div></div>
+      </div>
+      <div class="testi-card">
+        <div class="testi-stars">★★★★★</div>
+        <p class="testi-quote">Por fin entiendo la diferencia entre Freiberufler y Gewerbe. <strong>Estaba pagando Gewerbesteuer de más.</strong> Clara me ayudó a corregirlo con el Finanzamt.</p>
+        <div class="testi-author"><div class="testi-av" style="background:#556338;">L</div><div><p class="testi-name">Laura V.</p><p class="testi-role">Traductora · Múnich</p></div></div>
+      </div>
+      <div class="testi-card">
+        <div class="testi-stars">★★★★★</div>
+        <p class="testi-quote">La UStVA del Q1 se me pasó en 2023 y tuve una multa de 150€. Desde Klaro, <strong>el calendario me avisa con una semana de antelación.</strong> Nunca más.</p>
+        <div class="testi-author"><div class="testi-av" style="background:#00628c;">A</div><div><p class="testi-name">Andrés R.</p><p class="testi-role">Desarrollador · Hamburgo</p></div></div>
+      </div>
+      <div class="testi-card">
+        <div class="testi-stars">★★★★★</div>
+        <p class="testi-quote"><strong>El home office nunca lo había declarado</strong> porque no sabía cómo. Clara me explicó los 6€/día y los 210 días máximos. Recuperé 1.260€ en deducciones.</p>
+        <div class="testi-author"><div class="testi-av" style="background:#8c4a00;">C</div><div><p class="testi-name">Carolina M.</p><p class="testi-role">Consultora · Frankfurt</p></div></div>
+      </div>
+      <div class="testi-card">
+        <div class="testi-stars">★★★★★</div>
+        <p class="testi-quote">Me registré como Freiberufler gracias a Klaro. Antes pagaba a un Steuerberater 800€/año. <strong>Ahora lo gestiono yo solo</strong>, con Clara como apoyo.</p>
+        <div class="testi-author"><div class="testi-av" style="background:#4a1942;">R</div><div><p class="testi-name">Rodrigo S.</p><p class="testi-role">Fotógrafo · Stuttgart</p></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CTA -->
+<div id="cta">
+  <div class="cta-sun-orb reveal"></div>
+  <div class="reveal reveal-d1">
+    <p class="section-label">Empieza hoy</p>
+    <h2 class="cta-h2">Al fin,<br/>los impuestos <em>claros.</em></h2>
+    <p class="cta-sub">Únete a los freelancers hispanohablantes en Alemania que duermen tranquilos gracias a Klaro.</p>
+    <div class="cta-row">
+      <a href="klaro-clara.html" class="btn-primary" style="font-size:15px;padding:15px 32px;" onclick="openClara(); return false;">Hablar con Clara gratis</a>
+      <a href="#how" class="btn-secondary" style="font-size:15px;padding:15px 24px;">Ver cómo funciona</a>
+    </div>
+    <p class="cta-note">Sin tarjeta de crédito · En español · Datos 100% privados</p>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <span class="footer-brand">Klaro</span>
+  <div class="footer-links">
+    <a href="#">Términos</a>
+    <a href="#">Privacidad</a>
+    <a href="#">Soporte</a>
+  </div>
+  <p class="footer-note">© 2025 Klaro · Orientación informativa, no asesoría fiscal oficial.</p>
+</footer>
+
+<!-- CLARA FLOAT WIDGET -->
+<button id="clara-fab" onclick="toggleClara()" aria-label="Abrir Clara">
+  <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+</button>
+
+<div id="clara-drawer">
+  <div class="drawer-hd">
+    <div class="drawer-hd-left">
+      <div class="drawer-avatar"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
+      <div>
+        <div class="drawer-name">Clara</div>
+        <div class="drawer-status"><span class="online"></span>Asesora fiscal</div>
+      </div>
+    </div>
+    <button class="drawer-close" onclick="toggleClara()">
+      <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+  </div>
+
+  <div id="no-key-banner" class="no-key-banner" style="display:flex; background:#f0fdf4; border-color:#86efac;">
+    <svg viewBox="0 0 24 24" style="stroke:#16a34a;"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" fill="none" stroke-width="2" stroke-linecap="round"/></svg>
+    <div style="color:#15803d;">
+      <strong>Modo demo activo</strong> — respuestas ilustrativas. <span class="no-key-link" onclick="this.closest('.no-key-banner').nextElementSibling.querySelector('.dm-chip').click()">Prueba una pregunta →</span>
+    </div>
+  </div>
+
+  <div id="drawer-msgs">
+    <div class="dm-clara">¡Hola! Soy Clara, tu asesora fiscal para <strong>freelancers en Alemania</strong>. Pregúntame lo que necesites — en español.</div>
+    <div class="dm-chips">
+      <span class="dm-chip" onclick="sendMsg('¿Qué impuestos pago como Freiberufler?')">¿Qué impuestos pago?</span>
+      <span class="dm-chip" onclick="sendMsg('¿Cuándo vence mi UStVA del Q2?')">¿Cuándo vence UStVA?</span>
+      <span class="dm-chip" onclick="sendMsg('¿Puedo deducir el home office?')">Home office</span>
+    </div>
+  </div>
+
+  <div id="drawer-input-bar">
+    <textarea id="drawer-input" rows="1" placeholder="Pregunta a Clara…"></textarea>
+    <button id="drawer-send" disabled onclick="sendFromInput()">
+      <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+    </button>
+  </div>
+</div>
+
+<div id="grain" style="position:fixed;inset:0;z-index:9999;pointer-events:none;opacity:0.035;background-image:url('data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22200%22 height=%22200%22><filter id=%22n%22><feTurbulence type=%22fractalNoise%22 baseFrequency=%220.9%22 numOctaves=%224%22 stitchTiles=%22stitch%22/><feColorMatrix type=%22saturate%22 values=%220%22/></filter><rect width=%22200%22 height=%22200%22 filter=%22url(%23n)%22/></svg>');"></div>
+
+<script>
+// ─── SUN SCROLL ──────────────────────────────────────────
+const heroWrapper = document.getElementById('hero-wrapper');
+const sun = document.getElementById('sun');
+const sunRays = document.getElementById('sun-rays');
+const phaseDawn = document.getElementById('phase-dawn');
+const phaseNoon = document.getElementById('phase-noon');
+const nav = document.getElementById('nav');
+
+function ease(t) { return t < 0.5 ? 2*t*t : -1+(4-2*t)*t; }
+function clamp(v,a,b) { return Math.max(a,Math.min(b,v)); }
+function lerp(a,b,t) { return a+(b-a)*t; }
+
+let raf = false;
+function onScroll() {
+  if (!raf) { raf = true; requestAnimationFrame(tick); }
+}
+function tick() {
+  raf = false;
+  const rect = heroWrapper.getBoundingClientRect();
+  const scrollable = heroWrapper.offsetHeight - window.innerHeight;
+  const raw = clamp(-rect.top / scrollable, 0, 1);
+  const p = ease(raw);
+
+  document.documentElement.style.setProperty('--p', raw);
+
+  // Sun
+  const scale = lerp(0.06, 2.4, p);
+  const opacity = lerp(0.07, 1, Math.pow(p, 0.55));
+  const g1 = lerp(8, 140, p);
+  const g2 = lerp(16, 260, p);
+  const g3 = lerp(24, 380, p);
+
+  sun.style.transform = `translate(-50%, -50%) scale(${scale})`;
+  sun.style.opacity = opacity;
+  sun.style.boxShadow = `0 0 ${g1}px rgba(255,200,80,0.85), 0 0 ${g2}px rgba(255,130,40,0.5), 0 0 ${g3}px rgba(200,70,10,0.18)`;
+
+  const heroBg = document.getElementById('hero-bg');
+  if (heroBg) heroBg.style.opacity = 0.4 + p * 0.6;
+
+  sunRays.style.transform = `translate(-50%, -50%) scale(${scale * 1.5}) rotate(${p * 90}deg)`;
+  sunRays.style.opacity = Math.pow(p, 1.5) * 0.9;
+
+  // Phase text
+  if (raw < 0.5) {
+    phaseDawn.style.opacity = clamp(1 - raw / 0.38, 0, 1);
+    phaseDawn.style.transform = `translateY(${-raw * 8}px)`;
+    phaseNoon.style.opacity = 0;
+    phaseNoon.style.transform = 'translateY(12px)';
+  } else {
+    phaseDawn.style.opacity = 0;
+    const n = clamp((raw - 0.58) / 0.28, 0, 1);
+    phaseNoon.style.opacity = n;
+    phaseNoon.style.transform = `translateY(${(1-n)*12}px)`;
+  }
+
+  // Nav
+  nav.classList.toggle('scrolled', window.scrollY > 60);
+}
+
+window.addEventListener('scroll', onScroll, { passive: true });
+onScroll();
+
+// ─── SPOTLIGHT — chat card + all bento cells ─────────────
+function attachSpotlight(el) {
+  el.addEventListener('mousemove', e => {
+    const r = el.getBoundingClientRect();
+    el.style.setProperty('--mx', `${e.clientX - r.left}px`);
+    el.style.setProperty('--my', `${e.clientY - r.top}px`);
+  });
+}
+const spotCard = document.getElementById('spotlight-card');
+if (spotCard) attachSpotlight(spotCard);
+document.querySelectorAll('.bento-cell').forEach(attachSpotlight);
+
+// ─── NAV PILL magnetic lift ───────────────────────────────
+const navPill = document.querySelector('.nav-pill');
+if (navPill) {
+  navPill.addEventListener('mousemove', e => {
+    const r = navPill.getBoundingClientRect();
+    const cx = r.left + r.width / 2, cy = r.top + r.height / 2;
+    const dx = (e.clientX - cx) / r.width * 6;
+    const dy = (e.clientY - cy) / r.height * 4;
+    navPill.style.transform = `translate(${dx}px, ${dy - 1}px)`;
+  });
+  navPill.addEventListener('mouseleave', () => {
+    navPill.style.transform = '';
+  });
+}
+
+// ─── REVEAL ──────────────────────────────────────────────
+const obs = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('in'); });
+}, { threshold: 0.1, rootMargin: '0px 0px -32px 0px' });
+document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+
+// ─── CLARA WIDGET ─────────────────────────────────────────
+let drawerOpen = false;
+let chatHistory = [];
+
+function toggleClara() {
+  drawerOpen = !drawerOpen;
+  document.getElementById('clara-drawer').classList.toggle('open', drawerOpen);
+}
+
+function openClara(prefill) {
+  drawerOpen = true;
+  document.getElementById('clara-drawer').classList.add('open');
+  if (prefill) {
+    document.getElementById('drawer-input').value = prefill;
+    updateSendBtn();
+    setTimeout(() => sendFromInput(), 200);
+  }
+}
+
+function checkKey() {
+  const key = localStorage.getItem('klaro_api_key') || '';
+  const banner = document.getElementById('no-key-banner');
+  if (!key) {
+    banner.style.display = 'flex';
+    if (document.getElementById('key-input')) document.getElementById('key-input').value = '';
+  } else {
+    banner.style.display = 'none';
+  }
+}
+
+function saveKey() {
+  const val = document.getElementById('key-input').value.trim();
+  if (val.length > 10) {
+    localStorage.setItem('klaro_api_key', val);
+    document.getElementById('no-key-banner').style.display = 'none';
+  }
+}
+
+const drawerInput = document.getElementById('drawer-input');
+const drawerSend = document.getElementById('drawer-send');
+
+function updateSendBtn() {
+  drawerSend.disabled = !drawerInput.value.trim();
+}
+
+drawerInput.addEventListener('input', () => {
+  drawerInput.style.height = 'auto';
+  drawerInput.style.height = Math.min(drawerInput.scrollHeight, 100) + 'px';
+  updateSendBtn();
+});
+
+drawerInput.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendFromInput(); }
+});
+
+function sendFromInput() {
+  const text = drawerInput.value.trim();
+  if (!text) return;
+  drawerInput.value = '';
+  drawerInput.style.height = 'auto';
+  updateSendBtn();
+  sendMsg(text);
+}
+
+const SYSTEM_CLARA = `Eres Clara, asesora fiscal de Klaro — una app para freelancers hispanohablantes en Alemania.
+
+PERSONALIDAD: Cálida, directa, empática. Español natural. Si usas términos alemanes, los explicas. Cercana como una amiga que sabe de impuestos.
+
+CONOCIMIENTO FISCAL 2025 (fuente: BMF «Steuern von A–Z» 2025):
+- Freiberufler (§18 EStG): diseño, programación, consultoría, periodismo, arte. Solo Einkommensteuer + UStVA. NO Gewerbesteuer.
+- Gewerbetreibender: actividades comerciales. Pagan también Gewerbesteuer (beneficios > 24.500€/año).
+- Grundfreibetrag 2025: 12.096€ libre de impuesto. Tarifa: 0%→14%→42% (>68.430€)→45% (>277.826€).
+- Solidaritätszuschlag: eliminado para la mayoría. Solo si IRPF > 19.950€.
+- Kleinunternehmerregelung (§19 UStG) 2025: facturación año anterior < 25.000€ Y actual < 100.000€ → no cobras IVA (pero tampoco deduces Vorsteuer). NOTA: hasta 2024 el límite era 22.000€/50.000€.
+- UStVA: declaración periódica IVA. Trimestral: vence día 10 del mes siguiente (10 ene, 10 abr, 10 jul, 10 oct).
+- Einkommensteuererklärung: vence 31 julio del año siguiente. Con Steuerberater: hasta 2 junio del año posterior.
+- EÜR: registro simplificado ingresos–gastos. Obligatorio para Freiberufler.
+- Deducciones: Home office 6€/día máx 210 días = 1.260€/año. Equipo ≤800€ → 100% inmediato. Software → 100% inmediato. Seguro médico → hasta 2.800€/año (Sonderausgaben). Rürup/Basisrente → hasta 29.344€/año. Transporte: 0,30€/km hasta 20km, 0,38€/km después.
+- KSK: si eres artista/diseñador/escritor → pagas solo el 50% de la cotización a Rentenversicherung y Krankenversicherung.
+- Facturas UE con NIF-IVA: Reverse Charge (§13b UStG), sin IVA. Fuera de UE: sin IVA.
+- ELSTER (elster.de): portal oficial para declaraciones electrónicas.
+
+REGLAS: Máx 3-5 frases salvo que pidan detalle. Usa viñetas si hay más de 2 puntos. Personaliza si tienes datos del usuario. Termina SIEMPRE con: {"sugerencias": ["pregunta 1", "pregunta 2"]}. Añade: "⚠️ Orientación informativa, no asesoría oficial."`;
+
+function getDemoReply(text) {
+  const t = text.toLowerCase();
+  if (/ustv|iva|trimest/i.test(t))
+    return `La **UStVA** es tu declaración trimestral de IVA. Vence el **día 10 del mes siguiente** a cada trimestre:\n\n• Q1 (ene–mar): **10 de abril**\n• Q2 (abr–jun): **10 de julio**\n• Q3 (jul–sep): **10 de octubre**\n• Q4 (oct–dic): **10 de enero**\n\nSe presenta a través de **ELSTER** (elster.de). Un retraso genera multa automática del Finanzamt.\n\n⚠️ Orientación informativa, no asesoría fiscal oficial. {"sugerencias": ["¿Cómo me registro en ELSTER?", "¿Qué pasa si pago tarde?"]}`;
+  if (/home.?offic|teletrab|6.?€|jornada/i.test(t))
+    return `¡El home office es una de las deducciones más aprovechables! Como Freiberufler puedes deducir:\n\n• **6€ por día** de trabajo en casa, hasta **210 días al año → 1.260€** deducibles\n• No necesitas un cuarto exclusivo — aplica aunque trabajes en el salón\n• Se declara en el EÜR (línea Arbeitszimmer / Homeoffice-Pauschale)\n\n¿Tienes facturado más de 25.000€? Cuéntame y te calculo cuánto puedes recuperar.\n\n⚠️ Orientación informativa, no asesoría oficial. {"sugerencias": ["¿Puedo deducir equipo y software?", "¿Cómo registro el home office en el EÜR?"]}`;
+  if (/kleinunternehm|25[\.\,]?000|iva|factura.*(eu|ue|union)/i.test(t))
+    return `La **Kleinunternehmerregelung** (§19 UStG) te permite no cobrar IVA si:\n\n• Facturaste **menos de 25.000€ el año anterior**, Y\n• Prevés **menos de 100.000€ este año**\n\nVentaja: menos burocracia. Desventaja: tampoco puedes deducir el IVA de tus compras (Vorsteuer).\n\nSi facturas a clientes de la UE con NIF-IVA: aplica **Reverse Charge** (sin IVA en la factura, ellos lo autoliquidan).\n\n⚠️ Orientación informativa, no asesoría oficial. {"sugerencias": ["¿Cómo hago una factura Reverse Charge?", "¿Cuándo conviene salir de Kleinunternehmer?"]}`;
+  if (/freiberuf|gewerb|diferenc/i.test(t))
+    return `Buena pregunta — es una de las más importantes:\n\n• **Freiberufler (§18 EStG):** diseñadores, programadores, consultores, periodistas, artistas. Solo pagas **Einkommensteuer + UStVA**. Sin Gewerbesteuer.\n• **Gewerbetreibender:** actividades comerciales (tienda, distribución). Pagas también **Gewerbesteuer** si el beneficio supera los 24.500€/año.\n\nLa mayoría de creativos y tech freelancers son Freiberufler — es la categoría más ventajosa.\n\n⚠️ Orientación informativa, no asesoría oficial. {"sugerencias": ["¿Cómo me registro como Freiberufler?", "¿Qué impuestos pago en total?"]}`;
+  if (/eür|einnahmen|gastos|deducc/i.test(t))
+    return `El **EÜR** (Einnahmenüberschussrechnung) es el registro simplificado de ingresos y gastos obligatorio para Freiberufler. Funciona así:\n\n• **Ingresos** — todas tus facturas cobradas\n• **Gastos deducibles** — equipo (≤800€: 100% inmediato), software, home office 1.260€/año, seguro médico hasta 2.800€, formación, transporte\n• **Beneficio neto** = Ingresos – Gastos → sobre esto pagas Einkommensteuer\n\nKlaro registra todo automáticamente con cada factura que creas.\n\n⚠️ Orientación informativa, no asesoría oficial. {"sugerencias": ["¿Qué gastos puedo deducir?", "¿Cuándo presento el EÜR?"]}`;
+  if (/impuest|cuánto.*(pago|pagar)|renta|einkomm/i.test(t))
+    return `Como Freiberufler en Alemania pagas estos impuestos:\n\n• **Einkommensteuer** — IRPF. Tarifa: 0% hasta 12.096€ → 14% → 42% (>68.430€). Vence el **31 de julio**.\n• **UStVA** — IVA trimestral (si no eres Kleinunternehmer). Vence el día 10.\n• **Solidaritätszuschlag** — eliminado para la mayoría (solo si tu IRPF supera 19.950€).\n• **Krankenversicherung** — seguro médico, aprox. 14-15% de ingresos.\n\nRegla práctica: aparta el **30-35%** de cada ingreso como reserva fiscal.\n\n⚠️ Orientación informativa, no asesoría oficial. {"sugerencias": ["¿Cómo calculo mi reserva fiscal?", "¿Qué es el Grundfreibetrag?"]}`;
+  if (/plazo|deadline|fecha|vence|cuando/i.test(t))
+    return `Los plazos fiscales clave para Freiberufler en 2025–2026:\n\n• **10 abr** — UStVA Q1\n• **10 jul** — UStVA Q2\n• **31 jul** — Einkommensteuererklärung 2024\n• **10 oct** — UStVA Q3\n• **10 ene** — UStVA Q4\n\nCon Steuerberater tienes hasta el **2 de junio del año siguiente**. El Finanzamt cobra multa automática por retraso.\n\n⚠️ Orientación informativa, no asesoría oficial. {"sugerencias": ["¿Cómo presento la UStVA?", "¿Puedo pedir prórroga?"]}`;
+  // Default
+  return `¡Hola! Soy Clara, tu asesora fiscal para freelancers hispanohablantes en Alemania. Puedo ayudarte con:\n\n• **Impuestos** — Einkommensteuer, UStVA, EÜR\n• **Deducciones** — home office, equipo, seguro médico, Rürup\n• **Plazos** — cuándo presentar cada declaración\n• **Facturas** — IVA correcto para clientes alemanes, de la UE o fuera\n• **Estado** — Freiberufler vs Gewerbe, Kleinunternehmer\n\nPregúntame lo que necesites — en español, sin rodeos. {"sugerencias": ["¿Qué impuestos pago como Freiberufler?", "¿Cuánto puedo deducir de home office?", "¿Cuándo vence mi UStVA?"]}`;
+}
+
+async function sendMsg(text) {
+  const msgs = document.getElementById('drawer-msgs');
+
+  // User bubble
+  const ub = document.createElement('div');
+  ub.className = 'dm-user';
+  ub.textContent = text;
+  msgs.appendChild(ub);
+
+  // Typing indicator
+  const typing = document.createElement('div');
+  typing.className = 'dm-typing';
+  typing.innerHTML = '<div class="dm-dot"></div><div class="dm-dot"></div><div class="dm-dot"></div>';
+  msgs.appendChild(typing);
+  msgs.scrollTop = msgs.scrollHeight;
+
+  chatHistory.push({ role: 'user', content: text });
+
+  let reply = '';
+  try {
+    // 1. Try Next.js backend route (works when served by npm run dev)
+    let usedBackend = false;
+    try {
+      const res = await fetch('/api/clara', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ messages: chatHistory }),
+        signal: AbortSignal.timeout(3500)
+      });
+      if (res.ok) {
+        const data = await res.json();
+        reply = data.content?.[0]?.text || data.reply || '';
+        usedBackend = true;
+      }
+    } catch {}
+
+    // 2. Fallback: Gemini direct browser API with saved key
+    if (!usedBackend) {
+      const key = localStorage.getItem('klaro_api_key');
+      if (key) {
+        const geminiMessages = [
+          { role: 'system', content: SYSTEM_CLARA },
+          ...chatHistory
+        ];
+        const res2 = await fetch('https://generativelanguage.googleapis.com/v1beta/openai/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${key}`
+          },
+          body: JSON.stringify({ model: 'gemini-2.0-flash', max_tokens: 1024, messages: geminiMessages })
+        });
+        const data2 = await res2.json();
+        if (!res2.ok) throw new Error(`[${res2.status}] ${data2.error?.message || data2.error?.status || JSON.stringify(data2.error) || 'Error de API'}`);
+        reply = data2.choices?.[0]?.message?.content || '';
+      } else {
+        // 3. No key → smart demo mode (keyword-based responses)
+        await new Promise(r => setTimeout(r, 900 + Math.random() * 600));
+        reply = getDemoReply(text);
+      }
+    }
+
+    chatHistory.push({ role: 'assistant', content: reply });
+    typing.remove();
+
+    // Parse suggestions
+    const sugMatch = reply.match(/\{"sugerencias":\s*\[([^\]]+)\]/);
+    const sugs = [];
+    if (sugMatch) { try { sugs.push(...JSON.parse(`[${sugMatch[1]}]`)); } catch {} }
+    const clean = reply.replace(/\{"sugerencias":[^}]+\}/g, '').trim();
+
+    const cb = document.createElement('div');
+    cb.className = 'dm-clara';
+    cb.innerHTML = clean.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br/>');
+    msgs.appendChild(cb);
+
+    if (sugs.length) {
+      const chips = document.createElement('div');
+      chips.className = 'dm-chips';
+      sugs.forEach(s => {
+        const c = document.createElement('span');
+        c.className = 'dm-chip';
+        c.textContent = s;
+        c.onclick = () => sendMsg(s);
+        chips.appendChild(c);
+      });
+      msgs.appendChild(chips);
+    }
+  } catch (err) {
+    typing.remove();
+    const eb = document.createElement('div');
+    eb.className = 'dm-clara';
+    eb.innerHTML = `<span style="color:#ba1a1a;">Error: ${err.message}</span>`;
+    msgs.appendChild(eb);
+  }
+
+  msgs.scrollTop = msgs.scrollHeight;
+}
+</script>
+</body>
+</html>

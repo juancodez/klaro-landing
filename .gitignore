@@ -1,0 +1,14 @@
+# Design system dev tools (local only)
+design-system/
+design-system-url/
+
+# Claude Code
+.claude/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Env (never commit secrets)
+.env
+.env.local

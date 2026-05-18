@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Clara — Klaro · Tu asesora fiscal en Alemania</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            navy:   '#1A1D2E',
+            orange: '#a43700',
+            amber:  '#FFB830',
+            cream:  '#fff8f1',
+            muted:  '#594139',
+            soft:   '#e0bfb4',
+          },
+          fontFamily: { sans: ['Plus Jakarta Sans', 'sans-serif'] },
+        },
+      },
+    };
+  </script>
+  <style>
+    * { font-family: 'Plus Jakarta Sans', sans-serif; }
+
+    .chat-scroll::-webkit-scrollbar { width: 4px; }
+    .chat-scroll::-webkit-scrollbar-track { background: transparent; }
+    .chat-scroll::-webkit-scrollbar-thumb { background: #e0bfb4; border-radius: 10px; }
+
+    @keyframes bounce-dot {
+      0%, 80%, 100% { transform: translateY(0); opacity: .4; }
+      40%           { transform: translateY(-6px); opacity: 1; }
+    }
+    .dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: #e0bfb4; animation: bounce-dot 1.2s ease-in-out infinite; }
+    .dot:nth-child(2) { animation-delay: .2s; }
+    .dot:nth-child(3) { animation-delay: .4s; }
+
+    @keyframes fade-up { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+    .msg-in { animation: fade-up .22s ease-out forwards; }
+
+    .guide-card:hover .guide-title { color: #a43700; }
+
+    .suggestion { transition: all .15s; }
+    .suggestion:hover { background: #a43700 !important; color: #fff !important; border-color: #a43700 !important; }
+
+    textarea { field-sizing: content; min-height: 36px; max-height: 120px; }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="/auth.js"></script>
+</head>
+<body class="bg-[#f4ede5] text-[#1e1b17] overflow-hidden h-screen flex">
+
+<!-- ─── SIDEBAR ────────────────────────────────────────────────── -->
+<aside class="hidden md:flex flex-col w-64 h-screen flex-shrink-0 bg-[#fff8f1] z-40" style="border-right:1px solid rgba(164,55,0,0.08)">
+
+  <!-- Logo -->
+  <div class="flex items-center gap-3 px-6 py-6">
+    <div class="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style="background:#a43700">
+      <span style="font-size:18px;font-weight:900;color:white;font-family:'Plus Jakarta Sans',sans-serif;letter-spacing:-0.03em;">K</span>
+    </div>
+    <div>
+      <h1 class="text-xl font-black text-[#1e1b17] leading-none">Klaro</h1>
+    </div>
+  </div>
+
+  <!-- Nav -->
+  <nav class="flex-1 overflow-y-auto px-3 space-y-0.5">
+    <a href="klaro-dashboard.html" class="flex items-center gap-3 px-4 py-3 rounded-xl text-[#594139] font-medium hover:bg-[#a43700]/5 transition-all text-sm">
+      <svg class="w-[18px] h-[18px] flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+      Dashboard
+    </a>
+    <a href="klaro-facturas.html" class="flex items-center gap-3 px-4 py-3 rounded-xl text-[#594139] font-medium hover:bg-[#a43700]/5 transition-all text-sm">
+      <svg class="w-[18px] h-[18px] flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+      Facturas
+    </a>
+    <a href="klaro-gastos.html" class="flex items-center gap-3 px-4 py-3 rounded-xl text-[#594139] font-medium hover:bg-[#a43700]/5 transition-all text-sm">
+      <svg class="w-[18px] h-[18px] flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+      Gastos
+    </a>
+    <a href="klaro-impuestos.html" class="flex items-center gap-3 px-4 py-3 rounded-xl text-[#594139] font-medium hover:bg-[#a43700]/5 transition-all text-sm">
+      <svg class="w-[18px] h-[18px] flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+      Impuestos
+    </a>
+    <!-- Active: Clara -->
+    <a href="klaro-clara.html" class="flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm transition-all" style="background:#a43700;color:#fff;border-right:3px solid #a43700">
+      <svg class="w-[18px] h-[18px] flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      Clara
+    </a>
+  </nav>
+
+  <!-- Bottom -->
+  <div class="px-3 pb-6 pt-4 space-y-1" style="border-top:1px solid rgba(164,55,0,0.08)">
+    <button onclick="openKeyModal()" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm transition-all active:scale-95" style="background:#a43700;color:#fff">
+      <svg class="w-[18px] h-[18px] flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+      Nueva Factura
+    </button>
+    <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-xl text-[#594139] font-medium hover:bg-[#a43700]/5 transition-all text-sm">
+      <svg class="w-[18px] h-[18px] flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="7" r="4"/><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/></svg>
+      Perfil
+    </a>
+    <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-xl text-[#594139] font-medium hover:bg-[#a43700]/5 transition-all text-sm">
+      <svg class="w-[18px] h-[18px] flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93A10 10 0 0 0 4.93 19.07M4.93 4.93A10 10 0 0 1 19.07 19.07"/></svg>
+      Ayuda
+    </a>
+    <p class="text-center text-[9px] px-4 pt-1" style="color:rgba(89,65,57,.4)">Klaro Beta · v1.0 · 2026</p>
+  </div>
+</aside>
+
+<!-- ─── MAIN ──────────────────────────────────────────────────────── -->
+<div class="flex flex-col flex-1 min-w-0 h-screen overflow-hidden">
+
+  <!-- Top Bar -->
+  <header class="flex-shrink-0 h-16 bg-[#fff8f1] flex items-center justify-between px-6" style="border-bottom:1px solid rgba(164,55,0,0.08)">
+    <div class="flex items-center gap-4">
+      <div>
+        <h1 class="text-base font-bold text-[#1e1b17] leading-tight">Clara</h1>
+        <div class="flex items-center gap-1.5">
+          <span id="status-dot" class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
+          <p id="status-label" class="text-xs text-[#594139]/70">Conectando…</p>
+        </div>
+      </div>
+    </div>
+    <div class="flex items-center gap-3">
+      <!-- API key button -->
+      <button onclick="openKeyModal()" title="Configurar API key" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all hover:bg-[#a43700]/8" style="color:#594139;border:1px solid rgba(164,55,0,0.15)">
+        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        API Key
+      </button>
+      <!-- Bell -->
+      <button class="relative w-9 h-9 rounded-xl flex items-center justify-center transition-colors hover:bg-[#a43700]/5" style="color:#594139">
+        <svg class="w-[17px] h-[17px]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+        <span class="absolute top-1.5 right-1.5 w-1.5 h-1.5 rounded-full" style="background:#a43700"></span>
+      </button>
+      <!-- Avatar -->
+      <div class="w-8 h-8 rounded-full flex items-center justify-center text-white font-bold text-xs" style="background:linear-gradient(135deg,#a43700,#c94c13)">AG</div>
+    </div>
+  </header>
+
+  <!-- Grid -->
+  <div class="flex-1 overflow-hidden flex gap-0 p-4 gap-4">
+
+    <!-- ── CHAT ────────────────────────────────────── -->
+    <section class="flex flex-col flex-1 min-w-0 bg-[#fff8f1] rounded-2xl overflow-hidden" style="border:1px solid rgba(164,55,0,0.1)">
+
+      <!-- Chat Header -->
+      <div class="flex items-center justify-between px-5 py-4 flex-shrink-0" style="border-bottom:1px solid rgba(164,55,0,0.08);background:#fff8f1">
+        <div class="flex items-center gap-3">
+          <div class="relative">
+            <div class="w-11 h-11 rounded-2xl flex items-center justify-center" style="background:linear-gradient(135deg,#a43700,#c94c13)">
+              <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            </div>
+            <span id="clara-dot" class="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border-2 border-[#fff8f1]" style="background:#fbbf24"></span>
+          </div>
+          <div>
+            <p class="font-bold text-[#1e1b17] text-sm">Clara</p>
+            <p id="clara-status" class="text-xs" style="color:#594139">Iniciando…</p>
+          </div>
+        </div>
+        <div class="flex items-center gap-1">
+          <button onclick="clearChat()" title="Nueva conversación" class="p-2 rounded-xl transition-colors hover:bg-[#a43700]/8" style="color:#594139">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.84"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- No-key banner (hidden by default) -->
+      <div id="no-key-banner" class="hidden mx-4 mt-3 flex-shrink-0 items-start gap-2 p-3 rounded-xl text-xs" style="background:#FFFBEB;border:1px solid #FCD34D">
+        <svg class="w-3.5 h-3.5 flex-shrink-0 mt-0.5" style="color:#D97706" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        <p style="color:#92400E">
+          API key no configurada. Clara responde en modo demo.
+          <button onclick="openKeyModal()" style="color:#a43700;font-weight:700;text-decoration:underline;margin-left:4px">Añadir API key →</button>
+        </p>
+      </div>
+
+      <!-- Demo-mode banner -->
+      <div id="demo-banner" class="hidden mx-4 mt-3 flex-shrink-0 items-start gap-2 p-3 rounded-xl text-xs" style="background:#f0fdf4;border:1px solid #bbf7d0">
+        <svg class="w-3.5 h-3.5 flex-shrink-0 mt-0.5" style="color:#16a34a" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+        <p style="color:#166534">Clara en modo demo — respuestas predefinidas. Conecta una API key para IA real.</p>
+      </div>
+
+      <!-- Messages -->
+      <div id="chat-messages" class="flex-1 overflow-y-auto chat-scroll px-5 py-5 space-y-5" style="background:#f9f3eb">
+
+        <div class="msg-in">
+          <div class="flex items-start gap-3">
+            <div class="w-8 h-8 rounded-xl flex-shrink-0 flex items-center justify-center mt-0.5" style="background:linear-gradient(135deg,#a43700,#c94c13)">
+              <svg class="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            </div>
+            <div>
+              <div class="bg-white rounded-2xl rounded-tl-sm px-4 py-3 shadow-sm text-sm leading-relaxed max-w-lg" style="border:1px solid rgba(164,55,0,0.08);color:#1e1b17">
+                <p class="font-bold mb-1">¡Hola, Ana! 👋</p>
+                <p style="color:#594139">Soy Clara, tu asesora fiscal para Alemania. Puedo ayudarte con <strong>impuestos, deducciones, plazos y todo lo que necesitas como Freiberuflerin</strong>. ¿Por dónde empezamos?</p>
+              </div>
+              <div class="flex flex-wrap gap-1.5 mt-2">
+                <button class="suggestion text-xs px-3 py-1.5 rounded-full font-semibold border" style="border-color:rgba(164,55,0,0.25);color:#a43700;background:rgba(164,55,0,0.04)" onclick="sendSuggestion(this)">¿Qué es la UStVA?</button>
+                <button class="suggestion text-xs px-3 py-1.5 rounded-full font-semibold border" style="border-color:rgba(164,55,0,0.25);color:#a43700;background:rgba(164,55,0,0.04)" onclick="sendSuggestion(this)">¿Cuándo vence el IVA?</button>
+                <button class="suggestion text-xs px-3 py-1.5 rounded-full font-semibold border" style="border-color:rgba(164,55,0,0.25);color:#a43700;background:rgba(164,55,0,0.04)" onclick="sendSuggestion(this)">¿Puedo deducir home office?</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Input -->
+      <div class="px-4 pb-4 pt-3 flex-shrink-0 bg-[#fff8f1]" style="border-top:1px solid rgba(164,55,0,0.08)">
+        <div class="flex items-end gap-2 rounded-2xl px-3 py-2 transition-all" style="background:#f4ede5;border:1px solid rgba(164,55,0,0.12)">
+          <textarea
+            id="chat-input"
+            placeholder="Escribe tu pregunta fiscal…"
+            rows="1"
+            class="flex-1 bg-transparent border-none focus:ring-0 outline-none text-sm resize-none py-1"
+            style="color:#1e1b17;"
+            onkeydown="handleKey(event)"
+            oninput="autoResize(this)"
+          ></textarea>
+          <button onclick="sendMessage()" class="w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0 transition-all active:scale-95" style="background:#a43700">
+            <svg class="w-[14px] h-[14px] text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+          </button>
+        </div>
+        <p class="text-[10px] text-center mt-2" style="color:rgba(89,65,57,.5)">Orientación informativa · no asesoría oficial · Klaro 2026</p>
+      </div>
+    </section>
+
+    <!-- ── RIGHT PANEL ──────────────────────────────── -->
+    <aside class="hidden lg:flex flex-col w-72 xl:w-80 flex-shrink-0 space-y-4 overflow-y-auto chat-scroll">
+
+      <!-- Quick guides -->
+      <div class="bg-[#fff8f1] rounded-2xl p-5" style="border:1px solid rgba(164,55,0,0.1)">
+        <h3 class="font-bold text-[#1e1b17] text-sm mb-4 flex items-center gap-2">
+          <svg class="w-4 h-4" style="color:#a43700" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+          Guías rápidas
+        </h3>
+        <div class="space-y-2">
+          <button class="guide-card w-full text-left p-3.5 rounded-xl transition-all" style="background:#f4ede5" onclick="sendSuggestion(this,'¿Cómo funciona la UStVA trimestral en Alemania?')">
+            <div class="flex items-center gap-3">
+              <div class="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 text-lg" style="background:#fff8f1">📋</div>
+              <div class="min-w-0">
+                <p class="guide-title text-sm font-semibold text-[#1e1b17] transition-colors truncate">UStVA trimestral</p>
+                <p class="text-xs truncate" style="color:#594139">Declaración IVA — cada 3 meses</p>
+              </div>
+            </div>
+          </button>
+          <button class="guide-card w-full text-left p-3.5 rounded-xl transition-all" style="background:#f4ede5" onclick="sendSuggestion(this,'¿Cómo deduzco la oficina en casa en Alemania?')">
+            <div class="flex items-center gap-3">
+              <div class="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 text-lg" style="background:#fff8f1">🏠</div>
+              <div class="min-w-0">
+                <p class="guide-title text-sm font-semibold text-[#1e1b17] transition-colors truncate">Home office</p>
+                <p class="text-xs truncate" style="color:#594139">Arbeitszimmer — hasta 1.260 €/año</p>
+              </div>
+            </div>
+          </button>
+          <button class="guide-card w-full text-left p-3.5 rounded-xl transition-all" style="background:#f4ede5" onclick="sendSuggestion(this,'¿Qué es la Kleinunternehmerregelung y me conviene?')">
+            <div class="flex items-center gap-3">
+              <div class="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 text-lg" style="background:#fff8f1">🏷️</div>
+              <div class="min-w-0">
+                <p class="guide-title text-sm font-semibold text-[#1e1b17] transition-colors truncate">Kleinunternehmer</p>
+                <p class="text-xs truncate" style="color:#594139">Sin IVA si facturas &lt; 25.000 €</p>
+              </div>
+            </div>
+          </button>
+          <button class="guide-card w-full text-left p-3.5 rounded-xl transition-all" style="background:#f4ede5" onclick="sendSuggestion(this,'¿Cómo registro mi Steuernummer en el Finanzamt de Berlín?')">
+            <div class="flex items-center gap-3">
+              <div class="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 text-lg" style="background:#fff8f1">🔢</div>
+              <div class="min-w-0">
+                <p class="guide-title text-sm font-semibold text-[#1e1b17] transition-colors truncate">Steuernummer</p>
+                <p class="text-xs truncate" style="color:#594139">Cómo obtenerla en el Finanzamt</p>
+              </div>
+            </div>
+          </button>
+          <button class="guide-card w-full text-left p-3.5 rounded-xl transition-all" style="background:#f4ede5" onclick="sendSuggestion(this,'¿Qué gastos son deducibles como Freiberufler en Alemania?')">
+            <div class="flex items-center gap-3">
+              <div class="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 text-lg" style="background:#fff8f1">🧾</div>
+              <div class="min-w-0">
+                <p class="guide-title text-sm font-semibold text-[#1e1b17] transition-colors truncate">Betriebsausgaben</p>
+                <p class="text-xs truncate" style="color:#594139">Gastos deducibles como autónomo</p>
+              </div>
+            </div>
+          </button>
+        </div>
+      </div>
+
+      <!-- Deadlines -->
+      <div class="bg-[#fff8f1] rounded-2xl p-5" style="border:1px solid rgba(164,55,0,0.1)">
+        <h3 class="font-bold text-[#1e1b17] text-sm mb-4 flex items-center gap-2">
+          <svg class="w-4 h-4" style="color:#a43700" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          Próximos vencimientos
+        </h3>
+        <div class="space-y-2.5">
+          <div class="flex items-center gap-3 py-2" style="border-bottom:1px solid rgba(164,55,0,0.07)">
+            <div class="w-9 h-9 rounded-xl flex flex-col items-center justify-center flex-shrink-0" style="background:#FEF2F2">
+              <span class="text-[11px] font-bold leading-none" style="color:#E24B4A">10</span>
+              <span class="text-[9px] uppercase leading-none" style="color:#E24B4A">abr</span>
+            </div>
+            <div class="flex-1 min-w-0">
+              <p class="text-sm font-semibold text-[#1e1b17] truncate">UStVA Q1 2026</p>
+              <p class="text-xs" style="color:#594139">Declaración IVA trimestral</p>
+            </div>
+            <span class="text-xs font-bold" style="color:#E24B4A">Vencido</span>
+          </div>
+          <div class="flex items-center gap-3 py-2" style="border-bottom:1px solid rgba(164,55,0,0.07)">
+            <div class="w-9 h-9 rounded-xl flex flex-col items-center justify-center flex-shrink-0" style="background:#FFFBEB">
+              <span class="text-[11px] font-bold leading-none" style="color:#D97706">10</span>
+              <span class="text-[9px] uppercase leading-none" style="color:#D97706">jul</span>
+            </div>
+            <div class="flex-1 min-w-0">
+              <p class="text-sm font-semibold text-[#1e1b17] truncate">UStVA Q2 2026</p>
+              <p class="text-xs" style="color:#594139">Declaración IVA trimestral</p>
+            </div>
+            <span class="text-xs font-bold" style="color:#D97706">85d</span>
+          </div>
+          <div class="flex items-center gap-3 py-2">
+            <div class="w-9 h-9 rounded-xl flex flex-col items-center justify-center flex-shrink-0" style="background:#F0FDF4">
+              <span class="text-[11px] font-bold leading-none" style="color:#059669">31</span>
+              <span class="text-[9px] uppercase leading-none" style="color:#059669">jul</span>
+            </div>
+            <div class="flex-1 min-w-0">
+              <p class="text-sm font-semibold text-[#1e1b17] truncate">Einkommensteuer 2025</p>
+              <p class="text-xs" style="color:#594139">Declaración renta anual</p>
+            </div>
+            <span class="text-xs font-bold" style="color:#059669">106d</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- CTA -->
+      <div class="rounded-2xl p-5 relative overflow-hidden flex-shrink-0" style="background:linear-gradient(135deg,#a43700,#812900)">
+        <div class="relative z-10">
+          <h4 class="text-lg font-extrabold text-white mb-1">Diagnóstico fiscal</h4>
+          <p class="text-sm mb-4 leading-snug" style="color:rgba(255,255,255,.8)">Descubre tu situación fiscal completa en 5 minutos.</p>
+          <a href="index.html" class="inline-flex items-center gap-1.5 bg-white font-bold text-sm px-4 py-2 rounded-xl transition-all active:scale-95" style="color:#a43700">
+            Iniciar diagnóstico
+            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+          </a>
+        </div>
+        <div class="absolute -right-6 -bottom-6 w-28 h-28 rounded-full opacity-10" style="background:rgba(255,255,255,.12)"></div>
+      </div>
+
+    </aside>
+  </div>
+</div>
+
+<!-- ─── API KEY MODAL ─────────────────────────────────────────────── -->
+<div id="key-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center" style="background:rgba(0,0,0,.5)">
+  <div class="bg-white rounded-2xl p-6 w-full max-w-sm shadow-2xl" style="border:1px solid rgba(0,0,0,.08)">
+    <h3 class="font-bold text-[#1e1b17] text-base mb-1">Configurar API Key</h3>
+    <p class="text-sm mb-4" style="color:#594139">Añade tu Anthropic API key para activar la IA real de Clara. Se guarda solo en tu navegador.</p>
+    <input id="modal-key-input" type="password" placeholder="sk-ant-api03-..." class="w-full rounded-xl px-4 py-3 text-sm outline-none mb-3" style="background:#f4ede5;border:1px solid rgba(164,55,0,0.2);color:#1e1b17" />
+    <div class="flex gap-2">
+      <button onclick="closeKeyModal()" class="flex-1 py-2.5 rounded-xl text-sm font-semibold transition-all" style="background:#f4ede5;color:#594139">Cancelar</button>
+      <button onclick="saveModalKey()" class="flex-1 py-2.5 rounded-xl text-sm font-bold text-white transition-all active:scale-95" style="background:#a43700">Guardar</button>
+    </div>
+    <a href="https://console.anthropic.com/settings/keys" target="_blank" class="block text-center text-xs mt-3 font-medium" style="color:#a43700;text-decoration:underline">Obtener API key en Anthropic Console →</a>
+  </div>
+</div>
+
+<!-- ─── SCRIPT ────────────────────────────────────────────────────── -->
+<script>
+  // ── Config ────────────────────────────────────────────────────────────
+  const API_URL   = '/api/clara';
+  let chatHistory = [];   // [{role, content}]
+  let isLoading   = false;
+  let useRealApi  = false;
+
+  // ── API key helpers ───────────────────────────────────────────────────
+  function getApiKey() { try { return localStorage.getItem('klaro_api_key'); } catch { return null; } }
+
+  function openKeyModal()  {
+    document.getElementById('modal-key-input').value = getApiKey() || '';
+    document.getElementById('key-modal').classList.remove('hidden');
+    document.getElementById('key-modal').classList.add('flex');
+    setTimeout(() => document.getElementById('modal-key-input').focus(), 50);
+  }
+  function closeKeyModal() {
+    document.getElementById('key-modal').classList.add('hidden');
+    document.getElementById('key-modal').classList.remove('flex');
+  }
+  function saveModalKey() {
+    const val = document.getElementById('modal-key-input').value.trim();
+    if (val) { localStorage.setItem('klaro_api_key', val); }
+    else      { localStorage.removeItem('klaro_api_key'); }
+    closeKeyModal();
+    checkApiConnection();
+  }
+
+  // ── Check API reachability ────────────────────────────────────────────
+  async function checkApiConnection() {
+    const dot   = document.getElementById('status-dot');
+    const label = document.getElementById('status-label');
+    const cDot  = document.getElementById('clara-dot');
+    const cStat = document.getElementById('clara-status');
+
+    try {
+      const res = await fetch(API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', ...(getApiKey() ? {'x-api-key': getApiKey()} : {}) },
+        body: JSON.stringify({ messages: [{role:'user', content:'ping'}], userProfile: null }),
+        signal: AbortSignal.timeout(4000),
+      });
+      const data = await res.json();
+
+      if (res.status === 401 || data.needsKey) {
+        // Server reachable but no key
+        useRealApi = false;
+        dot.style.background   = '#fbbf24';
+        cDot.style.background  = '#fbbf24';
+        label.textContent      = 'Servidor OK · sin API key';
+        cStat.textContent      = 'Modo demo activo';
+        document.getElementById('no-key-banner').classList.remove('hidden');
+        document.getElementById('no-key-banner').classList.add('flex');
+        document.getElementById('demo-banner').classList.add('hidden');
+      } else {
+        // Fully connected
+        useRealApi = true;
+        dot.style.background   = '#22c55e';
+        cDot.style.background  = '#22c55e';
+        label.textContent      = 'Clara conectada · IA activa';
+        cStat.textContent      = 'IA real · En línea';
+        document.getElementById('no-key-banner').classList.add('hidden');
+        document.getElementById('demo-banner').classList.add('hidden');
+      }
+    } catch {
+      // Server not running → demo mode
+      useRealApi = false;
+      dot.style.background   = '#f97316';
+      cDot.style.background  = '#f97316';
+      label.textContent      = 'Modo demo · sin servidor';
+      cStat.textContent      = 'Respuestas predefinidas';
+      document.getElementById('no-key-banner').classList.add('hidden');
+      document.getElementById('demo-banner').classList.remove('hidden');
+      document.getElementById('demo-banner').classList.add('flex');
+    }
+  }
+
+  // ── Canned responses (fallback when server is not running) ────────────
+  const DEMO = {
+    ustv: `La **UStVA** (Umsatzsteuervoranmeldung) es la declaración trimestral del IVA que debes presentar como Freiberuflerin:\n\n• **Frecuencia:** trimestral\n• **Plazo:** el 10 del mes siguiente (10 abr, 10 jul, 10 oct, 10 ene)\n• **Cómo:** a través de ELSTER (elster.de)\n• **IVA general:** 19% · reducido: 7%\n\n⚠️ Orientación informativa, no asesoría fiscal oficial.`,
+    iva:  `Los **plazos del IVA** en Alemania 2026:\n\n• Q1 (Ene–Mar): **10 de abril** ⚠️ ya vencido\n• Q2 (Abr–Jun): **10 de julio**\n• Q3 (Jul–Sep): **10 de octubre**\n• Q4 (Oct–Dic): **10 de enero 2027**\n\nSi no presentaste el Q1, hazlo cuanto antes para evitar recargos.\n\n⚠️ Orientación informativa, no asesoría fiscal oficial.`,
+    home: `En Alemania puedes deducir el **Arbeitszimmer** (home office) de dos formas:\n\n• **Pauschale (2023+):** 6 €/día trabajado en casa, máx. **1.260 €/año** (210 días)\n• **Espacio dedicado:** % proporcional del alquiler y suministros si usas una habitación solo para trabajo\n\nLa Pauschale es más sencilla y suficiente para la mayoría de freelancers.\n\n⚠️ Orientación informativa, no asesoría fiscal oficial.`,
+    klein:`La **Kleinunternehmerregelung** (§19 UStG) te permite no cobrar IVA si:\n\n• Año anterior: ingresos brutos ≤ **25.000 €** (nuevo límite 2025)\n• Año actual previsto: ≤ **100.000 €**\n\n✅ Ventajas: facturas simples, sin UStVA trimestral\n❌ Desventajas: no puedes deducir el IVA de tus compras (Vorsteuer)\n\n⚠️ Orientación informativa, no asesoría fiscal oficial.`,
+    steu: `Para tu **Steuernummer** en el Finanzamt de Berlín:\n\n1. **Anmeldung** en la Bürgeramt (pasaporte + contrato alquiler)\n2. **Fragebogen zur steuerlichen Erfassung** — en ELSTER o en papel\n3. Recibes la Steuernummer por correo en **2–6 semanas**\n\nMientras esperas, escribe "Steuernummer beantragt" en tus facturas.\n\n⚠️ Orientación informativa, no asesoría fiscal oficial.`,
+    gast: `Como Freiberuflerin en Alemania, los gastos deducibles más comunes:\n\n• 💻 Software (Adobe, Figma, SaaS) — 100% inmediato\n• 📱 Equipo (MacBook, monitor) — si ≤ 800 €, 100%; si más, amortización 3–5 años\n• 🏠 Home office — Pauschale 6 €/día, máx. 1.260 €/año\n• 🚌 Transporte — BVG, 0,30 €/km en coche propio\n• 📚 Formación profesional — 100%\n• 📞 Teléfono e internet — parte proporcional laboral\n\n⚠️ Orientación informativa, no asesoría fiscal oficial.`,
+    def:  `Como asesora fiscal para **españoles en Alemania**, puedo ayudarte con:\n\n• UStVA (IVA trimestral)\n• Einkommensteuer (renta anual)\n• Betriebsausgaben (gastos deducibles)\n• Steuernummer y registro en Finanzamt\n• Kleinunternehmerregelung\n• Facturas a clientes UE (Reverse Charge)\n\nCuéntame más sobre tu situación y te doy una respuesta más precisa.\n\n⚠️ Orientación informativa, no asesoría fiscal oficial.`,
+  };
+
+  function getCannedResponse(msg) {
+    const m = msg.toLowerCase();
+    if (m.includes('ustv') || m.includes('trimest'))       return DEMO.ustv;
+    if (m.includes('iva') || m.includes('vence') || m.includes('plazo')) return DEMO.iva;
+    if (m.includes('home') || m.includes('oficina') || m.includes('arbeit')) return DEMO.home;
+    if (m.includes('klein') || m.includes('sin iva'))      return DEMO.klein;
+    if (m.includes('steuer') || m.includes('finanzamt') || m.includes('numer')) return DEMO.steu;
+    if (m.includes('gasto') || m.includes('deduci') || m.includes('betrieb')) return DEMO.gast;
+    return DEMO.def;
+  }
+
+  // ── Render helpers ────────────────────────────────────────────────────
+  function esc(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+  function md(text) {
+    // Strip sugerencias JSON
+    text = text.replace(/\{"sugerencias":[^}]+\}/g, '').trim();
+    // Bold
+    text = text.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+    // Bullets
+    text = text.replace(/^[•\-\*] (.+)$/gm, '<li style="display:flex;gap:6px;align-items:flex-start"><span style="color:#a43700;flex-shrink:0">•</span><span>$1</span></li>');
+    text = text.replace(/^\d+\. (.+)$/gm, '<li style="display:flex;gap:6px;align-items:flex-start"><span style="color:#a43700;flex-shrink:0;font-weight:700">→</span><span>$1</span></li>');
+    text = text.replace(/^✅ (.+)$/gm, '<li style="display:flex;gap:6px;align-items:flex-start"><span>✅</span><span>$1</span></li>');
+    text = text.replace(/^❌ (.+)$/gm, '<li style="display:flex;gap:6px;align-items:flex-start"><span>❌</span><span>$1</span></li>');
+    text = text.replace(/^✓ (.+)$/gm,  '<li style="display:flex;gap:6px;align-items:flex-start;color:#16a34a"><span>✓</span><span>$1</span></li>');
+    // Wrap <li> groups in <ul>
+    text = text.replace(/(<li[\s\S]+?<\/li>\n?)+/g, m => `<ul style="margin:6px 0;space-y:4px">${m}</ul>`);
+    // Blockquote
+    text = text.replace(/^> (.+)$/gm, '<div style="background:rgba(164,55,0,0.06);border-left:2px solid #a43700;padding:6px 12px;border-radius:0 8px 8px 0;margin:6px 0;font-size:12px">$1</div>');
+    // Line breaks
+    text = text.replace(/\n\n/g,'<br/><br/>').replace(/\n/g,'<br/>');
+    return text;
+  }
+
+  function extractSuggestions(text) {
+    const m = text.match(/"sugerencias":\s*\[([^\]]+)\]/);
+    if (!m) return [];
+    try { return JSON.parse(`[${m[1]}]`); } catch { return []; }
+  }
+
+  // ── Append messages ───────────────────────────────────────────────────
+  function appendUser(text) {
+    const c = document.getElementById('chat-messages');
+    const d = document.createElement('div');
+    d.className = 'msg-in flex justify-end';
+    d.innerHTML = `<div style="background:#a43700;color:#fff;border-radius:16px 2px 16px 16px;padding:10px 16px;font-size:14px;max-width:75%;line-height:1.5;font-weight:500;box-shadow:0 2px 8px rgba(164,55,0,.2)">${esc(text)}</div>`;
+    c.appendChild(d);
+    scrollBot();
+  }
+
+  function appendTyping() {
+    const c = document.getElementById('chat-messages');
+    const d = document.createElement('div');
+    d.id = 'typing';
+    d.className = 'msg-in flex items-start gap-3';
+    d.innerHTML = `
+      <div style="width:32px;height:32px;border-radius:12px;background:linear-gradient(135deg,#a43700,#c94c13);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+        <svg style="width:16px;height:16px;color:white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      </div>
+      <div style="background:#fff8f1;border:1px solid rgba(164,55,0,.1);border-radius:2px 16px 16px 16px;padding:12px 16px;box-shadow:0 1px 4px rgba(0,0,0,.05);display:flex;gap:6px;align-items:center">
+        <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+      </div>`;
+    c.appendChild(d);
+    scrollBot();
+  }
+
+  function removeTyping() { const el = document.getElementById('typing'); if(el) el.remove(); }
+
+  function appendClara(text, suggestions=[]) {
+    const c = document.getElementById('chat-messages');
+    const d = document.createElement('div');
+    d.className = 'msg-in';
+    const pills = suggestions.length
+      ? `<div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px">${suggestions.map(s=>`<button class="suggestion" style="font-size:11px;padding:6px 12px;border-radius:100px;font-weight:600;border:1px solid rgba(164,55,0,.25);color:#a43700;background:rgba(164,55,0,.04)" onclick="sendSuggestion(this)">${esc(s)}</button>`).join('')}</div>`
+      : '';
+    d.innerHTML = `
+      <div style="display:flex;align-items:flex-start;gap:12px">
+        <div style="width:32px;height:32px;border-radius:12px;background:linear-gradient(135deg,#a43700,#c94c13);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px">
+          <svg style="width:16px;height:16px;color:white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        </div>
+        <div style="flex:1;max-width:480px">
+          <div style="background:#fff8f1;border:1px solid rgba(164,55,0,.1);border-radius:2px 16px 16px 16px;padding:12px 16px;box-shadow:0 1px 4px rgba(0,0,0,.05);font-size:14px;color:#1e1b17;line-height:1.65">
+            ${md(text)}
+          </div>
+          ${pills}
+        </div>
+      </div>`;
+    c.appendChild(d);
+    scrollBot();
+  }
+
+  function scrollBot() {
+    const c = document.getElementById('chat-messages');
+    c.scrollTop = c.scrollHeight;
+  }
+
+  // ── Send ──────────────────────────────────────────────────────────────
+  async function sendMessage(override) {
+    const input = document.getElementById('chat-input');
+    const text  = (override ?? input.value).trim();
+    if (!text || isLoading) return;
+
+    input.value = '';
+    autoResize(input);
+    isLoading = true;
+    chatHistory.push({ role: 'user', content: text });
+
+    appendUser(text);
+    appendTyping();
+
+    if (useRealApi) {
+      try {
+        const key = getApiKey();
+        const headers = { 'Content-Type': 'application/json' };
+        if (key) headers['x-api-key'] = key;
+
+        const res  = await fetch(API_URL, {
+          method: 'POST',
+          headers,
+          body: JSON.stringify({ messages: chatHistory, userProfile: null }),
+        });
+        const data = await res.json();
+
+        removeTyping();
+
+        if (res.status === 401 || data.needsKey) {
+          useRealApi = false;
+          document.getElementById('no-key-banner').classList.remove('hidden');
+          document.getElementById('no-key-banner').classList.add('flex');
+          const reply = getCannedResponse(text);
+          chatHistory.push({ role: 'assistant', content: reply });
+          appendClara(reply);
+        } else if (data.content?.text) {
+          const rawText   = data.content.text;
+          const sugs      = extractSuggestions(rawText);
+          chatHistory.push({ role: 'assistant', content: rawText });
+          appendClara(rawText, sugs);
+        } else {
+          appendClara('Ups, algo salió mal. Inténtalo de nuevo.');
+        }
+      } catch (e) {
+        removeTyping();
+        // Server went down mid-session → fall back
+        useRealApi = false;
+        const reply = getCannedResponse(text);
+        chatHistory.push({ role: 'assistant', content: reply });
+        appendClara(reply);
+      }
+    } else {
+      // Demo mode — simulate latency
+      await new Promise(r => setTimeout(r, 700 + Math.random()*500));
+      removeTyping();
+      const reply = getCannedResponse(text);
+      chatHistory.push({ role: 'assistant', content: reply });
+      appendClara(reply);
+    }
+
+    isLoading = false;
+  }
+
+  function sendSuggestion(btn, override) {
+    sendMessage(override ?? btn.textContent.trim());
+  }
+
+  function handleKey(e) {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+  }
+
+  function autoResize(el) {
+    el.style.height = 'auto';
+    el.style.height = Math.min(el.scrollHeight, 120) + 'px';
+  }
+
+  function clearChat() {
+    chatHistory.length = 0;
+    const c = document.getElementById('chat-messages');
+    c.innerHTML = '';
+    appendClara('Chat reiniciado. ¡Hola de nuevo! ¿En qué puedo ayudarte con tus impuestos en Alemania?', ['¿Qué es la UStVA?','¿Cuándo vence el IVA?','¿Puedo deducir home office?']);
+  }
+
+  // Close modal on backdrop click
+  document.getElementById('key-modal').addEventListener('click', function(e) {
+    if (e.target === this) closeKeyModal();
+  });
+
+  // ── Init ──────────────────────────────────────────────────────────────
+  document.getElementById('chat-input').focus();
+  checkApiConnection();
+</script>
+
+</body>
+</html>

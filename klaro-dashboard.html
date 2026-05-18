@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard — Klaro · Asistente Fiscal para Freelancers en Alemania</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            orange: '#a43700',
+            amber:  '#FFB830',
+            cream:  '#fff8f1',
+            muted:  '#594139',
+            soft:   '#e0bfb4',
+          },
+          fontFamily: { sans: ['Plus Jakarta Sans', 'sans-serif'] },
+        },
+      },
+    };
+  </script>
+  <style>
+    * { font-family: 'Plus Jakarta Sans', sans-serif; }
+
+    /* Thin scrollbar */
+    .thin-scroll::-webkit-scrollbar { width: 4px; }
+    .thin-scroll::-webkit-scrollbar-track { background: transparent; }
+    .thin-scroll::-webkit-scrollbar-thumb { background: #e0bfb4; border-radius: 10px; }
+
+    /* FAB glow */
+    @keyframes pulse-glow {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(164,55,0,.4), 0 8px 24px rgba(164,55,0,.35); }
+      50%       { box-shadow: 0 0 0 8px rgba(164,55,0,0), 0 8px 24px rgba(164,55,0,.55); }
+    }
+    .fab-glow { animation: pulse-glow 2.4s ease-in-out infinite; }
+
+    /* Fade in */
+    @keyframes fade-up { from { opacity: 0; transform: translateY(7px); } to { opacity: 1; transform: translateY(0); } }
+    .fade-in { animation: fade-up .3s ease-out both; }
+    .fade-in-2 { animation: fade-up .3s ease-out .08s both; }
+    .fade-in-3 { animation: fade-up .3s ease-out .16s both; }
+    .fade-in-4 { animation: fade-up .3s ease-out .24s both; }
+
+    /* Stat card hover */
+    .stat-card { transition: box-shadow .2s, transform .2s; }
+    .stat-card:hover { box-shadow: 0 6px 28px rgba(164,55,0,.1); transform: translateY(-2px); }
+
+    /* Nav active */
+    .nav-active { background: #a43700 !important; color: #fff !important; }
+
+    /* Bar chart bars */
+    .bar-wrap { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+    .bar-group { display: flex; align-items: flex-end; gap: 3px; height: 120px; }
+    .bar { border-radius: 5px 5px 0 0; transition: opacity .15s; min-width: 16px; }
+    .bar:hover { opacity: .8; }
+
+    /* Checklist */
+    .step-done { text-decoration: line-through; color: #9e8880; }
+    .step-done .step-dot { background: #22c55e; }
+
+    /* Invoice rows */
+    .inv-row { transition: background .12s; }
+    .inv-row:hover { background: rgba(164,55,0,.035); }
+
+    /* Deadline rows */
+    .dl-row { transition: background .12s; }
+    .dl-row:hover { background: rgba(164,55,0,.035); }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="/auth.js"></script>
+</head>
+<body class="bg-[#f4ede5] text-[#1e1b17] overflow-hidden h-screen flex">
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     SIDEBAR
+════════════════════════════════════════════════════════════════════ -->
+<aside class="hidden md:flex flex-col w-64 h-screen flex-shrink-0 bg-[#fff8f1] z-40 flex-shrink-0"
+       style="border-right:1px solid rgba(164,55,0,0.08)">
+
+  <!-- Logo -->
+  <div class="flex items-center gap-3 px-6 py-6 flex-shrink-0">
+    <div class="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
+         style="background:#a43700">
+      <span class="text-white font-black text-lg leading-none">K</span>
+    </div>
+    <div>
+      <h1 class="text-xl font-black text-[#1e1b17] leading-none">Klaro</h1>
+      <p class="text-[10px] uppercase tracking-widest font-bold" style="color:rgba(89,65,57,.55)">Asistente fiscal</p>
+    </div>
+  </div>
+
+  <!-- User chip -->
+  <div class="mx-4 mb-5 px-3.5 py-3 rounded-2xl flex items-center gap-3 flex-shrink-0"
+       style="background:rgba(164,55,0,0.06);border:1px solid rgba(164,55,0,0.08)">
+    <div class="w-9 h-9 rounded-full flex-shrink-0 flex items-center justify-center font-bold text-xs text-white"
+         style="background:linear-gradient(135deg,#a43700,#FFB830)">AG</div>
+    <div class="min-w-0">
+      <p class="text-[#1e1b17] text-sm font-semibold truncate leading-tight">Ana García</p>
+      <p class="text-[11px] truncate leading-tight" style="color:#594139">Freiberuflerin · Berlín</p>
+    </div>
+  </div>
+
+  <!-- Nav links -->
+  <nav class="flex-1 overflow-y-auto px-3 space-y-0.5 thin-scroll">
+
+    <!-- Dashboard ACTIVE -->
+    <a href="klaro-dashboard.html"
+       class="nav-active flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm transition-all">
+      <svg class="w-[18px] h-[18px] flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/>
+        <rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>
+      </svg>
+      Dashboard
+    </a>
+
+    <!-- Facturas -->
+    <a href="klaro-facturas.html"
+       class="flex items-center gap-3 px-4 py-3 rounded-xl text-[#594139] font-medium hover:bg-[#a43700]/5 transition-all text-sm">
+      <svg class="w-[18px] h-[18px] flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+        <polyline points="14 2 14 8 20 8"/>
+        <line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>
+      </svg>
+      Facturas
+    </a>
+
+    <!-- Gastos -->
+    <a href="klaro-gastos.html"
+       class="flex items-center gap-3 px-4 py-3 rounded-xl text-[#594139] font-medium hover:bg-[#a43700]/5 transition-all text-sm">
+      <svg class="w-[18px] h-[18px] flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path d="M20 12V22H4V12"/><path d="M22 7H2v5h20V7z"/>
+        <path d="M12 22V7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/>
+        <path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/>
+      </svg>
+      Gastos
+    </a>
+
+    <!-- Impuestos -->
+    <a href="klaro-impuestos.html"
+       class="flex items-center gap-3 px-4 py-3 rounded-xl text-[#594139] font-medium hover:bg-[#a43700]/5 transition-all text-sm">
+      <svg class="w-[18px] h-[18px] flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="10"/>
+        <path d="M12 8v4l3 3"/>
+      </svg>
+      Impuestos
+    </a>
+
+    <!-- Clara -->
+    <a href="klaro-clara.html"
+       class="flex items-center gap-3 px-4 py-3 rounded-xl text-[#594139] font-medium hover:bg-[#a43700]/5 transition-all text-sm">
+      <svg class="w-[18px] h-[18px] flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+      </svg>
+      Clara
+    </a>
+
+  </nav>
+
+  <!-- Bottom -->
+  <div class="px-3 pb-5 pt-3 space-y-0.5 flex-shrink-0"
+       style="border-top:1px solid rgba(164,55,0,0.08)">
+    <a href="#"
+       class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-[#594139] font-medium hover:bg-[#a43700]/5 transition-all text-sm">
+      <svg class="w-[17px] h-[17px] flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="7" r="4"/><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+      </svg>
+      Perfil
+    </a>
+    <a href="#"
+       class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-[#594139] font-medium hover:bg-[#a43700]/5 transition-all text-sm">
+      <svg class="w-[17px] h-[17px] flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="3"/>
+        <path d="M19.07 4.93A10 10 0 0 0 4.93 19.07M4.93 4.93A10 10 0 0 1 19.07 19.07"/>
+      </svg>
+      Configuración
+    </a>
+    <p class="text-center text-[9px] px-4 pt-2" style="color:rgba(89,65,57,.38)">Klaro Beta · v1.0 · 2026</p>
+  </div>
+
+</aside>
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     MAIN AREA
+════════════════════════════════════════════════════════════════════ -->
+<div class="flex flex-col flex-1 min-w-0 h-screen overflow-hidden">
+
+  <!-- ── TOP BAR ─────────────────────────────────────────────────── -->
+  <header class="flex-shrink-0 h-[68px] bg-[#fff8f1] flex items-center justify-between px-7"
+          style="border-bottom:1px solid rgba(164,55,0,0.08)">
+
+    <!-- Left: date + greeting -->
+    <div>
+      <p class="text-[11px] font-semibold uppercase tracking-widest"
+         style="color:rgba(89,65,57,.5)">Jueves, 16 de abril · 2026</p>
+      <h2 class="text-xl font-black text-[#1e1b17] leading-tight mt-0.5">Bienvenida, Ana 👋</h2>
+    </div>
+
+    <!-- Right: bell + CTA -->
+    <div class="flex items-center gap-3">
+      <!-- Bell -->
+      <button class="relative w-9 h-9 rounded-xl flex items-center justify-center transition-colors hover:bg-[#a43700]/06"
+              style="border:1px solid rgba(164,55,0,0.12);background:#fff8f1">
+        <svg class="w-[17px] h-[17px] text-[#594139]" fill="none" viewBox="0 0 24 24"
+             stroke="currentColor" stroke-width="2">
+          <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+          <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+        </svg>
+        <span class="absolute top-1.5 right-1.5 w-2 h-2 rounded-full border-2 border-[#fff8f1]"
+              style="background:#a43700"></span>
+      </button>
+
+      <!-- Diagnóstico fiscal CTA -->
+      <a href="klaro-impuestos.html"
+         class="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold text-white transition-all hover:opacity-90 active:scale-95"
+         style="background:#a43700;box-shadow:0 2px 12px rgba(164,55,0,.3)">
+        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+          <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
+        </svg>
+        Diagnóstico fiscal
+      </a>
+    </div>
+  </header>
+
+  <!-- ── SCROLLABLE CONTENT ──────────────────────────────────────── -->
+  <div class="flex-1 overflow-y-auto thin-scroll px-7 py-6 space-y-5">
+
+    <!-- ══ HERO STATS GRID ══════════════════════════════════════════ -->
+    <div class="grid grid-cols-2 xl:grid-cols-4 gap-4 fade-in">
+
+      <!-- 1. Ingresos 2026 -->
+      <div class="stat-card rounded-2xl p-5"
+           style="background:#fff8f1;border:1px solid rgba(164,55,0,0.07);box-shadow:0 1px 6px rgba(164,55,0,.04)">
+        <div class="flex items-center justify-between mb-3">
+          <p class="text-xs font-semibold uppercase tracking-widest" style="color:rgba(89,65,57,.55)">Ingresos 2026</p>
+          <div class="w-8 h-8 rounded-xl flex items-center justify-center"
+               style="background:rgba(164,55,0,.08)">
+            <svg class="w-4 h-4 text-[#a43700]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+              <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/>
+              <polyline points="17 6 23 6 23 12"/>
+            </svg>
+          </div>
+        </div>
+        <p class="text-2xl font-black text-[#1e1b17] leading-none">€18.100</p>
+        <p class="text-xs font-semibold mt-2 text-green-600">+12% vs Q3</p>
+      </div>
+
+      <!-- 2. Gastos 2026 -->
+      <div class="stat-card rounded-2xl p-5"
+           style="background:#fff8f1;border:1px solid rgba(164,55,0,0.07);box-shadow:0 1px 6px rgba(164,55,0,.04)">
+        <div class="flex items-center justify-between mb-3">
+          <p class="text-xs font-semibold uppercase tracking-widest" style="color:rgba(89,65,57,.55)">Gastos 2026</p>
+          <div class="w-8 h-8 rounded-xl flex items-center justify-center"
+               style="background:rgba(164,55,0,.08)">
+            <svg class="w-4 h-4 text-[#a43700]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+              <path d="M20 12V22H4V12"/><path d="M22 7H2v5h20V7z"/>
+            </svg>
+          </div>
+        </div>
+        <p class="text-2xl font-black text-[#1e1b17] leading-none">€990</p>
+        <p class="text-xs font-medium mt-2" style="color:#594139">Todos deducibles</p>
+      </div>
+
+      <!-- 3. Beneficio neto -->
+      <div class="stat-card rounded-2xl p-5"
+           style="background:#fff8f1;border:1px solid rgba(164,55,0,0.07);box-shadow:0 1px 6px rgba(164,55,0,.04)">
+        <div class="flex items-center justify-between mb-3">
+          <p class="text-xs font-semibold uppercase tracking-widest" style="color:rgba(89,65,57,.55)">Beneficio neto</p>
+          <div class="w-8 h-8 rounded-xl flex items-center justify-center"
+               style="background:rgba(164,55,0,.08)">
+            <svg class="w-4 h-4 text-[#a43700]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+              <circle cx="12" cy="12" r="10"/>
+              <path d="M12 6v6l4 2"/>
+            </svg>
+          </div>
+        </div>
+        <p class="text-2xl font-black text-[#1e1b17] leading-none">€17.110</p>
+        <p class="text-xs font-medium mt-2" style="color:#594139">Antes de impuestos</p>
+      </div>
+
+      <!-- 4. IVA pendiente -->
+      <div class="stat-card rounded-2xl p-5"
+           style="background:#fff8f1;border:1px solid rgba(164,55,0,0.07);box-shadow:0 2px 12px rgba(164,55,0,.07)">
+        <div class="flex items-center justify-between mb-3">
+          <p class="text-xs font-semibold uppercase tracking-widest" style="color:rgba(89,65,57,.55)">IVA pendiente</p>
+          <div class="w-8 h-8 rounded-xl flex items-center justify-center"
+               style="background:rgba(164,55,0,.1)">
+            <svg class="w-4 h-4 text-[#a43700]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+              <circle cx="12" cy="12" r="10"/>
+              <line x1="12" y1="8" x2="12" y2="12"/>
+              <line x1="12" y1="16" x2="12.01" y2="16"/>
+            </svg>
+          </div>
+        </div>
+        <p class="text-2xl font-black text-[#1e1b17] leading-none">€1.254</p>
+        <p class="text-xs font-semibold mt-2" style="color:#a43700">Vence en 85d</p>
+      </div>
+
+    </div><!-- /hero stats -->
+
+
+    <!-- ══ MIDDLE GRID: chart (3) + deadlines (2) ═══════════════════ -->
+    <div class="grid grid-cols-5 gap-4 fade-in-2">
+
+      <!-- ── BAR CHART ────────────────────────────────────────────── -->
+      <div class="col-span-5 xl:col-span-3 rounded-2xl p-6"
+           style="background:#fff8f1;border:1px solid rgba(164,55,0,0.07);box-shadow:0 1px 6px rgba(164,55,0,.04)">
+
+        <!-- Header -->
+        <div class="flex items-center justify-between mb-5">
+          <div>
+            <h3 class="font-bold text-[#1e1b17] text-sm leading-tight">Actividad económica</h3>
+            <p class="text-xs mt-0.5" style="color:#594139">Ingresos y gastos 2026</p>
+          </div>
+          <!-- Legend -->
+          <div class="flex items-center gap-4">
+            <div class="flex items-center gap-1.5">
+              <span class="w-3 h-3 rounded-sm flex-shrink-0" style="background:#a43700"></span>
+              <span class="text-xs font-medium" style="color:#594139">Ingresos</span>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <span class="w-3 h-3 rounded-sm flex-shrink-0" style="background:#FFB830"></span>
+              <span class="text-xs font-medium" style="color:#594139">Gastos</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Chart body -->
+        <div class="flex gap-2 items-stretch">
+
+          <!-- Y-axis labels -->
+          <div class="flex flex-col justify-between pb-6 pr-2" style="height:148px">
+            <span class="text-[10px] font-semibold" style="color:rgba(89,65,57,.45)">€6k</span>
+            <span class="text-[10px] font-semibold" style="color:rgba(89,65,57,.45)">€4k</span>
+            <span class="text-[10px] font-semibold" style="color:rgba(89,65,57,.45)">€2k</span>
+            <span class="text-[10px] font-semibold" style="color:rgba(89,65,57,.45)">€0</span>
+          </div>
+
+          <!-- Bars + grid area -->
+          <div class="flex-1 relative">
+            <!-- Horizontal grid lines -->
+            <div class="absolute inset-0 flex flex-col justify-between pb-6 pointer-events-none">
+              <div style="border-top:1px dashed rgba(164,55,0,.1)"></div>
+              <div style="border-top:1px dashed rgba(164,55,0,.1)"></div>
+              <div style="border-top:1px dashed rgba(164,55,0,.1)"></div>
+              <div style="border-top:1px solid rgba(164,55,0,.14)"></div>
+            </div>
+
+            <!-- Bar columns -->
+            <div class="flex items-end gap-0 h-full pb-6" style="height:142px">
+
+              <!-- Each month: we scale to max €6300 → 120px height = 100% of bar-group height -->
+              <!-- Scale factor: 120 / 6300 ≈ 0.019047 -->
+
+              <!-- Enero: ingresos 5000 → 95px, gastos 217 → 4px -->
+              <div class="flex-1 flex flex-col items-center gap-1">
+                <div class="flex items-end gap-1 w-full justify-center" style="height:120px">
+                  <div class="bar" style="background:#a43700;height:95px;width:40%"></div>
+                  <div class="bar" style="background:#FFB830;height:4px;width:40%"></div>
+                </div>
+                <span class="text-[10px] font-semibold" style="color:rgba(89,65,57,.5)">Ene</span>
+              </div>
+
+              <!-- Feb: ingresos 4000 → 76px, gastos 348 → 7px -->
+              <div class="flex-1 flex flex-col items-center gap-1">
+                <div class="flex items-end gap-1 w-full justify-center" style="height:120px">
+                  <div class="bar" style="background:#a43700;height:76px;width:40%"></div>
+                  <div class="bar" style="background:#FFB830;height:7px;width:40%"></div>
+                </div>
+                <span class="text-[10px] font-semibold" style="color:rgba(89,65,57,.5)">Feb</span>
+              </div>
+
+              <!-- Mar: ingresos 6300 → 120px, gastos 270 → 5px -->
+              <div class="flex-1 flex flex-col items-center gap-1">
+                <div class="flex items-end gap-1 w-full justify-center" style="height:120px">
+                  <div class="bar" style="background:#a43700;height:120px;width:40%"></div>
+                  <div class="bar" style="background:#FFB830;height:5px;width:40%"></div>
+                </div>
+                <span class="text-[10px] font-semibold" style="color:rgba(89,65,57,.5)">Mar</span>
+              </div>
+
+              <!-- Abr: ingresos 2800 → 53px, gastos 155 → 3px -->
+              <div class="flex-1 flex flex-col items-center gap-1">
+                <div class="flex items-end gap-1 w-full justify-center" style="height:120px">
+                  <div class="bar" style="background:#a43700;height:53px;opacity:.7;width:40%"></div>
+                  <div class="bar" style="background:#FFB830;height:3px;opacity:.7;width:40%"></div>
+                </div>
+                <span class="text-[10px] font-semibold" style="color:rgba(89,65,57,.5)">Abr</span>
+              </div>
+
+            </div><!-- /bars flex -->
+          </div><!-- /bar area -->
+        </div><!-- /chart body -->
+
+        <!-- Monthly totals row -->
+        <div class="mt-4 grid grid-cols-4 gap-3 pt-3" style="border-top:1px solid rgba(164,55,0,.08)">
+          <div class="text-center">
+            <p class="text-xs font-bold text-[#1e1b17]">€5.000</p>
+            <p class="text-[10px]" style="color:#594139">Enero</p>
+          </div>
+          <div class="text-center">
+            <p class="text-xs font-bold text-[#1e1b17]">€4.000</p>
+            <p class="text-[10px]" style="color:#594139">Febrero</p>
+          </div>
+          <div class="text-center">
+            <p class="text-xs font-bold text-[#1e1b17]">€6.300</p>
+            <p class="text-[10px]" style="color:#594139">Marzo</p>
+          </div>
+          <div class="text-center">
+            <p class="text-xs font-bold" style="color:#a43700">€2.800</p>
+            <p class="text-[10px]" style="color:#594139">Abril</p>
+          </div>
+        </div>
+
+      </div><!-- /chart card -->
+
+      <!-- ── VENCIMIENTOS ──────────────────────────────────────────── -->
+      <div class="col-span-5 xl:col-span-2 rounded-2xl p-6"
+           style="background:#fff8f1;border:1px solid rgba(164,55,0,0.07);box-shadow:0 1px 6px rgba(164,55,0,.04)">
+
+        <div class="flex items-center justify-between mb-5">
+          <h3 class="font-bold text-[#1e1b17] text-sm">Vencimientos</h3>
+          <a href="klaro-impuestos.html"
+             class="text-xs font-bold hover:opacity-70 transition-opacity" style="color:#a43700">
+            Ver todos →
+          </a>
+        </div>
+
+        <div class="space-y-2">
+
+          <!-- Row 1: 10 abr — VENCIDO -->
+          <div class="dl-row flex items-center gap-3 px-3 py-3 rounded-xl -mx-1">
+            <!-- Date badge -->
+            <div class="flex-shrink-0 w-12 h-12 rounded-xl flex flex-col items-center justify-center"
+                 style="background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.18)">
+              <span class="text-[10px] font-black text-red-500 leading-none">10</span>
+              <span class="text-[9px] font-bold text-red-400 uppercase tracking-wide">ABR</span>
+            </div>
+            <!-- Label -->
+            <div class="flex-1 min-w-0">
+              <p class="text-sm font-semibold text-[#1e1b17] leading-tight">UStVA Q1 2026</p>
+              <p class="text-[11px] mt-0.5" style="color:#594139">Umsatzsteuervoranmeldung</p>
+            </div>
+            <!-- Status pill -->
+            <span class="flex-shrink-0 text-[10px] font-black px-2.5 py-1 rounded-lg"
+                  style="background:rgba(239,68,68,.12);color:#dc2626">Vencido</span>
+          </div>
+
+          <!-- Divider -->
+          <div style="height:1px;background:rgba(164,55,0,.07);margin:0 4px"></div>
+
+          <!-- Row 2: 10 jul — 85d -->
+          <div class="dl-row flex items-center gap-3 px-3 py-3 rounded-xl -mx-1">
+            <div class="flex-shrink-0 w-12 h-12 rounded-xl flex flex-col items-center justify-center"
+                 style="background:rgba(255,184,48,.1);border:1px solid rgba(255,184,48,.25)">
+              <span class="text-[10px] font-black leading-none" style="color:#b45309">10</span>
+              <span class="text-[9px] font-bold uppercase tracking-wide" style="color:#d97706">JUL</span>
+            </div>
+            <div class="flex-1 min-w-0">
+              <p class="text-sm font-semibold text-[#1e1b17] leading-tight">UStVA Q2 2026</p>
+              <p class="text-[11px] mt-0.5" style="color:#594139">Umsatzsteuervoranmeldung</p>
+            </div>
+            <span class="flex-shrink-0 text-[10px] font-black px-2.5 py-1 rounded-lg"
+                  style="background:rgba(255,184,48,.15);color:#b45309">85d</span>
+          </div>
+
+          <div style="height:1px;background:rgba(164,55,0,.07);margin:0 4px"></div>
+
+          <!-- Row 3: 31 jul — 106d -->
+          <div class="dl-row flex items-center gap-3 px-3 py-3 rounded-xl -mx-1">
+            <div class="flex-shrink-0 w-12 h-12 rounded-xl flex flex-col items-center justify-center"
+                 style="background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.2)">
+              <span class="text-[10px] font-black text-green-700 leading-none">31</span>
+              <span class="text-[9px] font-bold text-green-600 uppercase tracking-wide">JUL</span>
+            </div>
+            <div class="flex-1 min-w-0">
+              <p class="text-sm font-semibold text-[#1e1b17] leading-tight">Einkommensteuer 2025</p>
+              <p class="text-[11px] mt-0.5" style="color:#594139">Einkommensteuererklärung</p>
+            </div>
+            <span class="flex-shrink-0 text-[10px] font-black px-2.5 py-1 rounded-lg"
+                  style="background:rgba(34,197,94,.12);color:#15803d">106d</span>
+          </div>
+
+        </div><!-- /deadline rows -->
+
+      </div><!-- /vencimientos -->
+
+    </div><!-- /middle grid -->
+
+
+    <!-- ══ BOTTOM GRID: pasos + facturas ════════════════════════════ -->
+    <div class="grid grid-cols-1 xl:grid-cols-2 gap-4 fade-in-3">
+
+      <!-- ── PRÓXIMOS PASOS ────────────────────────────────────────── -->
+      <div class="rounded-2xl p-6"
+           style="background:#fff8f1;border:1px solid rgba(164,55,0,0.07);box-shadow:0 1px 6px rgba(164,55,0,.04)">
+
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="font-bold text-[#1e1b17] text-sm">Próximos pasos</h3>
+          <span class="text-[10px] font-bold px-2 py-0.5 rounded-lg"
+                style="background:rgba(164,55,0,.08);color:#a43700">4 tareas</span>
+        </div>
+
+        <div class="space-y-1">
+
+          <!-- Step 1: DONE -->
+          <div class="flex items-start gap-3 px-3 py-3 rounded-xl"
+               style="background:rgba(34,197,94,.05)">
+            <!-- Check circle -->
+            <div class="step-dot mt-0.5 w-5 h-5 rounded-full flex-shrink-0 flex items-center justify-center"
+                 style="background:#22c55e">
+              <svg class="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+                <polyline points="20 6 9 17 4 12"/>
+              </svg>
+            </div>
+            <div class="flex-1 min-w-0">
+              <p class="text-sm font-medium step-done">Registrar Steuernummer en Finanzamt Berlin</p>
+            </div>
+          </div>
+
+          <!-- Step 2: PENDING + HOY -->
+          <div class="flex items-start gap-3 px-3 py-3 rounded-xl hover:bg-[#a43700]/04 transition-colors">
+            <div class="mt-0.5 w-5 h-5 rounded-full flex-shrink-0 border-2 flex items-center justify-center"
+                 style="border-color:rgba(164,55,0,.3)"></div>
+            <div class="flex-1 min-w-0">
+              <p class="text-sm font-semibold text-[#1e1b17]">Subir facturas enero–marzo 2026</p>
+            </div>
+            <span class="flex-shrink-0 text-[9px] font-black px-2 py-0.5 rounded-lg"
+                  style="background:rgba(239,68,68,.12);color:#dc2626">HOY</span>
+          </div>
+
+          <!-- Step 3: PENDING -->
+          <div class="flex items-start gap-3 px-3 py-3 rounded-xl hover:bg-[#a43700]/04 transition-colors">
+            <div class="mt-0.5 w-5 h-5 rounded-full flex-shrink-0 border-2 flex items-center justify-center"
+                 style="border-color:rgba(164,55,0,.3)"></div>
+            <div class="flex-1 min-w-0">
+              <p class="text-sm font-semibold text-[#1e1b17]">Revisar gastos deducibles Q1</p>
+            </div>
+          </div>
+
+          <!-- Step 4: PENDING + HOY -->
+          <div class="flex items-start gap-3 px-3 py-3 rounded-xl hover:bg-[#a43700]/04 transition-colors">
+            <div class="mt-0.5 w-5 h-5 rounded-full flex-shrink-0 border-2 flex items-center justify-center"
+                 style="border-color:rgba(239,68,68,.5)"></div>
+            <div class="flex-1 min-w-0">
+              <p class="text-sm font-semibold text-[#1e1b17]">Preparar UStVA Q1 (vence 10 abril)</p>
+            </div>
+            <span class="flex-shrink-0 text-[9px] font-black px-2 py-0.5 rounded-lg"
+                  style="background:rgba(239,68,68,.12);color:#dc2626">HOY</span>
+          </div>
+
+        </div><!-- /steps -->
+
+        <!-- Clara prompt row -->
+        <a href="klaro-clara.html"
+           class="mt-4 flex items-center gap-3 px-4 py-3.5 rounded-xl group transition-all hover:opacity-90 active:scale-[.99]"
+           style="background:linear-gradient(135deg,#a43700,#c45200);box-shadow:0 2px 14px rgba(164,55,0,.25)">
+          <!-- Sparkle avatar -->
+          <div class="w-8 h-8 rounded-full flex-shrink-0 flex items-center justify-center"
+               style="background:rgba(255,255,255,.18)">
+            <svg class="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path d="M12 2l2.09 4.26L18 7.27l-3 2.92.7 4.14L12 12.77l-3.7 1.56.7-4.14L6 7.27l3.91-1.01L12 2z"/>
+              <circle cx="5" cy="3" r="1" fill="currentColor" stroke="none"/>
+              <circle cx="19" cy="5" r="1" fill="currentColor" stroke="none"/>
+            </svg>
+          </div>
+          <p class="text-white text-xs font-semibold leading-tight flex-1">
+            Pregunta a Clara sobre tus pasos pendientes →
+          </p>
+        </a>
+
+      </div><!-- /próximos pasos -->
+
+      <!-- ── ÚLTIMAS FACTURAS ──────────────────────────────────────── -->
+      <div class="rounded-2xl p-6"
+           style="background:#fff8f1;border:1px solid rgba(164,55,0,0.07);box-shadow:0 1px 6px rgba(164,55,0,.04)">
+
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="font-bold text-[#1e1b17] text-sm">Últimas facturas</h3>
+          <a href="klaro-facturas.html"
+             class="text-xs font-bold hover:opacity-70 transition-opacity" style="color:#a43700">
+            Ver todas →
+          </a>
+        </div>
+
+        <!-- Column headers -->
+        <div class="grid grid-cols-[auto_1fr_auto_auto] gap-x-3 px-2 mb-1.5 items-center">
+          <div class="w-8"></div>
+          <p class="text-[10px] font-bold uppercase tracking-widest" style="color:rgba(89,65,57,.45)">Cliente</p>
+          <p class="text-[10px] font-bold uppercase tracking-widest text-right" style="color:rgba(89,65,57,.45)">Importe</p>
+          <p class="text-[10px] font-bold uppercase tracking-widest text-right" style="color:rgba(89,65,57,.45)">Estado</p>
+        </div>
+
+        <div class="space-y-0.5">
+
+          <!-- Invoice 1: Studio Hamburg GmbH · 15 ene · €3.200 · Cobrada -->
+          <div class="inv-row grid grid-cols-[auto_1fr_auto_auto] gap-x-3 px-2 py-2.5 rounded-xl items-center">
+            <div class="w-8 h-8 rounded-lg flex items-center justify-center text-[11px] font-black text-white flex-shrink-0"
+                 style="background:rgba(100,116,139,.7)">SH</div>
+            <div class="min-w-0">
+              <p class="text-sm font-semibold text-[#1e1b17] truncate leading-tight">Studio Hamburg GmbH</p>
+              <p class="text-[10px]" style="color:#594139">15 ene 2026</p>
+            </div>
+            <p class="text-sm font-bold text-[#1e1b17] text-right">€3.200</p>
+            <span class="text-[10px] font-black px-2 py-0.5 rounded-lg text-right whitespace-nowrap"
+                  style="background:rgba(34,197,94,.12);color:#15803d">Cobrada</span>
+          </div>
+
+          <!-- Invoice 2: Freelance Client NL · 28 ene · €1.800 · Cobrada -->
+          <div class="inv-row grid grid-cols-[auto_1fr_auto_auto] gap-x-3 px-2 py-2.5 rounded-xl items-center">
+            <div class="w-8 h-8 rounded-lg flex items-center justify-center text-[11px] font-black text-white flex-shrink-0"
+                 style="background:rgba(100,116,139,.7)">FC</div>
+            <div class="min-w-0">
+              <p class="text-sm font-semibold text-[#1e1b17] truncate leading-tight">Freelance Client NL</p>
+              <p class="text-[10px]" style="color:#594139">28 ene 2026</p>
+            </div>
+            <p class="text-sm font-bold text-[#1e1b17] text-right">€1.800</p>
+            <span class="text-[10px] font-black px-2 py-0.5 rounded-lg text-right whitespace-nowrap"
+                  style="background:rgba(34,197,94,.12);color:#15803d">Cobrada</span>
+          </div>
+
+          <!-- Invoice 3: Studio Hamburg GmbH · 10 feb · €2.400 · Cobrada -->
+          <div class="inv-row grid grid-cols-[auto_1fr_auto_auto] gap-x-3 px-2 py-2.5 rounded-xl items-center">
+            <div class="w-8 h-8 rounded-lg flex items-center justify-center text-[11px] font-black text-white flex-shrink-0"
+                 style="background:rgba(100,116,139,.7)">SH</div>
+            <div class="min-w-0">
+              <p class="text-sm font-semibold text-[#1e1b17] truncate leading-tight">Studio Hamburg GmbH</p>
+              <p class="text-[10px]" style="color:#594139">10 feb 2026</p>
+            </div>
+            <p class="text-sm font-bold text-[#1e1b17] text-right">€2.400</p>
+            <span class="text-[10px] font-black px-2 py-0.5 rounded-lg text-right whitespace-nowrap"
+                  style="background:rgba(34,197,94,.12);color:#15803d">Cobrada</span>
+          </div>
+
+          <!-- Invoice 4: Berlin Startup AG · 20 feb · €1.600 · Pendiente -->
+          <div class="inv-row grid grid-cols-[auto_1fr_auto_auto] gap-x-3 px-2 py-2.5 rounded-xl items-center">
+            <div class="w-8 h-8 rounded-lg flex items-center justify-center text-[11px] font-black text-white flex-shrink-0"
+                 style="background:rgba(100,116,139,.7)">BS</div>
+            <div class="min-w-0">
+              <p class="text-sm font-semibold text-[#1e1b17] truncate leading-tight">Berlin Startup AG</p>
+              <p class="text-[10px]" style="color:#594139">20 feb 2026</p>
+            </div>
+            <p class="text-sm font-bold text-[#1e1b17] text-right">€1.600</p>
+            <span class="text-[10px] font-black px-2 py-0.5 rounded-lg text-right whitespace-nowrap"
+                  style="background:rgba(255,184,48,.15);color:#b45309">Pendiente</span>
+          </div>
+
+          <!-- Invoice 5: Berlin Startup AG · 5 mar · €4.100 · Cobrada -->
+          <div class="inv-row grid grid-cols-[auto_1fr_auto_auto] gap-x-3 px-2 py-2.5 rounded-xl items-center">
+            <div class="w-8 h-8 rounded-lg flex items-center justify-center text-[11px] font-black text-white flex-shrink-0"
+                 style="background:rgba(100,116,139,.7)">BS</div>
+            <div class="min-w-0">
+              <p class="text-sm font-semibold text-[#1e1b17] truncate leading-tight">Berlin Startup AG</p>
+              <p class="text-[10px]" style="color:#594139">5 mar 2026</p>
+            </div>
+            <p class="text-sm font-bold text-[#1e1b17] text-right">€4.100</p>
+            <span class="text-[10px] font-black px-2 py-0.5 rounded-lg text-right whitespace-nowrap"
+                  style="background:rgba(34,197,94,.12);color:#15803d">Cobrada</span>
+          </div>
+
+        </div><!-- /invoice rows -->
+
+        <!-- Quick summary strip -->
+        <div class="mt-4 pt-4 flex items-center justify-between"
+             style="border-top:1px solid rgba(164,55,0,.08)">
+          <div>
+            <p class="text-[10px] font-semibold uppercase tracking-widest" style="color:rgba(89,65,57,.5)">Total cobrado</p>
+            <p class="text-sm font-black text-[#1e1b17]">€13.100</p>
+          </div>
+          <div class="text-right">
+            <p class="text-[10px] font-semibold uppercase tracking-widest" style="color:rgba(89,65,57,.5)">Pendiente</p>
+            <p class="text-sm font-black" style="color:#b45309">€1.600</p>
+          </div>
+          <a href="klaro-facturas.html"
+             class="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold transition-all hover:opacity-90 active:scale-95 text-white"
+             style="background:#a43700">
+            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+              <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+            </svg>
+            Nueva factura
+          </a>
+        </div>
+
+      </div><!-- /últimas facturas -->
+
+    </div><!-- /bottom grid -->
+
+    <!-- Bottom padding -->
+    <div class="h-4"></div>
+
+  </div><!-- /scrollable content -->
+
+</div><!-- /main area -->
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     CLARA FAB
+════════════════════════════════════════════════════════════════════ -->
+<a href="klaro-clara.html"
+   title="Abrir Clara"
+   class="fab-glow fixed bottom-6 right-6 w-14 h-14 rounded-full flex items-center justify-center z-50 transition-transform hover:scale-110 active:scale-95"
+   style="background:linear-gradient(135deg,#a43700,#c45200)">
+  <svg class="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+  </svg>
+</a>
+
+</body>
+</html>
