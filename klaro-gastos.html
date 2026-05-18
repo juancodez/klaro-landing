@@ -448,7 +448,8 @@
     document.getElementById('loading-state').classList.remove('hidden');
     document.getElementById('expense-list').classList.add('hidden');
     document.getElementById('empty-state').classList.add('hidden');
-    const { data, error } = await sb.from('expenses').select('*').order('date', { ascending: false });
+    const { data: { user } } = await sb.auth.getUser();
+    const { data, error } = await sb.from('expenses').select('*').eq('user_id', user.id).order('date', { ascending: false });
     document.getElementById('loading-state').classList.add('hidden');
     document.getElementById('expense-list').classList.remove('hidden');
     if (error) { console.error(error); document.getElementById('expense-count').textContent = 'Error al cargar'; return; }
