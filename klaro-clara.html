@@ -373,9 +373,12 @@
   let currentUserId = null;  // set after auth resolves
 
   // ── Supabase persistence ──────────────────────────────────────────────
-  async function saveMessage(role, content) {
+  function savePair(userText, assistantText) {
     if (!currentUserId) return;
-    await _sb.from('chat_messages').insert({ user_id: currentUserId, role, content });
+    _sb.from('chat_messages').insert([
+      { user_id: currentUserId, role: 'user',      content: userText },
+      { user_id: currentUserId, role: 'assistant', content: assistantText },
+    ]);
   }
 
   async function loadHistory() {
@@ -597,7 +600,6 @@
 
     appendUser(text);
     appendTyping();
-    saveMessage('user', text);
 
     if (useRealApi) {
       try {
@@ -621,13 +623,13 @@
           const reply = getCannedResponse(text);
           chatHistory.push({ role: 'assistant', content: reply });
           appendClara(reply);
-          saveMessage('assistant', reply);
+          savePair(text, reply);
         } else if (data.content?.text) {
           const rawText   = data.content.text;
           const sugs      = extractSuggestions(rawText);
           chatHistory.push({ role: 'assistant', content: rawText });
           appendClara(rawText, sugs);
-          saveMessage('assistant', rawText);
+          savePair(text, rawText);
         } else {
           appendClara('Ups, algo salió mal. Inténtalo de nuevo.');
         }
@@ -638,7 +640,7 @@
         const reply = getCannedResponse(text);
         chatHistory.push({ role: 'assistant', content: reply });
         appendClara(reply);
-        saveMessage('assistant', reply);
+        savePair(text, reply);
       }
     } else {
       // Demo mode — simulate latency
@@ -647,7 +649,7 @@
       const reply = getCannedResponse(text);
       chatHistory.push({ role: 'assistant', content: reply });
       appendClara(reply);
-      saveMessage('assistant', reply);
+      savePair(text, reply);
     }
 
     isLoading = false;
