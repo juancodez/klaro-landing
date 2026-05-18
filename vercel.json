@@ -1,10 +1,5 @@
 {
-  "functions": {
-    "api/clara.js": {
-      "runtime": "nodejs20.x"
-    }
-  },
-  "rewrites": [
-    { "source": "/", "destination": "/index.html" }
-  ]
+    "rewrites": [
+          { "source": "/", "destination": "/index.html" }
+    ]
 }
