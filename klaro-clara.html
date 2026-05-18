@@ -370,6 +370,42 @@
   let chatHistory = [];   // [{role, content}]
   let isLoading   = false;
   let useRealApi  = false;
+  let currentUserId = null;  // set after auth resolves
+
+  // ── Supabase persistence ──────────────────────────────────────────────
+  async function saveMessage(role, content) {
+    if (!currentUserId) return;
+    await _sb.from('chat_messages').insert({ user_id: currentUserId, role, content });
+  }
+
+  async function loadHistory() {
+    try {
+      const { data: { session } } = await _sb.auth.getSession();
+      if (!session) return;
+      currentUserId = session.user.id;
+
+      const { data: msgs } = await _sb
+        .from('chat_messages')
+        .select('role, content')
+        .eq('user_id', currentUserId)
+        .order('created_at', { ascending: true })
+        .limit(20);
+
+      if (!msgs || msgs.length === 0) return;
+
+      // Hide the hardcoded welcome message, replace with history
+      const welcome = document.querySelector('#chat-messages .msg-in');
+      if (welcome) welcome.remove();
+
+      msgs.forEach(m => {
+        if (m.role === 'user') appendUser(m.content);
+        else appendClara(m.content);
+        chatHistory.push({ role: m.role, content: m.content });
+      });
+    } catch (e) {
+      // silently ignore — history is non-critical
+    }
+  }
 
   // ── API key helpers ───────────────────────────────────────────────────
   function getApiKey() { try { return localStorage.getItem('klaro_api_key'); } catch { return null; } }
@@ -561,6 +597,7 @@
 
     appendUser(text);
     appendTyping();
+    saveMessage('user', text);
 
     if (useRealApi) {
       try {
@@ -584,11 +621,13 @@
           const reply = getCannedResponse(text);
           chatHistory.push({ role: 'assistant', content: reply });
           appendClara(reply);
+          saveMessage('assistant', reply);
         } else if (data.content?.text) {
           const rawText   = data.content.text;
           const sugs      = extractSuggestions(rawText);
           chatHistory.push({ role: 'assistant', content: rawText });
           appendClara(rawText, sugs);
+          saveMessage('assistant', rawText);
         } else {
           appendClara('Ups, algo salió mal. Inténtalo de nuevo.');
         }
@@ -599,6 +638,7 @@
         const reply = getCannedResponse(text);
         chatHistory.push({ role: 'assistant', content: reply });
         appendClara(reply);
+        saveMessage('assistant', reply);
       }
     } else {
       // Demo mode — simulate latency
@@ -607,6 +647,7 @@
       const reply = getCannedResponse(text);
       chatHistory.push({ role: 'assistant', content: reply });
       appendClara(reply);
+      saveMessage('assistant', reply);
     }
 
     isLoading = false;
@@ -640,6 +681,7 @@
   // ── Init ──────────────────────────────────────────────────────────────
   document.getElementById('chat-input').focus();
   checkApiConnection();
+  loadHistory();
 </script>
 
 
