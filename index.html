@@ -2,15 +2,20 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <link rel="icon" type="image/svg+xml" href="/assets/Klaro-Logo-Favicon-orange.svg" />
+  <link rel="icon" type="image/svg+xml" href="assets/Klaro-Logo-Favicon-orange.svg" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Klaro — Al fin, los impuestos claros</title>
+  <meta name="description" content="Klaro ayuda a freelancers hispanohablantes en Alemania a entender y gestionar sus impuestos — con Clara, tu asesora fiscal en español." />
+  <meta property="og:title" content="Klaro — Al fin, los impuestos claros" />
+  <meta property="og:description" content="La declaración de impuestos alemana, en tu idioma. Clara te guía paso a paso." />
   <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,300;1,400&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,300;1,400&family=Bricolage+Grotesque:opsz,wght@12..96,300..800&display=swap" rel="stylesheet" />
   <style>
     :root { --p: 0; }
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
     body { font-family: 'Plus Jakarta Sans', sans-serif; background: #fff8f1; color: #1e1b17; overflow-x: hidden; }
+    .display { font-family: 'Bricolage Grotesque', 'Plus Jakarta Sans', sans-serif; }
 
     /* ── NAV ── */
     #nav {
@@ -66,6 +71,9 @@
       align-items: center; justify-content: center;
       overflow: hidden; text-align: center;
       padding: 120px 32px 80px;
+      background:
+        radial-gradient(ellipse 120% 55% at 50% 125%, rgba(164,55,0,0.14) 0%, transparent 65%),
+        radial-gradient(ellipse 70% 40% at 15% 85%, rgba(164,55,0,0.07) 0%, transparent 50%);
     }
 
     /* Overline */
@@ -78,9 +86,10 @@
     }
 
     .hero-h1 {
-      font-size: clamp(52px, 9vw, 104px);
-      font-weight: 800; line-height: 0.97; letter-spacing: -0.04em;
-      color: #1e1b17;
+      font-family: 'Bricolage Grotesque', 'Plus Jakarta Sans', sans-serif;
+      font-size: clamp(56px, 10vw, 120px);
+      font-weight: 800; line-height: 0.94; letter-spacing: -0.045em;
+      color: #1e1b17; text-wrap: balance;
     }
     .hero-h1 em { font-style: italic; font-weight: 300; color: #a43700; }
 
@@ -180,7 +189,7 @@
       display: grid; grid-template-columns: 5fr 7fr; gap: 96px; align-items: start;
     }
     .pain-label { font-size: 10.5px; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; color: #ffb59a; margin-bottom: 24px; }
-    .pain-h2 { font-size: clamp(36px, 4.5vw, 58px); font-weight: 800; line-height: 1.06; letter-spacing: -0.035em; color: #fff8f1; }
+    .pain-h2 { font-family: 'Bricolage Grotesque', 'Plus Jakarta Sans', sans-serif; font-size: clamp(44px, 5.5vw, 72px); font-weight: 800; line-height: 1.04; letter-spacing: -0.04em; color: #fff8f1; text-wrap: balance; }
     .pain-h2 em { font-style: italic; font-weight: 300; color: #ffb59a; }
     .pain-body { margin-top: 24px; font-size: 16px; color: rgba(255,248,241,0.45); line-height: 1.75; max-width: 38ch; }
     .pain-cards { display: flex; flex-direction: column; gap: 0; }
@@ -308,8 +317,10 @@
     }
     .reveal.in .pain-label::before { width: 24px; }
     .section-h2 {
+      font-family: 'Bricolage Grotesque', 'Plus Jakarta Sans', sans-serif;
       font-size: clamp(36px, 5vw, 64px); font-weight: 800;
       line-height: 1.05; letter-spacing: -0.035em; color: #1e1b17;
+      text-wrap: balance;
     }
     .section-h2 em { font-style: italic; font-weight: 300; color: #a43700; }
     .section-body { font-size: 16px; color: #594139; line-height: 1.75; max-width: 44ch; margin-top: 20px; }
@@ -353,12 +364,14 @@
     .step-row:first-child { border-top: 1px solid rgba(164,55,0,0.08); }
     .step-row:hover { padding-left: 12px; }
     .step-num {
-      font-size: 60px; font-weight: 800; line-height: 1;
-      letter-spacing: -0.06em; color: rgba(164,55,0,0.08);
-      min-width: 64px; align-self: center;
+      font-family: 'Bricolage Grotesque', 'Plus Jakarta Sans', sans-serif;
+      font-size: clamp(96px, 13vw, 160px); font-weight: 800; line-height: 0.85;
+      letter-spacing: -0.06em; color: rgba(164,55,0,0.09);
+      min-width: 120px; align-self: center;
       transition: color 0.4s cubic-bezier(0.16,1,0.3,1);
+      user-select: none; pointer-events: none;
     }
-    .step-row:hover .step-num { color: rgba(164,55,0,0.22); }
+    .step-row:hover .step-num { color: rgba(164,55,0,0.25); }
     .step-icon-wrap {
       width: 44px; height: 44px; border-radius: 12px;
       background: rgba(164,55,0,0.07); display: flex; align-items: center; justify-content: center;
@@ -416,8 +429,8 @@
     .mcd.ok { background: #d6e6af; color: #556338; }
     .cal-warning { font-size: 10.5px; font-weight: 700; color: #ba1a1a; margin-top: 10px; display: flex; align-items: center; gap: 5px; }
 
-    /* Bottom bento row */
-    .bento-bottom { grid-column: span 2; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+    /* Bottom bento row — asymmetric, not 3-equal */
+    .bento-bottom { grid-column: span 2; display: grid; grid-template-columns: 3fr 2fr 2fr; gap: 16px; }
 
     /* ── TESTIMONIALS — marquee ── */
     #testi { overflow: hidden; padding: 120px 0; background: #fff8f1; }
@@ -435,12 +448,24 @@
     .testi-role { font-size: 11px; color: #8c7168; }
 
     /* ── CTA ── */
-    #cta { padding: 100px 72px 160px; text-align: left; max-width: 860px; margin: 0 auto; }
-    .cta-h2 { font-size: clamp(40px, 5.5vw, 72px); font-weight: 800; line-height: 1.03; letter-spacing: -0.04em; color: #1e1b17; }
-    .cta-h2 em { font-style: italic; font-weight: 300; color: #a43700; }
-    .cta-sub { font-size: 16px; color: #594139; margin-top: 22px; line-height: 1.75; max-width: 44ch; }
+    #cta { padding: 0; text-align: left; max-width: none; margin: 0; background: #a43700; }
+    #cta .reveal { max-width: 860px; margin: 0 auto; padding: 120px 72px 160px; }
+    .cta-h2 { font-family: 'Bricolage Grotesque', 'Plus Jakarta Sans', sans-serif; font-size: clamp(52px, 7vw, 96px); font-weight: 800; line-height: 1.0; letter-spacing: -0.045em; color: #fff8f1; text-wrap: balance; }
+    .cta-h2 em { font-style: italic; font-weight: 200; color: rgba(255,248,241,0.55); }
+    .cta-sub { font-size: 16px; color: rgba(255,248,241,0.72); margin-top: 22px; line-height: 1.75; max-width: 44ch; }
     .cta-row { display: flex; gap: 14px; margin-top: 36px; flex-wrap: wrap; }
-    .cta-note { font-size: 11px; color: #8c7168; margin-top: 18px; }
+    .cta-note { font-size: 11px; color: rgba(255,248,241,0.4); margin-top: 18px; }
+    #cta .btn-primary {
+      background: #fff8f1; color: #1e1b17;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.9);
+    }
+    #cta .btn-primary:hover {
+      box-shadow: 0 12px 36px rgba(0,0,0,0.22), inset 0 1px 0 rgba(255,255,255,0.9);
+    }
+    #cta .btn-secondary {
+      color: rgba(255,248,241,0.82); border-color: rgba(255,248,241,0.28);
+    }
+    #cta .btn-secondary:hover { color: #fff8f1; border-color: rgba(255,248,241,0.6); }
 
     /* ── FOOTER ── */
     footer { border-top: 1px solid rgba(164,55,0,0.08); padding: 40px 72px; max-width: 1280px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; }
@@ -584,7 +609,8 @@
     @media (max-width: 960px) {
       #nav { width: calc(100vw - 32px); padding: 10px 16px; gap: 16px; }
       .nav-links { display: none; }
-      .pain-inner, .clara-wrap, #cta { grid-template-columns: 1fr; gap: 56px; padding: 100px 24px; }
+      .pain-inner, .clara-wrap { grid-template-columns: 1fr; gap: 56px; padding: 100px 24px; }
+      #cta .reveal { padding: 80px 24px 120px; }
       .how-inner { padding: 100px 24px; }
       .how-header { flex-direction: column; align-items: flex-start; margin-bottom: 56px; }
       .bento-grid, .bento-bottom { grid-template-columns: 1fr; }
@@ -593,6 +619,9 @@
       #clara-drawer { width: calc(100vw - 32px); right: 16px; }
       footer { padding: 32px 24px; }
       .hero-h1 { font-size: clamp(44px, 10vw, 72px); }
+      #proof > div { grid-template-columns: 1fr !important; }
+      #proof > div > div:first-child { padding: 48px 24px 0 !important; }
+      #proof > div > div:last-child { padding: 32px 24px 56px !important; }
     }
   </style>
 </head>
@@ -633,14 +662,47 @@
   </div>
 </div>
 
-<!-- PERSONA PHOTO — full bleed -->
-<div id="persona-photo" style="width:100%;overflow:hidden;line-height:0;">
-  <img
-    src="/assets/woman.png"
-    alt="Freelancer hispanohablante gestionando sus impuestos en Alemania con Klaro"
-    style="width:100%;max-height:600px;object-fit:cover;object-position:center 20%;display:block;"
-  />
-</div>
+<!-- PROOF STRIP -->
+<section id="proof" style="background:#f4ede5;overflow:hidden;">
+  <div style="max-width:1280px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;align-items:end;">
+    <div style="padding:80px 0 0 72px;">
+      <img
+        src="assets/persona.png"
+        alt="Freelancer hispanohablante en Alemania, usando Klaro para gestionar sus impuestos"
+        style="width:100%;max-width:520px;height:auto;display:block;"
+      />
+    </div>
+    <div class="reveal" style="padding:80px 72px 80px 56px;display:flex;flex-direction:column;gap:44px;">
+      <div>
+        <p class="section-label" style="margin-bottom:20px;">Para personas como tú</p>
+        <h2 class="section-h2" style="max-width:18ch;">Freelancers que ya <em>duermen tranquilos.</em></h2>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:0;">
+        <div style="display:flex;align-items:flex-start;gap:20px;padding:24px 0;border-bottom:1px solid rgba(164,55,0,0.09);">
+          <div style="font-family:'Bricolage Grotesque','Plus Jakarta Sans',sans-serif;font-size:52px;font-weight:800;color:#a43700;letter-spacing:-0.04em;line-height:1;flex-shrink:0;">€947</div>
+          <div style="padding-top:6px;">
+            <p style="font-size:14px;font-weight:700;color:#1e1b17;">de media recuperada</p>
+            <p style="font-size:13px;color:#8c7168;margin-top:3px;line-height:1.5;">en deducciones no declaradas el primer año</p>
+          </div>
+        </div>
+        <div style="display:flex;align-items:flex-start;gap:20px;padding:24px 0;border-bottom:1px solid rgba(164,55,0,0.09);">
+          <div style="font-family:'Bricolage Grotesque','Plus Jakarta Sans',sans-serif;font-size:52px;font-weight:800;color:#1e1b17;letter-spacing:-0.04em;line-height:1;flex-shrink:0;">2.4K+</div>
+          <div style="padding-top:6px;">
+            <p style="font-size:14px;font-weight:700;color:#1e1b17;">en lista de espera</p>
+            <p style="font-size:13px;color:#8c7168;margin-top:3px;line-height:1.5;">freelancers hispanohablantes en Alemania</p>
+          </div>
+        </div>
+        <div style="display:flex;align-items:flex-start;gap:20px;padding:24px 0;">
+          <div style="font-family:'Bricolage Grotesque','Plus Jakarta Sans',sans-serif;font-size:52px;font-weight:800;color:#1e1b17;letter-spacing:-0.04em;line-height:1;flex-shrink:0;">4.8★</div>
+          <div style="padding-top:6px;">
+            <p style="font-size:14px;font-weight:700;color:#1e1b17;">satisfacción con Clara</p>
+            <p style="font-size:13px;color:#8c7168;margin-top:3px;line-height:1.5;">en el acceso anticipado cerrado</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
 
 <!-- PAIN -->
 <div id="pain">
@@ -864,7 +926,13 @@
         <div class="bento-cell reveal">
           <div class="bento-cell-icon"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14,2 14,8 20,8"/></svg></div>
           <p class="bento-cell-title">Facturas profesionales</p>
-          <p class="bento-cell-desc">IVA correcto — 19%, 7% o Reverse Charge para clientes UE. PDF listo para enviar.</p>
+          <p class="bento-cell-desc" style="max-width:38ch;">IVA correcto — 19%, 7% o Reverse Charge para clientes UE. PDF listo para enviar al momento.</p>
+          <div style="margin-top:20px;display:flex;gap:8px;flex-wrap:wrap;">
+            <span style="font-size:11px;font-weight:600;color:#a43700;background:rgba(164,55,0,0.06);border:1px solid rgba(164,55,0,0.12);border-radius:6px;padding:4px 10px;">19% IVA</span>
+            <span style="font-size:11px;font-weight:600;color:#a43700;background:rgba(164,55,0,0.06);border:1px solid rgba(164,55,0,0.12);border-radius:6px;padding:4px 10px;">7% IVA</span>
+            <span style="font-size:11px;font-weight:600;color:#a43700;background:rgba(164,55,0,0.06);border:1px solid rgba(164,55,0,0.12);border-radius:6px;padding:4px 10px;">Reverse Charge UE</span>
+            <span style="font-size:11px;font-weight:600;color:#556338;background:rgba(85,99,56,0.06);border:1px solid rgba(85,99,56,0.12);border-radius:6px;padding:4px 10px;">PDF automático</span>
+          </div>
         </div>
         <div class="bento-cell reveal reveal-d1">
           <div class="bento-cell-icon"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></div>
@@ -891,7 +959,7 @@
     </div>
     <div class="reveal reveal-d1" style="margin-top:56px;display:inline-flex;flex-direction:column;align-items:center;background:white;border-radius:28px;padding:48px 56px;border:1px solid rgba(164,55,0,0.08);box-shadow:0 8px 40px rgba(164,55,0,0.07);min-width:340px;">
       <div style="font-size:13px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:#a43700;background:rgba(164,55,0,0.06);border:1px solid rgba(164,55,0,0.12);border-radius:100px;padding:5px 16px;margin-bottom:28px;">Beta gratuita</div>
-      <div style="font-size:72px;font-weight:800;color:#1e1b17;letter-spacing:-0.05em;line-height:1;">€0</div>
+      <div style="font-family:'Bricolage Grotesque','Plus Jakarta Sans',sans-serif;font-size:80px;font-weight:800;color:#1e1b17;letter-spacing:-0.05em;line-height:1;">€0</div>
       <div style="font-size:13px;color:#8c7168;margin-top:6px;">para siempre, durante la beta</div>
       <div style="display:flex;flex-direction:column;gap:12px;margin:32px 0;text-align:left;width:100%;">
         <div style="display:flex;align-items:center;gap:10px;font-size:14px;color:#1e1b17;">
