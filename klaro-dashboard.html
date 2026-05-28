@@ -77,6 +77,24 @@
 </head>
 <body class="bg-[#f4ede5] text-[#1e1b17] overflow-hidden h-screen flex">
 
+<!-- Empty state banner (shown only when user has no invoices or expenses) -->
+<div id="empty-state-banner" class="hidden fixed top-[68px] left-64 right-0 z-30 mx-6 mt-4 p-4 rounded-2xl flex items-center gap-4"
+  style="background:rgba(164,55,0,0.06);border:1px solid rgba(164,55,0,0.12)">
+  <div class="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style="background:#fff8f1">
+    <svg class="w-5 h-5" style="color:#a43700" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+      <path d="M12 4v16m8-8H4"/>
+    </svg>
+  </div>
+  <div>
+    <p class="text-sm font-bold" style="color:#1e1b17">Todavía no hay datos</p>
+    <p class="text-xs mt-0.5" style="color:#594139">Empezá añadiendo tu primera factura o gasto para ver tu resumen fiscal.</p>
+  </div>
+  <div class="ml-auto flex gap-2">
+    <a href="klaro-facturas.html" class="text-xs font-bold px-3 py-2 rounded-xl text-white" style="background:#a43700">+ Factura</a>
+    <a href="klaro-gastos.html" class="text-xs font-bold px-3 py-2 rounded-xl" style="background:rgba(164,55,0,0.1);color:#a43700">+ Gasto</a>
+  </div>
+</div>
+
 <!-- ═══════════════════════════════════════════════════════════════════
      SIDEBAR
 ════════════════════════════════════════════════════════════════════ -->
@@ -175,9 +193,9 @@
 
     <!-- Left: date + greeting -->
     <div>
-      <p class="text-[11px] font-semibold uppercase tracking-widest"
-         style="color:rgba(89,65,57,.5)">Jueves, 16 de abril · 2026</p>
-      <h2 class="text-xl font-black text-[#1e1b17] leading-tight mt-0.5">Bienvenida 👋</h2>
+      <p id="topbar-date" class="text-[11px] font-semibold uppercase tracking-widest"
+         style="color:rgba(89,65,57,.5)"></p>
+      <h2 id="topbar-greeting" class="text-xl font-black text-[#1e1b17] leading-tight mt-0.5">¡Hola! 👋</h2>
       <p class="text-[11px] mt-0.5 font-medium truncate max-w-[220px]" style="color:rgba(89,65,57,.5)" data-user-email></p>
     </div>
 
@@ -226,7 +244,7 @@
             </svg>
           </div>
         </div>
-        <p class="text-2xl font-black text-[#1e1b17] leading-none">€18.100</p>
+        <p data-stat="ingresos" class="text-2xl font-black text-[#1e1b17] leading-none">€18.100</p>
         <p class="text-xs font-semibold mt-2 text-green-600">+12% vs Q3</p>
       </div>
 
@@ -242,7 +260,7 @@
             </svg>
           </div>
         </div>
-        <p id="stat-gastos" class="text-2xl font-black text-[#1e1b17] leading-none">€990</p>
+        <p id="stat-gastos" data-stat="gastos" class="text-2xl font-black text-[#1e1b17] leading-none">€990</p>
         <p id="stat-docs" class="text-xs font-medium mt-2" style="color:#594139">Todos deducibles</p>
       </div>
 
@@ -259,7 +277,7 @@
             </svg>
           </div>
         </div>
-        <p class="text-2xl font-black text-[#1e1b17] leading-none">€17.110</p>
+        <p data-stat="beneficio" class="text-2xl font-black text-[#1e1b17] leading-none">€17.110</p>
         <p class="text-xs font-medium mt-2" style="color:#594139">Antes de impuestos</p>
       </div>
 
@@ -277,7 +295,7 @@
             </svg>
           </div>
         </div>
-        <p class="text-2xl font-black text-[#1e1b17] leading-none">€1.254</p>
+        <p data-stat="iva" class="text-2xl font-black text-[#1e1b17] leading-none">€1.254</p>
         <p class="text-xs font-semibold mt-2" style="color:#a43700">Vence en 85d</p>
       </div>
 
@@ -315,9 +333,9 @@
 
           <!-- Y-axis labels -->
           <div class="flex flex-col justify-between pb-6 pr-2" style="height:148px">
-            <span class="text-[10px] font-semibold" style="color:rgba(89,65,57,.45)">€6k</span>
-            <span class="text-[10px] font-semibold" style="color:rgba(89,65,57,.45)">€4k</span>
-            <span class="text-[10px] font-semibold" style="color:rgba(89,65,57,.45)">€2k</span>
+            <span id="y3" class="text-[10px] font-semibold" style="color:rgba(89,65,57,.45)">€6k</span>
+            <span id="y2" class="text-[10px] font-semibold" style="color:rgba(89,65,57,.45)">€4k</span>
+            <span id="y1" class="text-[10px] font-semibold" style="color:rgba(89,65,57,.45)">€2k</span>
             <span class="text-[10px] font-semibold" style="color:rgba(89,65,57,.45)">€0</span>
           </div>
 
@@ -331,71 +349,15 @@
               <div style="border-top:1px solid rgba(164,55,0,.14)"></div>
             </div>
 
-            <!-- Bar columns -->
-            <div class="flex items-end gap-0 h-full pb-6" style="height:142px">
-
-              <!-- Each month: we scale to max €6300 → 120px height = 100% of bar-group height -->
-              <!-- Scale factor: 120 / 6300 ≈ 0.019047 -->
-
-              <!-- Enero: ingresos 5000 → 95px, gastos 217 → 4px -->
-              <div class="flex-1 flex flex-col items-center gap-1">
-                <div class="flex items-end gap-1 w-full justify-center" style="height:120px">
-                  <div class="bar" style="background:#a43700;height:95px;width:40%"></div>
-                  <div class="bar" style="background:#FFB830;height:4px;width:40%"></div>
-                </div>
-                <span class="text-[10px] font-semibold" style="color:rgba(89,65,57,.5)">Ene</span>
-              </div>
-
-              <!-- Feb: ingresos 4000 → 76px, gastos 348 → 7px -->
-              <div class="flex-1 flex flex-col items-center gap-1">
-                <div class="flex items-end gap-1 w-full justify-center" style="height:120px">
-                  <div class="bar" style="background:#a43700;height:76px;width:40%"></div>
-                  <div class="bar" style="background:#FFB830;height:7px;width:40%"></div>
-                </div>
-                <span class="text-[10px] font-semibold" style="color:rgba(89,65,57,.5)">Feb</span>
-              </div>
-
-              <!-- Mar: ingresos 6300 → 120px, gastos 270 → 5px -->
-              <div class="flex-1 flex flex-col items-center gap-1">
-                <div class="flex items-end gap-1 w-full justify-center" style="height:120px">
-                  <div class="bar" style="background:#a43700;height:120px;width:40%"></div>
-                  <div class="bar" style="background:#FFB830;height:5px;width:40%"></div>
-                </div>
-                <span class="text-[10px] font-semibold" style="color:rgba(89,65,57,.5)">Mar</span>
-              </div>
-
-              <!-- Abr: ingresos 2800 → 53px, gastos 155 → 3px -->
-              <div class="flex-1 flex flex-col items-center gap-1">
-                <div class="flex items-end gap-1 w-full justify-center" style="height:120px">
-                  <div class="bar" style="background:#a43700;height:53px;opacity:.7;width:40%"></div>
-                  <div class="bar" style="background:#FFB830;height:3px;opacity:.7;width:40%"></div>
-                </div>
-                <span class="text-[10px] font-semibold" style="color:rgba(89,65,57,.5)">Abr</span>
-              </div>
-
+            <!-- Bar columns — rendered by JS -->
+            <div id="chart-bars" class="flex items-end gap-0 h-full pb-6" style="height:142px">
+              <div class="flex-1 flex items-center justify-center pb-6 text-xs" style="color:rgba(89,65,57,.4)">Cargando…</div>
             </div><!-- /bars flex -->
           </div><!-- /bar area -->
         </div><!-- /chart body -->
 
-        <!-- Monthly totals row -->
-        <div class="mt-4 grid grid-cols-4 gap-3 pt-3" style="border-top:1px solid rgba(164,55,0,.08)">
-          <div class="text-center">
-            <p class="text-xs font-bold text-[#1e1b17]">€5.000</p>
-            <p class="text-[10px]" style="color:#594139">Enero</p>
-          </div>
-          <div class="text-center">
-            <p class="text-xs font-bold text-[#1e1b17]">€4.000</p>
-            <p class="text-[10px]" style="color:#594139">Febrero</p>
-          </div>
-          <div class="text-center">
-            <p class="text-xs font-bold text-[#1e1b17]">€6.300</p>
-            <p class="text-[10px]" style="color:#594139">Marzo</p>
-          </div>
-          <div class="text-center">
-            <p class="text-xs font-bold" style="color:#a43700">€2.800</p>
-            <p class="text-[10px]" style="color:#594139">Abril</p>
-          </div>
-        </div>
+        <!-- Monthly totals row — rendered by JS -->
+        <div id="chart-totals" class="mt-4 grid gap-3 pt-3" style="border-top:1px solid rgba(164,55,0,.08)"></div>
 
       </div><!-- /chart card -->
 
@@ -427,14 +389,14 @@
               <p class="text-[11px] mt-0.5" style="color:#594139">Umsatzsteuervoranmeldung</p>
             </div>
             <!-- Status pill -->
-            <span class="flex-shrink-0 text-[10px] font-black px-2.5 py-1 rounded-lg"
-                  style="background:rgba(239,68,68,.12);color:#dc2626">Vencido</span>
+            <span id="dl-q1" class="flex-shrink-0 text-[10px] font-black px-2.5 py-1 rounded-lg"
+                  style="background:rgba(239,68,68,.12);color:#dc2626">—</span>
           </div>
 
           <!-- Divider -->
           <div style="height:1px;background:rgba(164,55,0,.07);margin:0 4px"></div>
 
-          <!-- Row 2: 10 jul — 85d -->
+          <!-- Row 2: 10 jul -->
           <div class="dl-row flex items-center gap-3 px-3 py-3 rounded-xl -mx-1">
             <div class="flex-shrink-0 w-12 h-12 rounded-xl flex flex-col items-center justify-center"
                  style="background:rgba(255,184,48,.1);border:1px solid rgba(255,184,48,.25)">
@@ -445,13 +407,13 @@
               <p class="text-sm font-semibold text-[#1e1b17] leading-tight">UStVA Q2 2026</p>
               <p class="text-[11px] mt-0.5" style="color:#594139">Umsatzsteuervoranmeldung</p>
             </div>
-            <span class="flex-shrink-0 text-[10px] font-black px-2.5 py-1 rounded-lg"
-                  style="background:rgba(255,184,48,.15);color:#b45309">85d</span>
+            <span id="dl-q2" class="flex-shrink-0 text-[10px] font-black px-2.5 py-1 rounded-lg"
+                  style="background:rgba(255,184,48,.15);color:#b45309">—</span>
           </div>
 
           <div style="height:1px;background:rgba(164,55,0,.07);margin:0 4px"></div>
 
-          <!-- Row 3: 31 jul — 106d -->
+          <!-- Row 3: 31 jul -->
           <div class="dl-row flex items-center gap-3 px-3 py-3 rounded-xl -mx-1">
             <div class="flex-shrink-0 w-12 h-12 rounded-xl flex flex-col items-center justify-center"
                  style="background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.2)">
@@ -462,8 +424,8 @@
               <p class="text-sm font-semibold text-[#1e1b17] leading-tight">Einkommensteuer 2025</p>
               <p class="text-[11px] mt-0.5" style="color:#594139">Einkommensteuererklärung</p>
             </div>
-            <span class="flex-shrink-0 text-[10px] font-black px-2.5 py-1 rounded-lg"
-                  style="background:rgba(34,197,94,.12);color:#15803d">106d</span>
+            <span id="dl-income" class="flex-shrink-0 text-[10px] font-black px-2.5 py-1 rounded-lg"
+                  style="background:rgba(34,197,94,.12);color:#15803d">—</span>
           </div>
 
         </div><!-- /deadline rows -->
@@ -810,25 +772,157 @@ async function loadInvoices(uid) {
   document.getElementById('inv-total-pendiente').textContent = fmt(pendiente);
 }
 
+// ── Helpers ───────────────────────────────────────────────────────────
+function _daysUntil(dateStr) {
+  const today = new Date(); today.setHours(0,0,0,0);
+  return Math.round((new Date(dateStr) - today) / 86400000);
+}
+
+function _deadlinePill(id, dateStr) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  const d = _daysUntil(dateStr);
+  if (d < 0) {
+    el.textContent = 'Vencido';
+    el.style.cssText = 'background:rgba(239,68,68,.12);color:#dc2626';
+  } else if (d <= 30) {
+    el.textContent = d + 'd';
+    el.style.cssText = 'background:rgba(255,184,48,.15);color:#b45309';
+  } else {
+    el.textContent = d + 'd';
+    el.style.cssText = 'background:rgba(34,197,94,.12);color:#15803d';
+  }
+}
+
+function _renderChart(invoices, expenses) {
+  const MONTHS_SHORT = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+  const MONTHS_FULL  = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+  const year = new Date().getFullYear();
+  const currentMonth = new Date().getMonth();
+
+  const ing = new Array(12).fill(0);
+  const gas = new Array(12).fill(0);
+  (invoices || []).forEach(i => {
+    if (i.status === 'paid' && i.date) {
+      const d = new Date(i.date);
+      if (d.getFullYear() === year) ing[d.getMonth()] += parseFloat(i.amount) || 0;
+    }
+  });
+  (expenses || []).forEach(e => {
+    if (e.date) {
+      const d = new Date(e.date);
+      if (d.getFullYear() === year) gas[d.getMonth()] += parseFloat(e.amount) || 0;
+    }
+  });
+
+  // Show up to 6 months ending at current month
+  const end   = currentMonth + 1;
+  const start = Math.max(0, end - 6);
+  const maxVal = Math.max(...ing.slice(start, end), ...gas.slice(start, end), 1000);
+  const yMax   = Math.ceil(maxVal / 1000) * 1000;
+
+  // Update Y-axis
+  const fmtK = v => v >= 1000 ? `€${v/1000}k` : `€${v}`;
+  const y3 = document.getElementById('y3'); if (y3) y3.textContent = fmtK(yMax);
+  const y2 = document.getElementById('y2'); if (y2) y2.textContent = fmtK(Math.round(yMax * 2/3));
+  const y1 = document.getElementById('y1'); if (y1) y1.textContent = fmtK(Math.round(yMax / 3));
+
+  const BAR_H = 120;
+  const fmt = n => n > 0 ? '€' + Math.round(n).toLocaleString('de-DE') : '—';
+
+  const barsEl   = document.getElementById('chart-bars');
+  const totalsEl = document.getElementById('chart-totals');
+  if (!barsEl) return;
+
+  const hasData = ing.slice(start, end).some(v => v > 0) || gas.slice(start, end).some(v => v > 0);
+  if (!hasData) {
+    barsEl.innerHTML = '<div class="flex-1 flex items-center justify-center pb-6 text-xs" style="color:rgba(89,65,57,.4)">Sin datos este año — añade facturas para ver la gráfica</div>';
+    if (totalsEl) totalsEl.innerHTML = '';
+    return;
+  }
+
+  let barsHtml = '', totalsHtml = '';
+  const cols = end - start;
+  for (let m = start; m < end; m++) {
+    const iH = Math.max(Math.round((ing[m] / yMax) * BAR_H), ing[m] > 0 ? 3 : 0);
+    const gH = Math.max(Math.round((gas[m] / yMax) * BAR_H), gas[m] > 0 ? 3 : 0);
+    const isNow = m === currentMonth;
+    barsHtml += `<div class="flex-1 flex flex-col items-center gap-1">
+      <div class="flex items-end gap-1 w-full justify-center" style="height:${BAR_H}px">
+        <div class="bar" style="background:#a43700;height:${iH}px;width:40%${isNow ? '' : ';opacity:.7'}"></div>
+        <div class="bar" style="background:#FFB830;height:${gH}px;width:40%${isNow ? '' : ';opacity:.7'}"></div>
+      </div>
+      <span class="text-[10px] font-semibold" style="color:rgba(89,65,57,.5)">${MONTHS_SHORT[m]}</span>
+    </div>`;
+    totalsHtml += `<div class="text-center">
+      <p class="text-xs font-bold" style="color:${isNow ? '#a43700' : '#1e1b17'}">${fmt(ing[m])}</p>
+      <p class="text-[10px]" style="color:#594139">${MONTHS_FULL[m]}</p>
+    </div>`;
+  }
+  barsEl.innerHTML = barsHtml;
+  if (totalsEl) {
+    totalsEl.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
+    totalsEl.innerHTML = totalsHtml;
+  }
+}
+
 // ── Bootstrap ─────────────────────────────────────────────────────────
 (async () => {
   const { data: { session } } = await _sb.auth.getSession();
   if (!session) return;
   const uid = session.user.id;
 
-  // Expenses total
-  const { data: expenses } = await _sb.from('expenses').select('amount').eq('user_id', uid);
-  if (expenses && expenses.length > 0) {
-    const total = expenses.reduce((s, e) => s + (Number(e.amount) || 0), 0);
-    const el = document.getElementById('stat-gastos');
-    if (el) el.textContent = '€' + total.toLocaleString('de-DE', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+  // Dynamic date
+  const dateEl = document.getElementById('topbar-date');
+  if (dateEl) {
+    const s = new Date().toLocaleDateString('es-DE', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
+    dateEl.textContent = s.charAt(0).toUpperCase() + s.slice(1);
   }
 
-  // Invoices
-  await loadInvoices(uid);
+  // Dynamic greeting (use email prefix until profile loads)
+  const greetEl = document.getElementById('topbar-greeting');
+  if (greetEl) {
+    const raw = session.user.user_metadata?.full_name || session.user.email.split('@')[0];
+    greetEl.textContent = `¡Hola, ${raw.split(' ')[0]}! 👋`;
+  }
 
-  // Documents — loads list and updates both badges
-  await loadDocuments(uid);
+  // Dynamic deadlines
+  _deadlinePill('dl-q1',     '2026-04-10');
+  _deadlinePill('dl-q2',     '2026-07-10');
+  _deadlinePill('dl-income', '2026-07-31');
+
+  const fmt = n => '€' + n.toLocaleString('de-DE', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+
+  // Fetch invoices and expenses in parallel (with date for chart)
+  const [{ data: invoices }, { data: expenses }] = await Promise.all([
+    _sb.from('invoices').select('amount, status, date').eq('user_id', uid),
+    _sb.from('expenses').select('amount, date').eq('user_id', uid),
+  ]);
+
+  // Stat cards
+  const totalIngresos = (invoices || []).filter(i => i.status === 'paid').reduce((s,i) => s + (parseFloat(i.amount)||0), 0);
+  const totalGastos   = (expenses || []).reduce((s,e) => s + (parseFloat(e.amount)||0), 0);
+  const beneficio     = totalIngresos - totalGastos;
+  const ivaPendiente  = totalIngresos * 0.19;
+
+  document.querySelectorAll('[data-stat]').forEach(el => {
+    if (el.dataset.stat === 'ingresos')  el.textContent = fmt(totalIngresos);
+    if (el.dataset.stat === 'gastos')    el.textContent = fmt(totalGastos);
+    if (el.dataset.stat === 'beneficio') el.textContent = fmt(beneficio);
+    if (el.dataset.stat === 'iva')       el.textContent = fmt(ivaPendiente);
+  });
+
+  // Empty state
+  if (!(invoices||[]).length && !(expenses||[]).length) {
+    const b = document.getElementById('empty-state-banner');
+    if (b) b.classList.remove('hidden');
+  }
+
+  // Bar chart
+  _renderChart(invoices, expenses);
+
+  // Invoice list & documents
+  await Promise.all([loadInvoices(uid), loadDocuments(uid)]);
 })();
 </script>
 
