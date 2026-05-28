@@ -848,10 +848,10 @@ function _renderChart(invoices, expenses) {
     const isNow = m === currentMonth;
     barsHtml += `<div class="flex-1 flex flex-col items-center gap-1">
       <div class="flex items-end gap-1 w-full justify-center" style="height:${BAR_H}px">
-        <div class="bar" style="background:#a43700;height:${iH}px;width:40%${isNow ? '' : ';opacity:.7'}"></div>
-        <div class="bar" style="background:#FFB830;height:${gH}px;width:40%${isNow ? '' : ';opacity:.7'}"></div>
+        <div class="bar" data-bar="ing" style="background:#a43700;height:${iH}px;width:40%${isNow ? '' : ';opacity:.7'}"></div>
+        <div class="bar" data-bar="gas" style="background:#FFB830;height:${gH}px;width:40%${isNow ? '' : ';opacity:.7'}"></div>
       </div>
-      <span class="text-[10px] font-semibold" style="color:rgba(89,65,57,.5)">${MONTHS_SHORT[m]}</span>
+      <span class="text-[10px] font-semibold" data-bar-label style="color:rgba(89,65,57,.5)">${MONTHS_SHORT[m]}</span>
     </div>`;
     totalsHtml += `<div class="text-center">
       <p class="text-xs font-bold" style="color:${isNow ? '#a43700' : '#1e1b17'}">${fmt(ing[m])}</p>
