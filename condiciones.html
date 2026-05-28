@@ -508,7 +508,7 @@ async function sendMsg(text) {
   let reply='';
   try {
     let ok=false;
-    try { const r=await fetch('/api/clara',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:chatHistory}),signal:AbortSignal.timeout(3500)}); if(r.ok){const d=await r.json();reply=d.content?.[0]?.text||d.reply||'';ok=true;} } catch{}
+    try { const r=await fetch('/api/clara',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:chatHistory}),signal:AbortSignal.timeout(3500)}); if(r.ok){const d=await r.json();reply=d.content?.text||d.reply||'';ok=true;} } catch{}
     if(!ok){const key=localStorage.getItem('klaro_api_key');if(key){const r2=await fetch('https://generativelanguage.googleapis.com/v1beta/openai/chat/completions',{method:'POST',headers:{'Content-Type':'application/json','Authorization':`Bearer ${key}`},body:JSON.stringify({model:'gemini-2.0-flash',max_tokens:1024,messages:[{role:'system',content:'Eres Clara, asesora fiscal de Klaro para freelancers hispanohablantes en Alemania.'},...chatHistory]})});const d2=await r2.json();if(!r2.ok)throw new Error(d2.error?.message||'Error');reply=d2.choices?.[0]?.message?.content||'';}else{await new Promise(r=>setTimeout(r,900+Math.random()*600));reply=getDemoReply(text);}}
     chatHistory.push({role:'assistant',content:reply}); typing.remove();
     const sugMatch=reply.match(/\{"sugerencias":\s*\[([^\]]+)\]/); const sugs=[]; if(sugMatch){try{sugs.push(...JSON.parse(`[${sugMatch[1]}]`));}catch{}}

@@ -30,18 +30,35 @@ Las sugerencias deben ser preguntas de seguimiento concretas sobre el tema que a
 
 module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
   if (req.method === 'OPTIONS') return res.status(200).end();
+
+  // Lightweight health check — no Claude call, no token cost
+  if (req.method === 'GET') {
+    return res.status(200).json({ status: 'ok', hasKey: !!process.env.ANTHROPIC_API_KEY });
+  }
+
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
   const apiKey = process.env.ANTHROPIC_API_KEY || req.headers['x-api-key'];
   if (!apiKey) return res.status(401).json({ needsKey: true });
 
-  const { messages } = req.body || {};
+  const { messages, userProfile } = req.body || {};
   if (!Array.isArray(messages) || messages.length === 0) {
     return res.status(400).json({ error: 'messages array required' });
+  }
+
+  // Inject user profile context into system prompt when available
+  let systemPrompt = SYSTEM;
+  if (userProfile) {
+    const ctx = [];
+    if (userProfile.full_name) ctx.push(`• Nombre: ${userProfile.full_name}`);
+    if (userProfile.city)      ctx.push(`• Ciudad: ${userProfile.city}`);
+    if (userProfile.tax_number) ctx.push(`• Steuernummer: registrada`);
+    else                        ctx.push(`• Steuernummer: aún no registrada`);
+    systemPrompt += `\n\nPERFIL DEL USUARIO (personaliza la respuesta cuando sea relevante):\n${ctx.join('\n')}`;
   }
 
   try {
@@ -55,7 +72,7 @@ module.exports = async function handler(req, res) {
       body: JSON.stringify({
         model: 'claude-haiku-4-5-20251001',
         max_tokens: 1024,
-        system: SYSTEM,
+        system: systemPrompt,
         messages: messages.slice(-10),
       }),
     });

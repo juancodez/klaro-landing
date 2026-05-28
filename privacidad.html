@@ -549,7 +549,7 @@ async function sendMsg(text) {
     let usedBackend = false;
     try {
       const res = await fetch('/api/clara', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ messages: chatHistory }), signal: AbortSignal.timeout(3500) });
-      if (res.ok) { const data = await res.json(); reply = data.content?.[0]?.text || data.reply || ''; usedBackend = true; }
+      if (res.ok) { const data = await res.json(); reply = data.content?.text || data.reply || ''; usedBackend = true; }
     } catch {}
     if (!usedBackend) { await new Promise(r => setTimeout(r, 640 + Math.random() * 400)); reply = getDemoReply(text); }
     typing.remove();

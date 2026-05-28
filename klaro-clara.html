@@ -52,7 +52,7 @@
     textarea { field-sizing: content; min-height: 36px; max-height: 120px; }
   </style>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="/auth.js"></script>
+  <script src="auth.js"></script>
 </head>
 <body class="bg-[#f4ede5] text-[#1e1b17] overflow-hidden h-screen flex">
 
@@ -73,8 +73,8 @@
   <div class="mx-4 mb-5 px-3.5 py-3 rounded-2xl flex items-center gap-3 flex-shrink-0" style="background:rgba(164,55,0,0.06);border:1px solid rgba(164,55,0,0.08)">
     <div class="w-9 h-9 rounded-full flex-shrink-0 flex items-center justify-center font-bold text-xs text-white" style="background:linear-gradient(135deg,#a43700,#FFB830)" data-user-initials="">AG</div>
     <div class="min-w-0">
-      <p class="text-[#1e1b17] text-sm font-semibold truncate leading-tight">Ana García</p>
-      <p class="text-[11px] truncate leading-tight" style="color:#594139">Freiberuflerin · Berlín</p>
+      <p id="sidebar-user-name" class="text-[#1e1b17] text-sm font-semibold truncate leading-tight">…</p>
+      <p id="sidebar-user-city" class="text-[11px] truncate leading-tight" style="color:#594139">Freiberufler/a</p>
     </div>
   </div>
 
@@ -223,7 +223,7 @@
             </div>
             <div>
               <div class="bg-white rounded-2xl rounded-tl-sm px-4 py-3 shadow-sm text-sm leading-relaxed max-w-lg" style="border:1px solid rgba(164,55,0,0.08);color:#1e1b17">
-                <p class="font-bold mb-1">¡Hola, Ana! 👋</p>
+                <p id="welcome-user-name" class="font-bold mb-1">¡Hola! 👋</p>
                 <p style="color:#594139">Soy Clara, tu asesora fiscal para Alemania. Puedo ayudarte con <strong>impuestos, deducciones, plazos y todo lo que necesitas como Freiberuflerin</strong>. ¿Por dónde empezamos?</p>
               </div>
               <div class="flex flex-wrap gap-1.5 mt-2">
@@ -393,10 +393,11 @@
 <script>
   // ── Config ────────────────────────────────────────────────────────────
   const API_URL   = '/api/clara';
-  let chatHistory = [];   // [{role, content}]
-  let isLoading   = false;
-  let useRealApi  = false;
-  let currentUserId = null;  // set after auth resolves
+  let chatHistory   = [];
+  let isLoading     = false;
+  let useRealApi    = false;
+  let currentUserId = null;
+  let userProfile   = null;
 
   // ── Supabase persistence ──────────────────────────────────────────────
   function savePair(userText, assistantText) {
@@ -413,6 +414,27 @@
       if (!session) return;
       currentUserId = session.user.id;
 
+      // Fetch user profile for personalization and Clara context
+      const { data: profile } = await _sb
+        .from('profiles').select('*').eq('id', currentUserId).single();
+      userProfile = profile || null;
+
+      // Update sidebar and header with real user data
+      const displayName = profile?.full_name || session.user.email;
+      const firstName   = profile?.full_name?.split(' ')[0] || session.user.email.split('@')[0];
+      const initials    = displayName.slice(0, 2).toUpperCase();
+
+      document.querySelectorAll('[data-user-initials]').forEach(el => el.textContent = initials);
+      const nameEl = document.getElementById('sidebar-user-name');
+      if (nameEl) nameEl.textContent = displayName;
+      if (profile?.city) {
+        const cityEl = document.getElementById('sidebar-user-city');
+        if (cityEl) cityEl.textContent = `Freiberufler/a · ${profile.city}`;
+      }
+      const welcomeEl = document.getElementById('welcome-user-name');
+      if (welcomeEl) welcomeEl.textContent = `¡Hola, ${firstName}! 👋`;
+
+      // Load chat history
       const { data: msgs } = await _sb
         .from('chat_messages')
         .select('role, content')
@@ -422,7 +444,7 @@
 
       if (!msgs || msgs.length === 0) return;
 
-      // Hide the hardcoded welcome message, replace with history
+      // Replace welcome message with persisted history
       const welcome = document.querySelector('#chat-messages .msg-in');
       if (welcome) welcome.remove();
 
@@ -457,7 +479,7 @@
     checkApiConnection();
   }
 
-  // ── Check API reachability ────────────────────────────────────────────
+  // ── Check API reachability (GET — zero token cost) ───────────────────
   async function checkApiConnection() {
     const dot   = document.getElementById('status-dot');
     const label = document.getElementById('status-label');
@@ -465,16 +487,18 @@
     const cStat = document.getElementById('clara-status');
 
     try {
-      const res = await fetch(API_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', ...(getApiKey() ? {'x-api-key': getApiKey()} : {}) },
-        body: JSON.stringify({ messages: [{role:'user', content:'ping'}], userProfile: null }),
-        signal: AbortSignal.timeout(4000),
-      });
+      const res  = await fetch(API_URL, { signal: AbortSignal.timeout(4000) });
       const data = await res.json();
 
-      if (res.status === 401 || data.needsKey) {
-        // Server reachable but no key
+      if (data.hasKey) {
+        useRealApi = true;
+        dot.style.background   = '#22c55e';
+        cDot.style.background  = '#22c55e';
+        label.textContent      = 'Clara conectada · IA activa';
+        cStat.textContent      = 'IA real · En línea';
+        document.getElementById('no-key-banner').classList.add('hidden');
+        document.getElementById('demo-banner').classList.add('hidden');
+      } else {
         useRealApi = false;
         dot.style.background   = '#fbbf24';
         cDot.style.background  = '#fbbf24';
@@ -483,18 +507,8 @@
         document.getElementById('no-key-banner').classList.remove('hidden');
         document.getElementById('no-key-banner').classList.add('flex');
         document.getElementById('demo-banner').classList.add('hidden');
-      } else {
-        // Fully connected
-        useRealApi = true;
-        dot.style.background   = '#22c55e';
-        cDot.style.background  = '#22c55e';
-        label.textContent      = 'Clara conectada · IA activa';
-        cStat.textContent      = 'IA real · En línea';
-        document.getElementById('no-key-banner').classList.add('hidden');
-        document.getElementById('demo-banner').classList.add('hidden');
       }
     } catch {
-      // Server not running → demo mode
       useRealApi = false;
       dot.style.background   = '#f97316';
       cDot.style.background  = '#f97316';
@@ -636,7 +650,7 @@
         const res  = await fetch(API_URL, {
           method: 'POST',
           headers,
-          body: JSON.stringify({ messages: chatHistory, userProfile: null }),
+          body: JSON.stringify({ messages: chatHistory, userProfile }),
         });
         const data = await res.json();
 
