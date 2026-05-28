@@ -7,7 +7,7 @@ DOMINIO — solo respondes sobre impuestos alemanes para autónomos:
 • Freiberufler vs. Gewerbetreibender — diferencias y registro
 • Kleinunternehmerregelung (§19 UStG) — límites y ventajas/desventajas
 • Steuernummer, USt-IdNr., registro en Finanzamt, uso de ELSTER
-• Vorauszahlungen (pagos anticipados trimestrales de renta e IVA)
+• Vorauszahlungen (pagos anticipados trimestrales de renta e IVA)h
 • Reverse Charge en facturas a clientes de la UE o internacionales
 • Plazos fiscales alemanes y consecuencias de no cumplirlos
 • Doble imposición España–Alemania para residentes fiscales en Alemania
@@ -70,7 +70,7 @@ module.exports = async function handler(req, res) {
         'content-type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'claude-haiku-4-5-20251001',
+                  model: 'claude-3-5-haiku-20241022',
         max_tokens: 1024,
         system: systemPrompt,
         messages: messages.slice(-10),
