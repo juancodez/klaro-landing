@@ -109,6 +109,12 @@
       </svg>
       Dashboard
     </a>
+    <a href="klaro-documentos.html" class="flex items-center gap-3 px-4 py-3 rounded-xl text-[#594139] font-medium hover:bg-[#a43700]/5 transition-all text-sm">
+      <svg class="w-[18px] h-[18px] flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
+      </svg>
+      Documentos
+    </a>
     <a href="klaro-facturas.html"
        class="flex items-center gap-3 px-4 py-3 rounded-xl text-[#594139] font-medium hover:bg-[#a43700]/5 transition-all text-sm">
       <svg class="w-[18px] h-[18px] flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -327,6 +333,64 @@
               </select>
             </div>
           </div>
+        </div>
+
+        <!-- DATOS FISCALES RÁPIDOS -->
+        <div class="rounded-2xl p-5 mt-4" style="background:#fff8f1;border:1px solid rgba(164,55,0,0.08)">
+          <div class="flex items-center gap-2 mb-4">
+            <div class="w-8 h-8 rounded-xl flex items-center justify-center" style="background:rgba(164,55,0,0.08)">
+              <svg class="w-4 h-4" style="color:#a43700" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            </div>
+            <div>
+              <p class="text-sm font-bold text-[#1e1b17]">Datos fiscales</p>
+              <p class="text-xs" style="color:#594139">Información para tus declaraciones</p>
+            </div>
+          </div>
+
+          <div class="space-y-3">
+            <div>
+              <label class="block text-xs font-semibold mb-1.5" style="color:#594139">Steuernummer</label>
+              <input id="prof-steuernummer" type="text" value="" placeholder="XX/XXX/XXXXX"
+                     class="w-full rounded-xl px-3.5 py-2.5 text-sm font-mono"
+                     style="background:#f4ede5;border:1px solid rgba(164,55,0,0.12);color:#1e1b17;outline:none"/>
+              <p class="text-[10px] mt-1" style="color:rgba(89,65,57,.5)">Tu número fiscal alemán del Finanzamt</p>
+            </div>
+
+            <div>
+              <label class="block text-xs font-semibold mb-1.5" style="color:#594139">USt-IdNr (IVA intracomunitario)</label>
+              <input id="prof-ustid" type="text" value="" placeholder="DE123456789"
+                     class="w-full rounded-xl px-3.5 py-2.5 text-sm font-mono"
+                     style="background:#f4ede5;border:1px solid rgba(164,55,0,0.12);color:#1e1b17;outline:none"/>
+              <p class="text-[10px] mt-1" style="color:rgba(89,65,57,.5)">Solo si facturas a clientes de la UE</p>
+            </div>
+
+            <div>
+              <label class="block text-xs font-semibold mb-1.5" style="color:#594139">Tipo de actividad</label>
+              <select id="prof-tax-type"
+                      class="w-full rounded-xl px-3.5 py-2.5 text-sm font-medium"
+                      style="background:#f4ede5;border:1px solid rgba(164,55,0,0.12);color:#1e1b17;outline:none">
+                <option value="freiberufler">Freiberufler/a (profesional liberal)</option>
+                <option value="gewerbetreibender">Gewerbetreibende/r (actividad comercial)</option>
+              </select>
+            </div>
+
+            <div class="flex items-center justify-between rounded-xl px-4 py-3" style="background:#f4ede5;border:1px solid rgba(164,55,0,0.08)">
+              <div>
+                <p class="text-sm font-semibold text-[#1e1b17]">Kleinunternehmerregelung</p>
+                <p class="text-xs mt-0.5" style="color:#594139">§19 UStG · ingresos &lt; €22.000/año · sin IVA en facturas</p>
+              </div>
+              <button id="kleinunternehmer-toggle" onclick="toggleKleinunternehmer()"
+                      class="relative flex-shrink-0 w-11 h-6 rounded-full transition-all"
+                      style="background:rgba(164,55,0,0.15)"
+                      aria-pressed="false">
+                <span id="kleinunternehmer-knob" class="absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform"></span>
+              </button>
+            </div>
+          </div>
+
+          <button onclick="saveFiscalProfile()" class="w-full mt-4 py-2.5 rounded-xl text-sm font-bold text-white transition-all hover:opacity-90" style="background:#a43700">
+            Guardar datos fiscales
+          </button>
         </div>
 
         <!-- Fiscal data card -->
@@ -794,6 +858,64 @@
       if (el && MAP[id] != null) el.value = MAP[id];
     });
   })();
+
+  // ── Kleinunternehmer toggle ──────────────────────────────────────────
+  var kleinunternehmerActive = false;
+
+  function toggleKleinunternehmer() {
+    kleinunternehmerActive = !kleinunternehmerActive;
+    var btn = document.getElementById('kleinunternehmer-toggle');
+    var knob = document.getElementById('kleinunternehmer-knob');
+    btn.style.background = kleinunternehmerActive ? '#a43700' : 'rgba(164,55,0,0.15)';
+    knob.style.transform = kleinunternehmerActive ? 'translateX(20px)' : 'translateX(0)';
+    btn.setAttribute('aria-pressed', kleinunternehmerActive.toString());
+  }
+
+  // ── Save fiscal profile ──────────────────────────────────────────────
+  async function saveFiscalProfile() {
+    var steuernummer = (document.getElementById('prof-steuernummer')?.value || '').trim();
+    var ustid        = (document.getElementById('prof-ustid')?.value        || '').trim();
+    var taxType      = document.getElementById('prof-tax-type')?.value      || 'freiberufler';
+
+    // Save to localStorage for use in PDF generation
+    if (steuernummer) localStorage.setItem('klaro_steuernummer', steuernummer);
+    if (ustid)        localStorage.setItem('klaro_ustid', ustid);
+    localStorage.setItem('klaro_tax_type', taxType);
+    localStorage.setItem('klaro_kleinunternehmer', kleinunternehmerActive.toString());
+
+    // Save to Supabase user metadata
+    var s = await _sb.auth.getSession();
+    var session = s.data.session;
+    if (session) {
+      await _sb.auth.updateUser({
+        data: {
+          steuernummer: steuernummer,
+          ust_id:       ustid,
+          tax_type:     taxType,
+          kleinunternehmer: kleinunternehmerActive,
+        }
+      });
+    }
+    showToast('Datos fiscales guardados ✓', true);
+  }
+
+  // ── Load fiscal profile ──────────────────────────────────────────────
+  async function loadFiscalProfile() {
+    var s = await _sb.auth.getSession();
+    var session = s.data.session;
+    if (!session) return;
+    var meta = session.user.user_metadata || {};
+    var snEl = document.getElementById('prof-steuernummer');
+    var uiEl = document.getElementById('prof-ustid');
+    var ttEl = document.getElementById('prof-tax-type');
+    if (snEl && meta.steuernummer) snEl.value = meta.steuernummer;
+    if (uiEl && meta.ust_id)       uiEl.value = meta.ust_id;
+    if (ttEl && meta.tax_type)     ttEl.value = meta.tax_type;
+    if (meta.kleinunternehmer && !kleinunternehmerActive) {
+      toggleKleinunternehmer();
+    }
+  }
+  loadFiscalProfile();
 
   // ── Save (overrides previous handleSave definition) ──────────────────
   async function handleSave() {

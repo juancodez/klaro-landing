@@ -105,6 +105,12 @@
       </svg>
       Dashboard
     </a>
+    <a href="klaro-documentos.html" class="flex items-center gap-3 px-4 py-3 rounded-xl text-[#594139] font-medium hover:bg-[#a43700]/5 transition-all text-sm">
+      <svg class="w-[18px] h-[18px] flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
+      </svg>
+      Documentos
+    </a>
     <a href="klaro-facturas.html" class="flex items-center gap-3 px-4 py-3 rounded-xl text-[#594139] font-medium hover:bg-[#a43700]/5 transition-all text-sm">
       <svg class="w-[18px] h-[18px] flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
         <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
@@ -426,97 +432,10 @@
             Timeline Fiscal 2026
           </h3>
 
-          <!-- Timeline items -->
+          <!-- Timeline items — rendered by JS -->
           <div class="relative">
-            <!-- Connecting line -->
             <div class="tl-line"></div>
-            <div class="space-y-0">
-
-              <!-- Item 1 — Completado (greyed out) -->
-              <div class="relative flex gap-4 pb-6">
-                <div class="relative z-10 flex-shrink-0">
-                  <div class="w-7 h-7 rounded-full flex items-center justify-center" style="background:#F3F4F6;border:2px solid #D1D5DB">
-                    <svg class="w-3.5 h-3.5" style="color:#9CA3AF" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-                  </div>
-                </div>
-                <div class="flex-1 pt-0.5 opacity-50">
-                  <div class="flex items-center justify-between">
-                    <p class="text-sm font-semibold line-through" style="color:#6B7280">10 Enero 2026</p>
-                    <span class="badge-green text-[10px] font-bold px-2 py-0.5 rounded-full">Completado</span>
-                  </div>
-                  <p class="text-xs mt-0.5" style="color:#9CA3AF">UStVA Q4 2025 · IVA trimestral</p>
-                </div>
-              </div>
-
-              <!-- Item 2 — Vencido (red) -->
-              <div class="relative flex gap-4 pb-6">
-                <div class="relative z-10 flex-shrink-0">
-                  <div class="w-7 h-7 rounded-full flex items-center justify-center" style="background:#FEF2F2;border:2px solid #FECACA">
-                    <svg class="w-3 h-3" style="color:#DC2626" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-                  </div>
-                </div>
-                <div class="flex-1 pt-0.5">
-                  <div class="flex items-center justify-between">
-                    <p class="text-sm font-bold" style="color:#DC2626">10 Abril 2026</p>
-                    <span class="badge-red text-[10px] font-bold px-2 py-0.5 rounded-full">Vencido</span>
-                  </div>
-                  <p class="text-xs font-semibold text-[#1e1b17] mt-0.5">UStVA Q1 2026</p>
-                  <p class="text-xs" style="color:#594139">IVA trimestral · <span id="iva-timeline-prev">—</span></p>
-                </div>
-              </div>
-
-              <!-- Item 3 — Próximo (amber) -->
-              <div class="relative flex gap-4 pb-6">
-                <div class="relative z-10 flex-shrink-0">
-                  <div class="w-7 h-7 rounded-full flex items-center justify-center" style="background:#FFFBEB;border:2px solid #FDE68A">
-                    <svg class="w-3 h-3" style="color:#D97706" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
-                  </div>
-                </div>
-                <div class="flex-1 pt-0.5">
-                  <div class="flex items-center justify-between">
-                    <p class="text-sm font-bold" style="color:#D97706">10 Julio 2026</p>
-                    <span class="badge-amber text-[10px] font-bold px-2 py-0.5 rounded-full">Próximo</span>
-                  </div>
-                  <p class="text-xs font-semibold text-[#1e1b17] mt-0.5">UStVA Q2 2026</p>
-                  <p class="text-xs" style="color:#594139">IVA trimestral · 85 días</p>
-                </div>
-              </div>
-
-              <!-- Item 4 — Julio (blue/teal) -->
-              <div class="relative flex gap-4 pb-6">
-                <div class="relative z-10 flex-shrink-0">
-                  <div class="w-7 h-7 rounded-full flex items-center justify-center" style="background:#EFF6FF;border:2px solid #BFDBFE">
-                    <svg class="w-3 h-3" style="color:#3B82F6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-                  </div>
-                </div>
-                <div class="flex-1 pt-0.5">
-                  <div class="flex items-center justify-between">
-                    <p class="text-sm font-bold" style="color:#3B82F6">31 Julio 2026</p>
-                    <span class="text-[10px] font-bold px-2 py-0.5 rounded-full" style="background:#EFF6FF;color:#3B82F6;border:1px solid rgba(59,130,246,.2)">106 días</span>
-                  </div>
-                  <p class="text-xs font-semibold text-[#1e1b17] mt-0.5">Einkommensteuer 2025</p>
-                  <p class="text-xs" style="color:#594139">Declaración renta anual</p>
-                </div>
-              </div>
-
-              <!-- Item 5 — Q3 (grey) -->
-              <div class="relative flex gap-4 pb-1">
-                <div class="relative z-10 flex-shrink-0">
-                  <div class="w-7 h-7 rounded-full flex items-center justify-center" style="background:#F9FAFB;border:2px solid #E5E7EB">
-                    <svg class="w-3 h-3" style="color:#9CA3AF" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-                  </div>
-                </div>
-                <div class="flex-1 pt-0.5">
-                  <div class="flex items-center justify-between">
-                    <p class="text-sm font-semibold" style="color:#9CA3AF">10 Octubre 2026</p>
-                    <span class="badge-gray text-[10px] font-bold px-2 py-0.5 rounded-full">Futuro</span>
-                  </div>
-                  <p class="text-xs font-semibold text-[#1e1b17] mt-0.5">UStVA Q3 2026</p>
-                  <p class="text-xs" style="color:#594139">IVA trimestral · Jul–Sep 2026</p>
-                </div>
-              </div>
-
-            </div>
+            <div id="tax-timeline" class="space-y-0"></div>
           </div>
 
           <!-- Divider -->
@@ -1086,6 +1005,186 @@
       }
     });
   })();
+</script>
+
+<!-- ── TIMELINE FISCAL DINÁMICO ──────────────────────────────────── -->
+<script>
+(async function renderTimeline() {
+  const container = document.getElementById('tax-timeline');
+  if (!container) return;
+
+  const now = new Date(); now.setHours(0, 0, 0, 0);
+  const year = now.getFullYear();
+  const prevYear = year - 1;
+  const month = now.getMonth() + 1;
+  const currentQ = month <= 3 ? 1 : month <= 6 ? 2 : month <= 9 ? 3 : 4;
+
+  // Returns date at midnight
+  const d = (y, m, day) => { const dt = new Date(y, m - 1, day); dt.setHours(0,0,0,0); return dt; };
+
+  // Days between two dates (positive = future)
+  const daysFrom = (date) => Math.round((date - now) / 86400000);
+
+  // Format: "10 enero 2026"
+  const fmtDate = (date) => date.toLocaleDateString('es-DE', { day: 'numeric', month: 'long', year: 'numeric' });
+
+  // Determine state of a deadline date
+  function getState(deadlineDate, qNum) {
+    const daysLeft = daysFrom(deadlineDate);
+    if (daysLeft < 0) {
+      // Past quarter — if it's before the current year's current Q, mark done
+      return qNum < currentQ ? 'done' : 'overdue';
+    }
+    if (qNum === currentQ) return 'current';
+    return 'upcoming';
+  }
+
+  // Build all entries
+  const entries = [];
+
+  // Q4 of previous year (deadline: 10 Jan current year)
+  const q4PrevDeadline = d(year, 1, 10);
+  entries.push({
+    deadline: q4PrevDeadline,
+    title: `UStVA Q4 ${prevYear}`,
+    sub: `IVA trimestral · Oct–Dic ${prevYear}`,
+    state: daysFrom(q4PrevDeadline) < 0 ? 'done' : 'upcoming',
+    isUStVA: true,
+  });
+
+  // Q1 current year (deadline: 10 Apr)
+  const q1Deadline = d(year, 4, 10);
+  entries.push({
+    deadline: q1Deadline,
+    title: `UStVA Q1 ${year}`,
+    sub: `IVA trimestral · Ene–Mar ${year}`,
+    state: getState(q1Deadline, 1),
+    isUStVA: true,
+  });
+
+  // Q2 current year (deadline: 10 Jul)
+  const q2Deadline = d(year, 7, 10);
+  entries.push({
+    deadline: q2Deadline,
+    title: `UStVA Q2 ${year}`,
+    sub: `IVA trimestral · Abr–Jun ${year}`,
+    state: getState(q2Deadline, 2),
+    isUStVA: true,
+  });
+
+  // Einkommensteuer previous year (deadline: 31 Jul current year)
+  const einkDeadline = d(year, 7, 31);
+  const einkDays = daysFrom(einkDeadline);
+  entries.push({
+    deadline: einkDeadline,
+    title: `Einkommensteuer ${prevYear}`,
+    sub: 'Declaración renta anual',
+    state: einkDays < 0 ? 'overdue' : 'upcoming',
+    isUStVA: false,
+    daysLeft: einkDays,
+  });
+
+  // Q3 current year (deadline: 10 Oct)
+  const q3Deadline = d(year, 10, 10);
+  entries.push({
+    deadline: q3Deadline,
+    title: `UStVA Q3 ${year}`,
+    sub: `IVA trimestral · Jul–Sep ${year}`,
+    state: getState(q3Deadline, 3),
+    isUStVA: true,
+  });
+
+  // Q4 current year (deadline: 10 Jan next year)
+  const q4CurrDeadline = d(year + 1, 1, 10);
+  entries.push({
+    deadline: q4CurrDeadline,
+    title: `UStVA Q4 ${year}`,
+    sub: `IVA trimestral · Oct–Dic ${year}`,
+    state: getState(q4CurrDeadline, 4),
+    isUStVA: true,
+  });
+
+  // Style maps
+  const STYLES = {
+    done: {
+      dotBg: '#F3F4F6', dotBorder: '#D1D5DB', dotColor: '#9CA3AF',
+      dotIcon: '<polyline points="20 6 9 17 4 12"/>',
+      dateColor: '#6B7280', dateClass: 'line-through',
+      badge: '<span class="badge-green text-[10px] font-bold px-2 py-0.5 rounded-full">Completado</span>',
+      wrapOpacity: 'opacity-50',
+    },
+    overdue: {
+      dotBg: '#FEF2F2', dotBorder: '#FECACA', dotColor: '#DC2626',
+      dotIcon: '<path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>',
+      dateColor: '#DC2626', dateClass: '',
+      badge: '<span class="badge-red text-[10px] font-bold px-2 py-0.5 rounded-full">Vencido</span>',
+      wrapOpacity: '',
+    },
+    current: {
+      dotBg: '#FFFBEB', dotBorder: '#FDE68A', dotColor: '#D97706',
+      dotIcon: '<circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/>',
+      dateColor: '#D97706', dateClass: '',
+      badge: '<span class="badge-amber text-[10px] font-bold px-2 py-0.5 rounded-full">Próximo</span>',
+      wrapOpacity: '',
+    },
+    upcoming: {
+      dotBg: '#F9FAFB', dotBorder: '#E5E7EB', dotColor: '#9CA3AF',
+      dotIcon: '<rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>',
+      dateColor: '#9CA3AF', dateClass: '',
+      badge: '<span class="badge-gray text-[10px] font-bold px-2 py-0.5 rounded-full">Futuro</span>',
+      wrapOpacity: '',
+    },
+  };
+
+  // Special style for Einkommensteuer upcoming: blue
+  function getEinkStyle(entry) {
+    if (entry.state === 'upcoming' || entry.state === 'current') {
+      const daysLeft = daysFrom(entry.deadline);
+      return {
+        dotBg: '#EFF6FF', dotBorder: '#BFDBFE', dotColor: '#3B82F6',
+        dotIcon: '<rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>',
+        dateColor: '#3B82F6', dateClass: '',
+        badge: `<span class="text-[10px] font-bold px-2 py-0.5 rounded-full" style="background:#EFF6FF;color:#3B82F6;border:1px solid rgba(59,130,246,.2)">${daysLeft > 0 ? daysLeft + ' días' : 'Vencido'}</span>`,
+        wrapOpacity: '',
+      };
+    }
+    return null;
+  }
+
+  const html = entries.map((entry, idx) => {
+    const isLast = idx === entries.length - 1;
+    const pb = isLast ? 'pb-1' : 'pb-6';
+    const daysLeft = daysFrom(entry.deadline);
+    let s = STYLES[entry.state] || STYLES.upcoming;
+    if (!entry.isUStVA) {
+      const overrideStyle = getEinkStyle(entry);
+      if (overrideStyle) s = overrideStyle;
+    }
+
+    let subText = entry.sub;
+    if (entry.state === 'current' && entry.isUStVA && daysLeft > 0) {
+      subText += ` · ${daysLeft} días`;
+    }
+
+    return `<div class="relative flex gap-4 ${pb}">
+      <div class="relative z-10 flex-shrink-0">
+        <div class="w-7 h-7 rounded-full flex items-center justify-center" style="background:${s.dotBg};border:2px solid ${s.dotBorder}">
+          <svg class="w-3 h-3" style="color:${s.dotColor}" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">${s.dotIcon}</svg>
+        </div>
+      </div>
+      <div class="flex-1 pt-0.5 ${s.wrapOpacity}">
+        <div class="flex items-center justify-between">
+          <p class="text-sm font-${entry.state === 'done' ? 'semibold' : 'bold'} ${s.dateClass}" style="color:${s.dateColor}">${fmtDate(entry.deadline)}</p>
+          ${s.badge}
+        </div>
+        <p class="text-xs font-semibold text-[#1e1b17] mt-0.5">${entry.title}</p>
+        <p class="text-xs" style="color:#594139">${subText}</p>
+      </div>
+    </div>`;
+  }).join('');
+
+  container.innerHTML = html;
+})();
 </script>
 
 <!-- ── IMPUESTOS: Calcular UStVA trimestral desde Supabase ────────── -->

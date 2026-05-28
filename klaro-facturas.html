@@ -118,6 +118,12 @@
       </svg>
       Dashboard
     </a>
+    <a href="klaro-documentos.html" class="flex items-center gap-3 px-4 py-3 rounded-xl text-[#594139] font-medium hover:bg-[#a43700]/5 transition-all text-sm">
+      <svg class="w-[18px] h-[18px] flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
+      </svg>
+      Documentos
+    </a>
     <a href="klaro-facturas.html" class="nav-active flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm transition-all">
       <svg class="w-[18px] h-[18px] flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
         <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
@@ -674,6 +680,16 @@
         '<p class="text-sm font-bold text-navy">' + fmtEur(gross) + '</p>' +
         '<p class="text-[10px]" style="color:#594139">neto ' + fmtEur(net) + '</p>' +
       '</div>' +
+      '<button onclick=\'printInvoice(' + JSON.stringify(inv).replace(/'/g, "\\'") + ')\' ' +
+              'title="Descargar PDF" ' +
+              'class="flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center transition-all hover:opacity-70 mr-1" ' +
+              'style="background:rgba(164,55,0,0.06);color:#a43700">' +
+        '<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">' +
+          '<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>' +
+          '<polyline points="17 8 12 3 7 8"/>' +
+          '<line x1="12" y1="3" x2="12" y2="15"/>' +
+        '</svg>' +
+      '</button>' +
       '<button onclick="deleteInvoice(\'' + inv.id + '\')" ' +
               'class="flex-shrink-0 w-7 h-7 flex items-center justify-center rounded-lg hover:text-red-500 transition-colors" ' +
               'style="color:#e0bfb4" title="Eliminar">' +
@@ -989,6 +1005,30 @@
     }
   }
 
+  /* ─ Print / PDF ─ */
+  function printInvoice(inv) {
+    const net = parseFloat(inv.amount || 0);
+    const vatRate = parseFloat(inv.vat_rate || inv.tax_rate || 19) / 100;
+    const vat = net * vatRate;
+    const gross = net + vat;
+    const fmt = n => '€ ' + n.toLocaleString('de-DE', {minimumFractionDigits:2, maximumFractionDigits:2});
+    const fmtDate = d => new Date(d).toLocaleDateString('de-DE', {day:'2-digit',month:'2-digit',year:'numeric'});
+
+    document.getElementById('pi-from-name').textContent = document.querySelector('[data-user-name]')?.textContent || '';
+    document.getElementById('pi-steuernummer').textContent = localStorage.getItem('klaro_steuernummer') ? 'St.-Nr.: ' + localStorage.getItem('klaro_steuernummer') : '';
+    document.getElementById('pi-invoice-number').textContent = inv.invoice_number || (inv.id ? inv.id.slice(0,8).toUpperCase() : '0001');
+    document.getElementById('pi-date').textContent = fmtDate(inv.date || inv.created_at || new Date());
+    document.getElementById('pi-client').textContent = inv.client_name || '—';
+    document.getElementById('pi-items').innerHTML = '<tr><td>' + escHtml(inv.description || 'Servicios profesionales') + '</td><td style="text-align:right">' + fmt(net) + '</td></tr>';
+    document.getElementById('pi-net').textContent = fmt(net);
+    document.getElementById('pi-vat-label').textContent = 'MwSt. ' + Math.round(vatRate * 100) + '%';
+    document.getElementById('pi-vat').textContent = fmt(vat);
+    document.getElementById('pi-gross').textContent = fmt(gross);
+    document.getElementById('pi-footer-year').textContent = new Date().getFullYear();
+
+    window.print();
+  }
+
   /* ─ Init ─ */
   updatePreview();
   loadInvoices();
@@ -1056,5 +1096,57 @@
     });
   })();
 </script>
+
+<!-- Print-only invoice template -->
+<div id="print-invoice" class="hidden">
+  <style>
+    @media print {
+      body > *:not(#print-invoice) { display: none !important; }
+      #print-invoice { display: block !important; font-family: 'Plus Jakarta Sans', sans-serif; padding: 48px; max-width: 700px; margin: 0 auto; color: #1e1b17; }
+      .pi-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 40px; }
+      .pi-brand { font-size: 22px; font-weight: 800; color: #a43700; }
+      .pi-meta { text-align: right; font-size: 12px; color: #594139; }
+      .pi-section { margin-bottom: 28px; }
+      .pi-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: #594139; margin-bottom: 6px; }
+      .pi-value { font-size: 14px; font-weight: 500; }
+      .pi-table { width: 100%; border-collapse: collapse; margin-bottom: 24px; }
+      .pi-table th { font-size: 10px; font-weight: 700; text-transform: uppercase; color: #594139; padding: 8px 12px; border-bottom: 2px solid #e0bfb4; text-align: left; }
+      .pi-table td { font-size: 13px; padding: 10px 12px; border-bottom: 1px solid #f4ede5; }
+      .pi-totals { margin-left: auto; width: 240px; }
+      .pi-totals-row { display: flex; justify-content: space-between; padding: 6px 0; font-size: 13px; }
+      .pi-totals-row.total { font-weight: 800; font-size: 16px; border-top: 2px solid #1e1b17; padding-top: 10px; margin-top: 4px; }
+      .pi-footer { margin-top: 48px; font-size: 10px; color: #594139; border-top: 1px solid #e0bfb4; padding-top: 16px; }
+    }
+    @media screen { #print-invoice { display: none; } }
+  </style>
+  <div class="pi-header">
+    <div>
+      <div class="pi-brand">Klaro</div>
+      <div style="font-size:12px;color:#594139;margin-top:4px" id="pi-from-name"></div>
+      <div style="font-size:12px;color:#594139" id="pi-steuernummer"></div>
+    </div>
+    <div class="pi-meta">
+      <div style="font-size:18px;font-weight:800;color:#1e1b17;margin-bottom:4px">RECHNUNG</div>
+      <div>Nr. <span id="pi-invoice-number"></span></div>
+      <div>Datum: <span id="pi-date"></span></div>
+    </div>
+  </div>
+  <div class="pi-section">
+    <div class="pi-label">Rechnungsempfänger</div>
+    <div class="pi-value" id="pi-client"></div>
+  </div>
+  <table class="pi-table">
+    <thead><tr><th>Beschreibung</th><th style="text-align:right">Betrag</th></tr></thead>
+    <tbody id="pi-items"></tbody>
+  </table>
+  <div class="pi-totals">
+    <div class="pi-totals-row"><span>Nettobetrag</span><span id="pi-net"></span></div>
+    <div class="pi-totals-row"><span id="pi-vat-label">MwSt. 19%</span><span id="pi-vat"></span></div>
+    <div class="pi-totals-row total"><span>Gesamtbetrag</span><span id="pi-gross"></span></div>
+  </div>
+  <div class="pi-footer">
+    Zahlbar innerhalb von 14 Tagen nach Rechnungsdatum. · Generado con Klaro · <span id="pi-footer-year"></span>
+  </div>
+</div>
 </body>
 </html>
