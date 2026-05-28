@@ -461,7 +461,7 @@
                     <span class="badge-red text-[10px] font-bold px-2 py-0.5 rounded-full">Vencido</span>
                   </div>
                   <p class="text-xs font-semibold text-[#1e1b17] mt-0.5">UStVA Q1 2026</p>
-                  <p class="text-xs" style="color:#594139">IVA trimestral · €1.254,50</p>
+                  <p class="text-xs" style="color:#594139">IVA trimestral · <span id="iva-timeline-prev">—</span></p>
                 </div>
               </div>
 
@@ -1165,6 +1165,9 @@
   set('iva-resumen-cobrado',    fmt(curr.ivaFacturado));
   set('iva-resumen-vorsteuer',  `− ${fmt(curr.vorsteuer)}`);
   set('iva-resumen-neto',       fmt(curr.netoPagar));
+
+  // Timeline: Q anterior neto
+  set('iva-timeline-prev',      fmt(prev.ivaFacturado));
 
   // Barra de progreso del trimestre actual
   const qStart    = new Date(Q_META[currentQ].start);
