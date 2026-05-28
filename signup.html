@@ -179,7 +179,11 @@
 
       setLoading(true);
 
-      const { error } = await _sb.auth.signUp({ email, password: pass1 });
+      const { error } = await _sb.auth.signUp({
+        email,
+        password: pass1,
+        options: { emailRedirectTo: 'https://klaro-landing.vercel.app/klaro-dashboard.html' },
+      });
 
       if (error) {
         setLoading(false);
