@@ -15,14 +15,34 @@ const _sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
     window.location.replace('login.html');
     return;
   }
-  // Populate any user-email placeholders in the page
-  const emailEls = document.querySelectorAll('[data-user-email]');
-  emailEls.forEach(el => { el.textContent = session.user.email; });
 
-  // Populate initials avatars
-  const avatarEls = document.querySelectorAll('[data-user-initials]');
-  const initials = session.user.email.slice(0, 2).toUpperCase();
-  avatarEls.forEach(el => { el.textContent = initials; });
+  // Fast fill from session — no extra round-trip
+  const emailFallback = session.user.email;
+  const initialsFallback = emailFallback.slice(0, 2).toUpperCase();
+  document.querySelectorAll('[data-user-email]').forEach(el => { el.textContent = emailFallback; });
+  document.querySelectorAll('[data-user-initials]').forEach(el => { el.textContent = initialsFallback; });
+  document.querySelectorAll('[data-user-name]').forEach(el => { el.textContent = emailFallback; });
+
+  // Fetch profile and upgrade to real name + city
+  try {
+    const { data: profile } = await _sb
+      .from('profiles')
+      .select('full_name, city')
+      .eq('id', session.user.id)
+      .single();
+
+    if (profile) {
+      const displayName = profile.full_name || emailFallback;
+      const initials    = displayName.slice(0, 2).toUpperCase();
+      document.querySelectorAll('[data-user-initials]').forEach(el => { el.textContent = initials; });
+      document.querySelectorAll('[data-user-name]').forEach(el => { el.textContent = displayName; });
+      if (profile.city) {
+        document.querySelectorAll('[data-user-city]').forEach(el => {
+          el.textContent = `Freiberufler/a · ${profile.city}`;
+        });
+      }
+    }
+  } catch { /* profile fetch is non-critical */ }
 })();
 
 async function logout() {
