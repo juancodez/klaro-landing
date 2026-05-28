@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
@@ -576,73 +576,8 @@
           <p class="text-[10px] font-bold uppercase tracking-widest text-right" style="color:rgba(89,65,57,.45)">Estado</p>
         </div>
 
-        <div class="space-y-0.5">
-
-          <!-- Invoice 1: Studio Hamburg GmbH · 15 ene · €3.200 · Cobrada -->
-          <div class="inv-row grid grid-cols-[auto_1fr_auto_auto] gap-x-3 px-2 py-2.5 rounded-xl items-center">
-            <div class="w-8 h-8 rounded-lg flex items-center justify-center text-[11px] font-black text-white flex-shrink-0"
-                 style="background:rgba(100,116,139,.7)">SH</div>
-            <div class="min-w-0">
-              <p class="text-sm font-semibold text-[#1e1b17] truncate leading-tight">Studio Hamburg GmbH</p>
-              <p class="text-[10px]" style="color:#594139">15 ene 2026</p>
-            </div>
-            <p class="text-sm font-bold text-[#1e1b17] text-right">€3.200</p>
-            <span class="text-[10px] font-black px-2 py-0.5 rounded-lg text-right whitespace-nowrap"
-                  style="background:rgba(34,197,94,.12);color:#15803d">Cobrada</span>
-          </div>
-
-          <!-- Invoice 2: Freelance Client NL · 28 ene · €1.800 · Cobrada -->
-          <div class="inv-row grid grid-cols-[auto_1fr_auto_auto] gap-x-3 px-2 py-2.5 rounded-xl items-center">
-            <div class="w-8 h-8 rounded-lg flex items-center justify-center text-[11px] font-black text-white flex-shrink-0"
-                 style="background:rgba(100,116,139,.7)">FC</div>
-            <div class="min-w-0">
-              <p class="text-sm font-semibold text-[#1e1b17] truncate leading-tight">Freelance Client NL</p>
-              <p class="text-[10px]" style="color:#594139">28 ene 2026</p>
-            </div>
-            <p class="text-sm font-bold text-[#1e1b17] text-right">€1.800</p>
-            <span class="text-[10px] font-black px-2 py-0.5 rounded-lg text-right whitespace-nowrap"
-                  style="background:rgba(34,197,94,.12);color:#15803d">Cobrada</span>
-          </div>
-
-          <!-- Invoice 3: Studio Hamburg GmbH · 10 feb · €2.400 · Cobrada -->
-          <div class="inv-row grid grid-cols-[auto_1fr_auto_auto] gap-x-3 px-2 py-2.5 rounded-xl items-center">
-            <div class="w-8 h-8 rounded-lg flex items-center justify-center text-[11px] font-black text-white flex-shrink-0"
-                 style="background:rgba(100,116,139,.7)">SH</div>
-            <div class="min-w-0">
-              <p class="text-sm font-semibold text-[#1e1b17] truncate leading-tight">Studio Hamburg GmbH</p>
-              <p class="text-[10px]" style="color:#594139">10 feb 2026</p>
-            </div>
-            <p class="text-sm font-bold text-[#1e1b17] text-right">€2.400</p>
-            <span class="text-[10px] font-black px-2 py-0.5 rounded-lg text-right whitespace-nowrap"
-                  style="background:rgba(34,197,94,.12);color:#15803d">Cobrada</span>
-          </div>
-
-          <!-- Invoice 4: Berlin Startup AG · 20 feb · €1.600 · Pendiente -->
-          <div class="inv-row grid grid-cols-[auto_1fr_auto_auto] gap-x-3 px-2 py-2.5 rounded-xl items-center">
-            <div class="w-8 h-8 rounded-lg flex items-center justify-center text-[11px] font-black text-white flex-shrink-0"
-                 style="background:rgba(100,116,139,.7)">BS</div>
-            <div class="min-w-0">
-              <p class="text-sm font-semibold text-[#1e1b17] truncate leading-tight">Berlin Startup AG</p>
-              <p class="text-[10px]" style="color:#594139">20 feb 2026</p>
-            </div>
-            <p class="text-sm font-bold text-[#1e1b17] text-right">€1.600</p>
-            <span class="text-[10px] font-black px-2 py-0.5 rounded-lg text-right whitespace-nowrap"
-                  style="background:rgba(255,184,48,.15);color:#b45309">Pendiente</span>
-          </div>
-
-          <!-- Invoice 5: Berlin Startup AG · 5 mar · €4.100 · Cobrada -->
-          <div class="inv-row grid grid-cols-[auto_1fr_auto_auto] gap-x-3 px-2 py-2.5 rounded-xl items-center">
-            <div class="w-8 h-8 rounded-lg flex items-center justify-center text-[11px] font-black text-white flex-shrink-0"
-                 style="background:rgba(100,116,139,.7)">BS</div>
-            <div class="min-w-0">
-              <p class="text-sm font-semibold text-[#1e1b17] truncate leading-tight">Berlin Startup AG</p>
-              <p class="text-[10px]" style="color:#594139">5 mar 2026</p>
-            </div>
-            <p class="text-sm font-bold text-[#1e1b17] text-right">€4.100</p>
-            <span class="text-[10px] font-black px-2 py-0.5 rounded-lg text-right whitespace-nowrap"
-                  style="background:rgba(34,197,94,.12);color:#15803d">Cobrada</span>
-          </div>
-
+        <div id="inv-list" class="space-y-0.5">
+          <div class="py-6 text-center text-xs" style="color:rgba(89,65,57,.4)">Cargando facturas…</div>
         </div><!-- /invoice rows -->
 
         <!-- Quick summary strip -->
@@ -650,11 +585,11 @@
              style="border-top:1px solid rgba(164,55,0,.08)">
           <div>
             <p class="text-[10px] font-semibold uppercase tracking-widest" style="color:rgba(89,65,57,.5)">Total cobrado</p>
-            <p class="text-sm font-black text-[#1e1b17]">€13.100</p>
+            <p id="inv-total-cobrado" class="text-sm font-black text-[#1e1b17]">—</p>
           </div>
           <div class="text-right">
             <p class="text-[10px] font-semibold uppercase tracking-widest" style="color:rgba(89,65,57,.5)">Pendiente</p>
-            <p class="text-sm font-black" style="color:#b45309">€1.600</p>
+            <p id="inv-total-pendiente" class="text-sm font-black" style="color:#b45309">—</p>
           </div>
           <a href="klaro-facturas.html"
              class="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold transition-all hover:opacity-90 active:scale-95 text-white"
@@ -828,6 +763,53 @@ async function deleteDoc(id, path) {
   await loadDocuments(_docUid);
 }
 
+// -- Invoices ---------------------------------------------------------
+async function loadInvoices(uid) {
+  const { data: invoices } = await _sb
+    .from('invoices')
+    .select('client_name, amount, date, status')
+    .eq('user_id', uid)
+    .order('date', { ascending: false })
+    .limit(5);
+
+  const list = document.getElementById('inv-list');
+  if (!list) return;
+
+  const ST = {
+    paid:    { label: 'Cobrada',  bg: 'rgba(34,197,94,.12)',  color: '#15803d' },
+    sent:    { label: 'Enviada',  bg: 'rgba(59,130,246,.1)',  color: '#1d4ed8' },
+    draft:   { label: 'Borrador', bg: 'rgba(100,116,139,.1)', color: '#475569' },
+    overdue: { label: 'Vencida',  bg: 'rgba(220,38,38,.1)',   color: '#dc2626' },
+  };
+  const fmt = n => '€' + Number(n).toLocaleString('de-DE', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+  const fmtD = d => d ? new Date(d).toLocaleDateString('es-DE', { day:'2-digit', month:'short', year:'numeric' }) : '—';
+  const ini  = s => (s||'??').split(' ').filter(Boolean).map(w=>w[0].toUpperCase()).join('').slice(0,2);
+  const esc  = s => String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+
+  if (!invoices || invoices.length === 0) {
+    list.innerHTML = '<div class="py-6 text-center text-xs" style="color:rgba(89,65,57,.4)">Sin facturas. <a href="klaro-facturas.html" style="color:#a43700;font-weight:600">Crear la primera &rarr;</a></div>';
+    document.getElementById('inv-total-cobrado').textContent = '€0';
+    document.getElementById('inv-total-pendiente').textContent = '€0';
+    return;
+  }
+
+  list.innerHTML = invoices.map(inv => {
+    const st = ST[inv.status] || ST.draft;
+    return '<div class="inv-row grid grid-cols-[auto_1fr_auto_auto] gap-x-3 px-2 py-2.5 rounded-xl items-center">' +
+      '<div class="w-8 h-8 rounded-lg flex items-center justify-center text-[11px] font-black text-white flex-shrink-0" style="background:rgba(100,116,139,.7)">' + esc(ini(inv.client_name)) + '</div>' +
+      '<div class="min-w-0"><p class="text-sm font-semibold text-[#1e1b17] truncate leading-tight">' + esc(inv.client_name||'—') + '</p>' +
+      '<p class="text-[10px]" style="color:#594139">' + fmtD(inv.date) + '</p></div>' +
+      '<p class="text-sm font-bold text-[#1e1b17] text-right">' + fmt(inv.amount) + '</p>' +
+      '<span class="text-[10px] font-black px-2 py-0.5 rounded-lg text-right whitespace-nowrap" style="background:' + st.bg + ';color:' + st.color + '">' + st.label + '</span>' +
+      '</div>';
+  }).join('');
+
+  const cobrado   = invoices.filter(i=>i.status==='paid').reduce((s,i)=>s+(Number(i.amount)||0),0);
+  const pendiente = invoices.filter(i=>i.status==='sent'||i.status==='overdue').reduce((s,i)=>s+(Number(i.amount)||0),0);
+  document.getElementById('inv-total-cobrado').textContent   = fmt(cobrado);
+  document.getElementById('inv-total-pendiente').textContent = fmt(pendiente);
+}
+
 // ── Bootstrap ─────────────────────────────────────────────────────────
 (async () => {
   const { data: { session } } = await _sb.auth.getSession();
@@ -841,6 +823,9 @@ async function deleteDoc(id, path) {
     const el = document.getElementById('stat-gastos');
     if (el) el.textContent = '€' + total.toLocaleString('de-DE', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
   }
+
+  // Invoices
+  await loadInvoices(uid);
 
   // Documents — loads list and updates both badges
   await loadDocuments(uid);

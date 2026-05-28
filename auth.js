@@ -21,10 +21,14 @@ _sb.auth.onAuthStateChange((event, session) => {
 
   // Fast fill from session — no extra round-trip
   const email    = session.user.email;
-  const initials = email.slice(0, 2).toUpperCase();
+  const metaName = (session.user.user_metadata || {}).full_name || '';
+  const displayName0 = metaName || email;
+  const initials0 = metaName
+    ? metaName.split(' ').filter(Boolean).map(w => w[0].toUpperCase()).join('').slice(0, 2)
+    : email.slice(0, 2).toUpperCase();
   document.querySelectorAll('[data-user-email]').forEach(el => { el.textContent = email; });
-  document.querySelectorAll('[data-user-initials]').forEach(el => { el.textContent = initials; });
-  document.querySelectorAll('[data-user-name]').forEach(el => { el.textContent = email; });
+  document.querySelectorAll('[data-user-initials]').forEach(el => { el.textContent = initials0; });
+  document.querySelectorAll('[data-user-name]').forEach(el => { el.textContent = displayName0; });
 
   // Fetch profile and upgrade to real name + city
   _sb.from('profiles')
@@ -34,7 +38,9 @@ _sb.auth.onAuthStateChange((event, session) => {
     .then(({ data: profile }) => {
       if (!profile) return;
       const displayName = profile.full_name || email;
-      const profileInitials = displayName.slice(0, 2).toUpperCase();
+      const profileInitials = profile.full_name
+        ? profile.full_name.split(' ').filter(Boolean).map(w => w[0].toUpperCase()).join('').slice(0, 2)
+        : email.slice(0, 2).toUpperCase();
       document.querySelectorAll('[data-user-initials]').forEach(el => { el.textContent = profileInitials; });
       document.querySelectorAll('[data-user-name]').forEach(el => { el.textContent = displayName; });
       if (profile.city) {
