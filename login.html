@@ -97,10 +97,15 @@
       </form>
     </div>
 
-    <!-- Switch to signup -->
+    <!-- Forgot password -->
     <p class="text-center text-sm mt-4" style="color:#594139">
+      <a href="reset.html" style="color:#a43700;font-weight:600;">¿Te olvidaste la contraseña?</a>
+    </p>
+
+    <!-- Switch to signup -->
+    <p class="text-center text-sm mt-2" style="color:#594139">
       ¿No tienes cuenta?
-      <a href="/signup.html" class="font-bold ml-1" style="color:#a43700">Regístrate gratis</a>
+      <a href="signup.html" class="font-bold ml-1" style="color:#a43700">Regístrate gratis</a>
     </p>
 
   </div>
@@ -113,7 +118,7 @@
     // If already logged in, skip to dashboard
     (async () => {
       const { data: { session } } = await _sb.auth.getSession();
-      if (session) window.location.replace('/klaro-dashboard.html');
+      if (session) window.location.replace('klaro-dashboard.html');
     })();
 
     function showError(msg) {
@@ -146,7 +151,7 @@
         };
         showError(msgs[error.message] || error.message);
       } else {
-        window.location.replace('/klaro-dashboard.html');
+        window.location.replace('klaro-dashboard.html');
       }
     }
   </script>

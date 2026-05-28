@@ -12,7 +12,7 @@ const _sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 (async () => {
   const { data: { session } } = await _sb.auth.getSession();
   if (!session) {
-    window.location.replace('/login.html');
+    window.location.replace('login.html');
     return;
   }
   // Populate any user-email placeholders in the page
@@ -27,5 +27,5 @@ const _sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 async function logout() {
   await _sb.auth.signOut();
-  window.location.replace('/login.html');
+  window.location.replace('login.html');
 }

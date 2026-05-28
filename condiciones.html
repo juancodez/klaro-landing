@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/svg+xml" href="assets/Klaro-Logo-Favicon-orange.svg" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Condiciones generales · Klaro</title>
+  <meta name="description" content="Términos y condiciones de uso de Klaro. Lo que puedes esperar de nosotros y lo que esperamos de ti." />
+  <link rel="canonical" href="/condiciones.html" />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,300;1,400&family=Bricolage+Grotesque:opsz,wght@12..96,300..800&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Plus Jakarta Sans', sans-serif; background: #fff8f1; color: #1e1b17; overflow-x: hidden; }
+
+    /* ── NAV ── */
+    #nav {
+      position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
+      z-index: 201; padding: 10px 20px 10px 16px;
+      display: flex; align-items: center; gap: 32px; width: max-content;
+      background: rgba(255,248,241,0.96); border-radius: 100px;
+      border: 1px solid rgba(164,55,0,0.10);
+      box-shadow: 0 4px 24px rgba(164,55,0,0.08), inset 0 1px 0 rgba(255,255,255,0.6);
+      transition: box-shadow 0.4s;
+    }
+    #nav.scrolled { box-shadow: 0 8px 32px rgba(164,55,0,0.12), inset 0 1px 0 rgba(255,255,255,0.6); }
+    .nav-links { display: flex; align-items: center; gap: 24px; }
+    .nav-links a {
+      font-size: 13px; font-weight: 500; color: #594139; text-decoration: none;
+      transition: color 0.2s; position: relative; padding-bottom: 2px;
+    }
+    .nav-links a::after { content: ''; position: absolute; bottom: -1px; left: 0; width: 0; height: 1px; background: #a43700; transition: width 0.3s cubic-bezier(0.16,1,0.3,1); }
+    .nav-links a:hover { color: #a43700; }
+    .nav-links a:hover::after { width: 100%; }
+    .nav-pill { background: #1e1b17; color: #fff8f1; font-size: 12.5px; font-weight: 700; padding: 8px 18px; border-radius: 100px; text-decoration: none; transition: opacity 0.2s, transform 0.15s cubic-bezier(0.16,1,0.3,1); white-space: nowrap; }
+    .nav-pill:hover { opacity: 0.82; transform: translateY(-1px); }
+    .nav-logo { display: flex; align-items: center; gap: 9px; text-decoration: none; }
+    .nav-wordmark { font-size: 16px; font-weight: 800; color: #1e1b17; letter-spacing: -0.03em; }
+    .nav-icon { width: 30px; height: 30px; border-radius: 8px; background: white; display: flex; align-items: center; justify-content: center; }
+
+    /* ── HAMBURGER ── */
+    .nav-burger { display: none; align-items: center; justify-content: center; width: 36px; height: 36px; background: none; border: none; cursor: pointer; padding: 6px; border-radius: 8px; transition: background 0.2s; }
+    .nav-burger:hover { background: rgba(164,55,0,0.07); }
+    .nav-burger-icon { display: flex; flex-direction: column; gap: 5px; width: 18px; }
+    .nav-burger-icon span { display: block; height: 1.5px; width: 100%; background: #1e1b17; border-radius: 2px; transform-origin: center; transition: transform 0.35s cubic-bezier(0.16,1,0.3,1), opacity 0.2s, width 0.35s cubic-bezier(0.16,1,0.3,1); }
+    .nav-burger.open .nav-burger-icon span:nth-child(1) { transform: translateY(6.5px) rotate(45deg); }
+    .nav-burger.open .nav-burger-icon span:nth-child(2) { opacity: 0; width: 0; }
+    .nav-burger.open .nav-burger-icon span:nth-child(3) { transform: translateY(-6.5px) rotate(-45deg); }
+
+    /* ── MOBILE MENU ── */
+    #mobile-menu { position: fixed; inset: 0; z-index: 200; background: rgba(255,248,241,0.98); backdrop-filter: blur(20px); display: flex; flex-direction: column; align-items: center; justify-content: center; pointer-events: none; opacity: 0; transform: scale(0.97); transition: opacity 0.3s cubic-bezier(0.16,1,0.3,1), transform 0.35s cubic-bezier(0.16,1,0.3,1); }
+    #mobile-menu.open { opacity: 1; transform: scale(1); pointer-events: all; }
+    .mobile-nav-links { display: flex; flex-direction: column; align-items: center; gap: 8px; width: 100%; padding: 0 32px; }
+    .mobile-nav-links a { font-size: 32px; font-weight: 700; font-family: 'Bricolage Grotesque', sans-serif; color: #1e1b17; text-decoration: none; letter-spacing: -0.02em; padding: 12px 0; width: 100%; text-align: center; border-bottom: 1px solid rgba(164,55,0,0.08); transition: color 0.2s; }
+    .mobile-nav-links a:first-child { border-top: 1px solid rgba(164,55,0,0.08); }
+    .mobile-nav-links a:hover { color: #a43700; }
+    .mobile-nav-cta { display: flex; flex-direction: column; align-items: center; gap: 12px; margin-top: 40px; width: 100%; padding: 0 32px; }
+    .mobile-nav-cta .nav-pill { display: block; text-align: center; padding: 14px 32px; font-size: 15px; width: 100%; max-width: 320px; }
+    .mobile-nav-cta .nav-login { font-size: 14px; color: #594139; text-decoration: none; }
+    .mobile-nav-cta .nav-login:hover { color: #a43700; }
+
+    /* ── HERO ── */
+    .legal-hero {
+      background: #1e1b17; padding: 160px 24px 100px;
+      text-align: center; position: relative; overflow: hidden;
+    }
+    .legal-hero::before {
+      content: ''; position: absolute; inset: 0;
+      background: url('assets/klaro-illu-01.svg') no-repeat center center / cover;
+      opacity: 0.05; pointer-events: none;
+    }
+    .legal-hero-inner { position: relative; z-index: 1; max-width: 640px; margin: 0 auto; }
+    .overline {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-size: 10.5px; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase;
+      color: #ffb59a; background: rgba(255,255,255,0.10); border-radius: 100px;
+      padding: 5px 14px; margin-bottom: 28px;
+    }
+    .legal-h1 {
+      font-family: 'Bricolage Grotesque', 'Plus Jakarta Sans', sans-serif;
+      font-size: clamp(36px, 6vw, 64px); font-weight: 800;
+      line-height: 1.04; letter-spacing: -0.015em; color: #fff8f1;
+      text-wrap: balance; margin-bottom: 20px;
+    }
+    .legal-h1 em { font-style: italic; font-weight: 300; color: #ffb59a; }
+    .legal-sub { font-size: 16px; color: rgba(255,248,241,0.64); line-height: 1.75; max-width: 44ch; margin: 0 auto 20px; }
+    .legal-updated { font-size: 11px; font-weight: 600; letter-spacing: 0.08em; color: rgba(255,181,154,0.55); text-transform: uppercase; }
+
+    /* ── BODY WRAPPER ── */
+    .legal-body { background: #fff8f1; padding: 80px 24px 120px; }
+    .legal-layout { max-width: 1000px; margin: 0 auto; display: grid; grid-template-columns: 220px 1fr; gap: 72px; align-items: start; }
+
+    /* ── QUICK NAV (sidebar) ── */
+    .legal-nav { position: sticky; top: 96px; }
+    .legal-nav-title { font-size: 10px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: #a43700; margin-bottom: 16px; }
+    .legal-nav-list { list-style: none; display: flex; flex-direction: column; gap: 2px; }
+    .legal-nav-list a {
+      display: block; font-size: 13px; font-weight: 500; color: #8c7168;
+      text-decoration: none; padding: 6px 12px; border-radius: 8px;
+      transition: color 0.2s, background 0.2s;
+      border-left: 2px solid transparent;
+    }
+    .legal-nav-list a:hover { color: #a43700; background: rgba(164,55,0,0.04); border-left-color: rgba(164,55,0,0.3); }
+    .legal-nav-list a.active { color: #a43700; font-weight: 700; border-left-color: #a43700; background: rgba(164,55,0,0.05); }
+
+    /* ── CONTENT ── */
+    .legal-content { display: flex; flex-direction: column; gap: 56px; }
+    .legal-section { scroll-margin-top: 100px; }
+    .legal-section h2 {
+      font-family: 'Bricolage Grotesque', 'Plus Jakarta Sans', sans-serif;
+      font-size: 22px; font-weight: 800; color: #1e1b17;
+      letter-spacing: -0.02em; margin-bottom: 20px;
+      padding-bottom: 12px; border-bottom: 1px solid rgba(164,55,0,0.10);
+    }
+    .legal-section p { font-size: 15px; color: #594139; line-height: 1.8; margin-bottom: 14px; }
+    .legal-section p:last-child { margin-bottom: 0; }
+    .legal-section ul { list-style: none; display: flex; flex-direction: column; gap: 8px; margin: 8px 0 14px; padding-left: 4px; }
+    .legal-section ul li { font-size: 15px; color: #594139; line-height: 1.7; padding-left: 20px; position: relative; }
+    .legal-section ul li::before { content: '—'; position: absolute; left: 0; color: #a43700; font-weight: 700; }
+    .legal-section a { color: #a43700; text-decoration: underline; text-underline-offset: 3px; }
+    .legal-section a:hover { color: #7a2900; }
+
+    /* Contact callout */
+    .contact-box {
+      background: rgba(164,55,0,0.04); border: 1px solid rgba(164,55,0,0.12);
+      border-radius: 16px; padding: 24px 28px; margin-top: 8px;
+    }
+    .contact-box a { font-size: 17px; font-weight: 700; color: #a43700; text-decoration: none; display: block; margin-top: 8px; }
+    .contact-box a:hover { text-decoration: underline; }
+
+    /* ── FOOTER ── */
+    footer { border-top: 1px solid rgba(164,55,0,0.08); padding: 64px 72px 48px; max-width: 1280px; margin: 0 auto; }
+    .footer-inner { display: flex; justify-content: space-between; align-items: flex-start; gap: 48px; }
+    .footer-brand-col { display: flex; flex-direction: column; }
+    .footer-note { font-size: 11.5px; color: #8c7168; line-height: 1.6; max-width: 36ch; margin-top: 48px; }
+    .footer-cols { display: flex; gap: 56px; flex-shrink: 0; }
+    .footer-col { display: flex; flex-direction: column; gap: 12px; }
+    .footer-col-title { font-size: 11px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: #1e1b17; margin-bottom: 4px; }
+    .footer-col a { font-size: 13px; color: #8c7168; text-decoration: none; transition: color 0.2s; }
+    .footer-col a:hover { color: #a43700; }
+
+    /* ── CLARA FLOAT WIDGET ── */
+    #clara-fab { position: fixed; bottom: 28px; right: 28px; z-index: 200; width: 56px; height: 56px; border-radius: 50%; overflow: hidden; box-shadow: 0 8px 24px rgba(164,55,0,0.32); cursor: pointer; border: none; padding: 0; transition: transform 0.2s cubic-bezier(0.16,1,0.3,1), box-shadow 0.2s; }
+    #clara-fab:hover { transform: scale(1.08); box-shadow: 0 12px 32px rgba(164,55,0,0.42); }
+    #clara-fab:active { transform: scale(0.96); }
+    #clara-fab img { width: 100%; height: 100%; object-fit: cover; object-position: center center; display: block; }
+    #clara-drawer { position: fixed; bottom: 96px; right: 28px; z-index: 199; width: 380px; height: 560px; background: white; border-radius: 24px; box-shadow: 0 24px 80px rgba(0,0,0,0.18), 0 0 0 1px rgba(164,55,0,0.08); display: flex; flex-direction: column; overflow: hidden; transform: translateY(16px) scale(0.97); opacity: 0; pointer-events: none; transition: transform 0.3s cubic-bezier(0.16,1,0.3,1), opacity 0.3s; }
+    #clara-drawer.open { transform: translateY(0) scale(1); opacity: 1; pointer-events: all; }
+    .drawer-hd { background: #fff8f1; border-bottom: 1px solid rgba(164,55,0,0.08); padding: 14px 18px; display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
+    .drawer-hd-left { display: flex; align-items: center; gap: 10px; }
+    .drawer-avatar { width: 32px; height: 32px; border-radius: 50%; overflow: hidden; flex-shrink: 0; }
+    .drawer-avatar img { width: 100%; height: 100%; object-fit: cover; object-position: center top; display: block; }
+    .drawer-name { font-size: 13px; font-weight: 700; color: #1e1b17; }
+    .drawer-status { font-size: 10.5px; color: #556338; font-weight: 600; display: flex; align-items: center; gap: 3px; }
+    .online { width: 5px; height: 5px; border-radius: 50%; background: #556338; }
+    .drawer-close { width: 28px; height: 28px; border-radius: 8px; border: none; background: transparent; cursor: pointer; display: flex; align-items: center; justify-content: center; color: #8c7168; transition: background 0.15s; }
+    .drawer-close:hover { background: rgba(164,55,0,0.06); color: #a43700; }
+    .drawer-close svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; }
+    #drawer-msgs { flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 12px; background: #fafaf8; scrollbar-width: thin; scrollbar-color: rgba(164,55,0,0.15) transparent; }
+    .dm-clara { background: white; border: 1px solid rgba(164,55,0,0.08); border-radius: 14px 14px 14px 3px; padding: 10px 13px; font-size: 12.5px; line-height: 1.55; color: #1e1b17; max-width: 88%; align-self: flex-start; }
+    .dm-clara strong { color: #a43700; }
+    .dm-user { background: #a43700; color: white; border-radius: 14px 14px 3px 14px; padding: 10px 13px; font-size: 12.5px; line-height: 1.55; max-width: 80%; align-self: flex-end; }
+    .dm-chips { display: flex; flex-wrap: wrap; gap: 6px; align-self: flex-start; }
+    .dm-chip { font-size: 11px; font-weight: 600; color: #a43700; background: rgba(164,55,0,0.06); border: 1px solid rgba(164,55,0,0.15); border-radius: 100px; padding: 5px 11px; cursor: pointer; transition: background 0.15s; }
+    .dm-chip:hover { background: rgba(164,55,0,0.12); }
+    .dm-typing { display: flex; align-items: center; gap: 5px; padding: 10px 13px; background: white; border: 1px solid rgba(164,55,0,0.08); border-radius: 14px; width: fit-content; }
+    .dm-dot { width: 5px; height: 5px; border-radius: 50%; background: #c0a898; animation: bounce 1.2s ease-in-out infinite; }
+    .dm-dot:nth-child(2) { animation-delay: 0.15s; }
+    .dm-dot:nth-child(3) { animation-delay: 0.3s; }
+    @keyframes bounce { 0%,80%,100%{transform:scale(0.7);opacity:0.5} 40%{transform:scale(1);opacity:1} }
+    .no-key-banner { margin: 10px; border-radius: 10px; background: #fffbeb; border: 1px solid #fcd34d; padding: 10px 14px; font-size: 11.5px; color: #92400e; display: flex; align-items: center; gap: 8px; }
+    .no-key-banner svg { width: 14px; height: 14px; stroke: #d97706; fill: none; stroke-width: 2; stroke-linecap: round; flex-shrink: 0; }
+    .no-key-link { color: #a43700; font-weight: 700; cursor: pointer; text-decoration: underline; }
+    #drawer-input-bar { border-top: 1px solid rgba(164,55,0,0.08); padding: 10px 12px; display: flex; align-items: flex-end; gap: 8px; background: white; flex-shrink: 0; }
+    #drawer-input { flex: 1; resize: none; border: 1px solid rgba(164,55,0,0.12); border-radius: 14px; padding: 9px 13px; font-size: 12.5px; color: #1e1b17; font-family: inherit; background: #fafaf8; outline: none; max-height: 100px; transition: border-color 0.2s; }
+    #drawer-input:focus { border-color: rgba(164,55,0,0.35); }
+    #drawer-send { width: 34px; height: 34px; border-radius: 50%; background: #a43700; border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: opacity 0.2s, transform 0.15s; flex-shrink: 0; }
+    #drawer-send:disabled { opacity: 0.3; }
+    #drawer-send:not(:disabled):hover { transform: scale(1.08); }
+    #drawer-send svg { width: 13px; height: 13px; fill: white; }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 960px) {
+      #nav { width: calc(100vw - 32px); padding: 10px 16px; gap: 16px; justify-content: space-between; }
+      .nav-links { display: none; }
+      .nav-pill { display: none; }
+      .nav-burger { display: flex; }
+      footer { padding: 40px 24px; }
+      .footer-inner { flex-direction: column; gap: 40px; }
+      .footer-cols { gap: 32px; }
+      .footer-note { margin-top: 16px; }
+      .legal-layout { grid-template-columns: 1fr; gap: 40px; }
+      .legal-nav { position: static; }
+      .legal-nav-list { flex-direction: row; flex-wrap: wrap; gap: 6px; }
+      .legal-nav-list a { padding: 5px 12px; border-left: none; border-radius: 100px; border: 1px solid rgba(164,55,0,0.12); font-size: 12px; }
+      .legal-nav-list a:hover, .legal-nav-list a.active { border-color: #a43700; }
+      #clara-drawer { width: calc(100vw - 32px); right: 16px; }
+    }
+    @media (max-width: 600px) {
+      .legal-hero { padding: 140px 24px 80px; }
+      .legal-body { padding: 48px 20px 80px; }
+      #clara-drawer { bottom: 0 !important; right: 0 !important; width: 100vw !important; height: 85dvh !important; border-radius: 20px 20px 0 0 !important; }
+      #clara-fab { bottom: 16px; right: 16px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- MOBILE MENU -->
+<div id="mobile-menu" role="dialog" aria-modal="true" aria-label="Menú de navegación">
+  <nav class="mobile-nav-links">
+    <a href="index.html#how">Proceso</a>
+    <a href="index.html#features">Funciones</a>
+    <a href="#" onclick="event.preventDefault(); openClara();">Clara</a>
+  </nav>
+  <div class="mobile-nav-cta">
+    <a href="/signup.html" class="nav-pill">Empezar gratis</a>
+    <a href="/login.html" class="nav-login">Ya tengo cuenta</a>
+  </div>
+</div>
+
+<!-- NAV -->
+<nav id="nav">
+  <a href="index.html" class="nav-logo">
+    <div class="nav-icon">
+      <svg width="100%" height="100%" viewBox="0 0 20 19" xmlns="http://www.w3.org/2000/svg" style="padding:4px;fill-rule:evenodd;clip-rule:evenodd"><path d="M13.006,11.97c-0.192,0.068 -0.391,0.12 -0.596,0.155l-3.004,-4.643l2.47,-2.707c0.376,0.01 0.738,0.076 1.079,0.19l3.095,-3.41l0.555,0.504l-2.936,3.234c0.566,0.337 1.034,0.82 1.353,1.398l4.336,-1.116l0.187,0.726l-4.227,1.088c0.043,0.14 0.078,0.284 0.104,0.431c0.038,0.213 0.058,0.432 0.058,0.656c0,0.358 -0.051,0.704 -0.146,1.032c-0.003,0.012 -0.007,0.023 -0.01,0.035l3.983,1.696l-0.294,0.69l-3.978,-1.694c-0.307,0.567 -0.758,1.046 -1.304,1.386l2.624,3.821l-0.618,0.424l-2.686,-3.912c-0.015,0.005 -0.03,0.011 -0.045,0.016Zm-1.824,-11.97l4.655,0l-6.717,7.362l7.235,11.182l-4.655,0l-5.174,-8.564l-2.796,2.973l0,5.591l-3.732,0l0,-18.544l3.732,0l0,8.235l7.451,-8.235Z" style="fill:#a43700"/></svg>
+    </div>
+    <span class="nav-wordmark">Klaro</span>
+  </a>
+  <div class="nav-links">
+    <a href="index.html#how">Proceso</a>
+    <a href="index.html#features">Funciones</a>
+    <a href="#" onclick="event.preventDefault(); openClara();">Clara</a>
+  </div>
+  <a href="/signup.html" class="nav-pill">Empezar gratis</a>
+  <button class="nav-burger" id="nav-burger" aria-label="Abrir menú" aria-expanded="false" aria-controls="mobile-menu">
+    <div class="nav-burger-icon"><span></span><span></span><span></span></div>
+  </button>
+</nav>
+
+<!-- ── HERO ── -->
+<div class="legal-hero">
+  <div class="legal-hero-inner">
+    <span class="overline">CONDICIONES DE USO</span>
+    <h1 class="legal-h1">Las reglas del juego,<br><em>en español claro.</em></h1>
+    <p class="legal-sub">Estos términos definen la relación entre Klaro y tú. Los escribimos para que se entiendan, no para que nadie los lea.</p>
+    <p class="legal-updated">Última actualización: enero 2026</p>
+  </div>
+</div>
+
+<!-- ── BODY ── -->
+<div class="legal-body">
+  <div class="legal-layout">
+
+    <!-- Sidebar nav -->
+    <aside class="legal-nav" aria-label="Índice de contenido">
+      <p class="legal-nav-title">Contenido</p>
+      <ul class="legal-nav-list">
+        <li><a href="#que-es">1. Qué es Klaro</a></li>
+        <li><a href="#cuenta">2. Tu cuenta</a></li>
+        <li><a href="#uso-permitido">3. Uso permitido</a></li>
+        <li><a href="#uso-prohibido">4. Uso prohibido</a></li>
+        <li><a href="#responsabilidad">5. Responsabilidad</a></li>
+        <li><a href="#precios">6. Precios y pagos</a></li>
+        <li><a href="#cancelacion">7. Cancelación</a></li>
+        <li><a href="#modificaciones">8. Modificaciones</a></li>
+        <li><a href="#ley">9. Ley aplicable</a></li>
+        <li><a href="#contacto">10. Contacto</a></li>
+      </ul>
+    </aside>
+
+    <!-- Content -->
+    <div class="legal-content">
+
+      <section class="legal-section" id="que-es">
+        <h2>1. Qué es Klaro</h2>
+        <p>Klaro es una herramienta de orientación fiscal para freelancers hispanohablantes que trabajan en Alemania. A través de Clara, nuestra asesora fiscal con IA, Klaro te ayuda a entender tus obligaciones tributarias, gestionar plazos y tomar mejores decisiones fiscales.</p>
+        <p>Klaro ofrece orientación informativa. No somos un despacho de asesoría fiscal y Clara no es una Steuerberaterin con licencia oficial. Para decisiones fiscales de alta complejidad o casos específicos, te recomendamos consultar con un profesional habilitado.</p>
+        <p>Al crear una cuenta y usar Klaro, aceptas estas condiciones.</p>
+      </section>
+
+      <section class="legal-section" id="cuenta">
+        <h2>2. Tu cuenta</h2>
+        <p>Para usar Klaro necesitas crear una cuenta con un correo electrónico válido y una contraseña.</p>
+        <p>Eres responsable de:</p>
+        <ul>
+          <li>Mantener la confidencialidad de tu contraseña.</li>
+          <li>Todas las actividades que ocurran desde tu cuenta.</li>
+          <li>Notificarnos de inmediato si sospechas acceso no autorizado (<a href="mailto:privacidad@klaro.app">privacidad@klaro.app</a>).</li>
+        </ul>
+        <p>Debes ser mayor de 18 años para crear una cuenta en Klaro.</p>
+        <p>Klaro se reserva el derecho de suspender cuentas que incumplan estas condiciones.</p>
+      </section>
+
+      <section class="legal-section" id="uso-permitido">
+        <h2>3. Qué puedes hacer con Klaro</h2>
+        <p>Puedes usar Klaro para:</p>
+        <ul>
+          <li>Obtener orientación sobre tu situación fiscal como freelancer en Alemania.</li>
+          <li>Consultar plazos de declaración (UStVA, Einkommensteuererklärung, EÜR) y recibir recordatorios.</li>
+          <li>Entender términos fiscales alemanes en español.</li>
+          <li>Gestionar tu perfil fiscal y guardar el historial de conversaciones con Clara.</li>
+          <li>Exportar información de tu perfil fiscal en los formatos disponibles.</li>
+        </ul>
+        <p>El acceso es personal e intransferible. No puedes compartir tu cuenta con terceros.</p>
+      </section>
+
+      <section class="legal-section" id="uso-prohibido">
+        <h2>4. Qué no puedes hacer</h2>
+        <p>Está prohibido:</p>
+        <ul>
+          <li>Usar Klaro para actividades ilegales o fraudulentas.</li>
+          <li>Intentar acceder a cuentas de otros usuarios.</li>
+          <li>Hacer ingeniería inversa, descompilar o copiar el código de Klaro.</li>
+          <li>Usar herramientas automatizadas para extraer datos de la plataforma (scraping).</li>
+          <li>Hacerse pasar por otra persona o entidad al usar el servicio.</li>
+          <li>Usar Klaro de forma que pueda dañar, sobrecargar o deteriorar los servidores o la experiencia de otros usuarios.</li>
+        </ul>
+      </section>
+
+      <section class="legal-section" id="responsabilidad">
+        <h2>5. Limitación de responsabilidad</h2>
+        <p>Klaro ofrece orientación informativa basada en la normativa fiscal alemana vigente. Nos esforzamos por que la información sea precisa y actualizada, pero:</p>
+        <ul>
+          <li>La normativa fiscal cambia. Klaro puede no reflejar cambios muy recientes en la ley.</li>
+          <li>Cada situación fiscal es única. La orientación de Clara puede no aplicar exactamente a tu caso concreto.</li>
+          <li>Klaro no es responsable de errores en declaraciones presentadas a partir de la orientación recibida.</li>
+        </ul>
+        <p>Para situaciones fiscales complejas —cambios de estado civil, ingresos en múltiples países, litigios con el Finanzamt— te recomendamos acudir a un Steuerberater habilitado.</p>
+        <p>En ningún caso la responsabilidad de Klaro superará el importe pagado por el usuario en los 12 meses previos al incidente.</p>
+      </section>
+
+      <section class="legal-section" id="precios">
+        <h2>6. Precios y pagos</h2>
+        <p>Klaro ofrece un plan gratuito con acceso a funciones básicas y planes de pago con funcionalidades adicionales. Los precios actualizados están disponibles en <strong>klaro.app/precios</strong>.</p>
+        <p>Los pagos se procesan de forma segura a través de proveedores de pago certificados. Klaro no almacena datos de tarjetas bancarias.</p>
+        <p>Los planes de pago se renuevan automáticamente al final de cada período salvo que canceles antes. Puedes cancelar en cualquier momento desde la configuración de tu cuenta.</p>
+        <p>Si hay cambios de precio en tu plan, te avisaremos con al menos 30 días de antelación por correo electrónico.</p>
+      </section>
+
+      <section class="legal-section" id="cancelacion">
+        <h2>7. Cancelación de cuenta</h2>
+        <p>Puedes eliminar tu cuenta en cualquier momento desde <strong>Configuración → Cuenta → Eliminar cuenta</strong>.</p>
+        <p>Al eliminar tu cuenta:</p>
+        <ul>
+          <li>Perderás acceso inmediato al servicio.</li>
+          <li>Tus datos personales se borrarán en un plazo de 30 días (salvo obligaciones legales de conservación).</li>
+          <li>Si tienes un plan de pago activo, la cancelación se hará efectiva al final del período ya pagado. No realizamos reembolsos por período no consumido.</li>
+        </ul>
+        <p>Klaro también puede cancelar una cuenta si detecta un uso contrario a estas condiciones, previo aviso por correo electrónico salvo en casos de fraude o seguridad urgente.</p>
+      </section>
+
+      <section class="legal-section" id="modificaciones">
+        <h2>8. Modificaciones del servicio</h2>
+        <p>Klaro puede actualizar, mejorar o modificar el servicio en cualquier momento. Si los cambios son significativos o afectan a condiciones de pago, te avisaremos con al menos 30 días de antelación.</p>
+        <p>Si no estás de acuerdo con los cambios, puedes cancelar tu cuenta antes de que entren en vigor.</p>
+      </section>
+
+      <section class="legal-section" id="ley">
+        <h2>9. Ley aplicable</h2>
+        <p>Estas condiciones se rigen por la legislación alemana.</p>
+        <p>Cualquier disputa que no pueda resolverse amistosamente se someterá a la jurisdicción de los tribunales de Berlín, Alemania.</p>
+        <p>Si eres consumidor en la UE, también puedes acudir a la plataforma de resolución de disputas online de la Comisión Europea: <a href="https://ec.europa.eu/consumers/odr" target="_blank" rel="noopener">ec.europa.eu/consumers/odr</a></p>
+      </section>
+
+      <section class="legal-section" id="contacto">
+        <h2>10. Contacto</h2>
+        <p>¿Tienes preguntas sobre estas condiciones?</p>
+        <div class="contact-box">
+          <p style="font-size:13px; color:#8c7168; margin-bottom:0;">Escríbenos a</p>
+          <a href="mailto:hola@klaro.app">hola@klaro.app</a>
+        </div>
+      </section>
+
+    </div>
+  </div>
+</div>
+
+<!-- ── FOOTER ── -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-brand-col">
+      <a href="index.html" class="nav-logo" style="text-decoration:none;">
+        <div class="nav-icon">
+          <svg width="100%" height="100%" viewBox="0 0 20 19" xmlns="http://www.w3.org/2000/svg" style="padding:4px;fill-rule:evenodd;clip-rule:evenodd"><path d="M13.006,11.97c-0.192,0.068 -0.391,0.12 -0.596,0.155l-3.004,-4.643l2.47,-2.707c0.376,0.01 0.738,0.076 1.079,0.19l3.095,-3.41l0.555,0.504l-2.936,3.234c0.566,0.337 1.034,0.82 1.353,1.398l4.336,-1.116l0.187,0.726l-4.227,1.088c0.043,0.14 0.078,0.284 0.104,0.431c0.038,0.213 0.058,0.432 0.058,0.656c0,0.358 -0.051,0.704 -0.146,1.032c-0.003,0.012 -0.007,0.023 -0.01,0.035l3.983,1.696l-0.294,0.69l-3.978,-1.694c-0.307,0.567 -0.758,1.046 -1.304,1.386l2.624,3.821l-0.618,0.424l-2.686,-3.912c-0.015,0.005 -0.03,0.011 -0.045,0.016Zm-1.824,-11.97l4.655,0l-6.717,7.362l7.235,11.182l-4.655,0l-5.174,-8.564l-2.796,2.973l0,5.591l-3.732,0l0,-18.544l3.732,0l0,8.235l7.451,-8.235Z" style="fill:#a43700"/></svg>
+        </div>
+        <span class="nav-wordmark">Klaro</span>
+      </a>
+      <p class="footer-note">© 2026 Klaro · Orientación informativa, no asesoría fiscal oficial.</p>
+    </div>
+    <div class="footer-cols">
+      <div class="footer-col">
+        <p class="footer-col-title">Klaro</p>
+        <a href="sobre-klaro.html">Sobre Klaro</a>
+        <a href="privacidad.html">Protección de datos</a>
+        <a href="cookies.html">Política de cookies</a>
+        <a href="condiciones.html">Condiciones generales</a>
+        <a href="programa.html">Contenido del programa</a>
+      </div>
+      <div class="footer-col">
+        <p class="footer-col-title">Cuenta</p>
+        <a href="login.html">Entrar</a>
+        <a href="signup.html">Crear cuenta</a>
+        <a href="mailto:juangomezvara@gmail.com" title="Klaro">Soporte</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<!-- CLARA FLOAT WIDGET -->
+<button id="clara-fab" onclick="toggleClara()" aria-label="Abrir Clara">
+  <img src="assets/clara-002.jpg" alt="Clara" />
+</button>
+
+<div id="clara-drawer">
+  <div class="drawer-hd">
+    <div class="drawer-hd-left">
+      <div class="drawer-avatar"><img src="assets/clara-002.jpg" alt="Clara" /></div>
+      <div>
+        <div class="drawer-name">Clara</div>
+        <div class="drawer-status"><span class="online"></span>Asesora fiscal</div>
+      </div>
+    </div>
+    <button class="drawer-close" onclick="toggleClara()">
+      <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+  </div>
+  <div id="no-key-banner" class="no-key-banner" style="display:flex;">
+    <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" fill="none" stroke-width="2" stroke-linecap="round"/></svg>
+    <div><strong>Vista previa.</strong> <a href="/signup.html" class="no-key-link">Crea tu cuenta gratis</a> para guardar tus conversaciones.</div>
+  </div>
+  <div id="drawer-msgs">
+    <div class="dm-clara">¡Hola! Soy Clara, tu asesora fiscal para <strong>freelancers en Alemania</strong>. Pregúntame lo que necesites, en español.</div>
+    <div class="dm-chips">
+      <span class="dm-chip" onclick="sendMsg('¿Qué impuestos pago como Freiberufler?')">¿Qué impuestos pago?</span>
+      <span class="dm-chip" onclick="sendMsg('¿Cuándo vence mi UStVA del Q2?')">¿Cuándo vence UStVA?</span>
+      <span class="dm-chip" onclick="sendMsg('¿Puedo deducir el home office?')">Home office</span>
+    </div>
+  </div>
+  <div id="drawer-input-bar">
+    <textarea id="drawer-input" rows="1" placeholder="Pregunta a Clara…"></textarea>
+    <button id="drawer-send" disabled onclick="sendFromInput()">
+      <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+    </button>
+  </div>
+</div>
+
+<script>
+// ─── NAV SCROLL ──────────────────────────────────────────
+const nav = document.getElementById('nav');
+window.addEventListener('scroll', () => { nav.classList.toggle('scrolled', window.scrollY > 60); }, { passive: true });
+
+// ─── NAV PILL lift ───────────────────────────────────────
+const navPill = document.querySelector('.nav-pill');
+if (navPill) {
+  navPill.addEventListener('mousemove', e => { const r = navPill.getBoundingClientRect(); navPill.style.transform = `translate(${(e.clientX-r.left-r.width/2)/r.width*6}px,${(e.clientY-r.top-r.height/2)/r.height*4-1}px)`; });
+  navPill.addEventListener('mouseleave', () => { navPill.style.transform = ''; });
+}
+
+// ─── ACTIVE NAV HIGHLIGHT ────────────────────────────────
+(function () {
+  const links = document.querySelectorAll('.legal-nav-list a');
+  const sections = document.querySelectorAll('.legal-section');
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        links.forEach(l => l.classList.remove('active'));
+        const active = document.querySelector(`.legal-nav-list a[href="#${e.target.id}"]`);
+        if (active) active.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px' });
+  sections.forEach(s => obs.observe(s));
+})();
+
+// ─── CLARA WIDGET ─────────────────────────────────────────
+let drawerOpen = false;
+let chatHistory = [];
+
+function toggleClara() {
+  drawerOpen = !drawerOpen;
+  document.getElementById('clara-drawer').classList.toggle('open', drawerOpen);
+}
+function openClara(prefill) {
+  drawerOpen = true;
+  document.getElementById('clara-drawer').classList.add('open');
+  if (prefill) { document.getElementById('drawer-input').value = prefill; updateSendBtn(); setTimeout(() => sendFromInput(), 200); }
+}
+
+const drawerInput = document.getElementById('drawer-input');
+const drawerSend  = document.getElementById('drawer-send');
+function updateSendBtn() { drawerSend.disabled = !drawerInput.value.trim(); }
+drawerInput.addEventListener('input', () => { drawerInput.style.height = 'auto'; drawerInput.style.height = Math.min(drawerInput.scrollHeight,100)+'px'; updateSendBtn(); });
+drawerInput.addEventListener('keydown', e => { if (e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendFromInput();} });
+function sendFromInput() { const t=drawerInput.value.trim(); if(!t)return; drawerInput.value=''; drawerInput.style.height='auto'; updateSendBtn(); sendMsg(t); }
+
+function getDemoReply(text) {
+  if (/impuest|cuánto/i.test(text)) return `Como Freiberufler pagas **Einkommensteuer** y **UStVA** trimestral. Aparta el **30-35%** de cada ingreso.\n\n⚠️ Orientación informativa. {"sugerencias":["¿Qué es el Grundfreibetrag?","¿Cuándo vence la declaración anual?"]}`;
+  return `¡Hola! Soy Clara. Pregúntame sobre impuestos, deducciones o plazos fiscales en Alemania, en español. {"sugerencias":["¿Qué impuestos pago como Freiberufler?","¿Cuándo vence mi UStVA?"]}`;
+}
+
+async function sendMsg(text) {
+  const msgs = document.getElementById('drawer-msgs');
+  const ub = document.createElement('div'); ub.className='dm-user'; ub.textContent=text; msgs.appendChild(ub);
+  const typing = document.createElement('div'); typing.className='dm-typing'; typing.innerHTML='<div class="dm-dot"></div><div class="dm-dot"></div><div class="dm-dot"></div>'; msgs.appendChild(typing);
+  msgs.scrollTop = msgs.scrollHeight;
+  chatHistory.push({role:'user',content:text});
+  let reply='';
+  try {
+    let ok=false;
+    try { const r=await fetch('/api/clara',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:chatHistory}),signal:AbortSignal.timeout(3500)}); if(r.ok){const d=await r.json();reply=d.content?.[0]?.text||d.reply||'';ok=true;} } catch{}
+    if(!ok){const key=localStorage.getItem('klaro_api_key');if(key){const r2=await fetch('https://generativelanguage.googleapis.com/v1beta/openai/chat/completions',{method:'POST',headers:{'Content-Type':'application/json','Authorization':`Bearer ${key}`},body:JSON.stringify({model:'gemini-2.0-flash',max_tokens:1024,messages:[{role:'system',content:'Eres Clara, asesora fiscal de Klaro para freelancers hispanohablantes en Alemania.'},...chatHistory]})});const d2=await r2.json();if(!r2.ok)throw new Error(d2.error?.message||'Error');reply=d2.choices?.[0]?.message?.content||'';}else{await new Promise(r=>setTimeout(r,900+Math.random()*600));reply=getDemoReply(text);}}
+    chatHistory.push({role:'assistant',content:reply}); typing.remove();
+    const sugMatch=reply.match(/\{"sugerencias":\s*\[([^\]]+)\]/); const sugs=[]; if(sugMatch){try{sugs.push(...JSON.parse(`[${sugMatch[1]}]`));}catch{}}
+    const clean=reply.replace(/\{"sugerencias":[^}]+\}/g,'').trim();
+    const cb=document.createElement('div'); cb.className='dm-clara'; cb.innerHTML=clean.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\n/g,'<br/>'); msgs.appendChild(cb);
+    if(sugs.length){const ch=document.createElement('div');ch.className='dm-chips';sugs.forEach(s=>{const c=document.createElement('span');c.className='dm-chip';c.textContent=s;c.onclick=()=>sendMsg(s);ch.appendChild(c);});msgs.appendChild(ch);}
+  } catch(err){typing.remove();const eb=document.createElement('div');eb.className='dm-clara';eb.innerHTML=`<span style="color:#ba1a1a;">Error: ${err.message}</span>`;msgs.appendChild(eb);}
+  msgs.scrollTop=msgs.scrollHeight;
+}
+
+// ─── HAMBURGER MENU ──────────────────────────────────────
+(function(){
+  const burger=document.getElementById('nav-burger'), menu=document.getElementById('mobile-menu'), links=menu.querySelectorAll('a');
+  function openMenu(){menu.classList.add('open');burger.classList.add('open');burger.setAttribute('aria-expanded','true');burger.setAttribute('aria-label','Cerrar menú');document.body.style.overflow='hidden';}
+  function closeMenu(){menu.classList.remove('open');burger.classList.remove('open');burger.setAttribute('aria-expanded','false');burger.setAttribute('aria-label','Abrir menú');document.body.style.overflow='';}
+  burger.addEventListener('click',()=>menu.classList.contains('open')?closeMenu():openMenu());
+  links.forEach(l=>l.addEventListener('click',closeMenu));
+  document.addEventListener('keydown',e=>{if(e.key==='Escape'&&menu.classList.contains('open'))closeMenu();});
+})();
+</script>
+
+</body>
+</html>

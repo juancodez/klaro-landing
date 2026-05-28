@@ -1,5 +1,9 @@
 {
-    "rewrites": [
-          { "source": "/", "destination": "/index.html" }
-    ]
+  "version": 2,
+  "framework": null,
+  "buildCommand": null,
+  "outputDirectory": ".",
+  "cleanUrls": false,
+  "trailingSlash": false
 }
+

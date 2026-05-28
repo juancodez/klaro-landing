@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/svg+xml" href="assets/Klaro-Logo-Favicon-orange.svg" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Política de cookies · Klaro</title>
+  <meta name="description" content="Qué cookies usa Klaro, para qué y cómo puedes controlarlas." />
+  <link rel="canonical" href="/cookies.html" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,300;1,400&family=Bricolage+Grotesque:opsz,wght@12..96,300..800&display=swap" rel="stylesheet" />
+  <style>
+    :root { --p: 0; }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Plus Jakarta Sans', sans-serif; background: #fff8f1; color: #1e1b17; overflow-x: hidden; }
+
+    /* ── NAV ── */
+    #nav { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 201; padding: 10px 20px 10px 16px; display: flex; align-items: center; gap: 32px; width: max-content; background: rgba(255,248,241,0.96); border-radius: 100px; border: 1px solid rgba(164,55,0,0.10); box-shadow: 0 4px 24px rgba(164,55,0,0.08), inset 0 1px 0 rgba(255,255,255,0.6); transition: box-shadow 0.4s; }
+    #nav.scrolled { box-shadow: 0 8px 32px rgba(164,55,0,0.12), inset 0 1px 0 rgba(255,255,255,0.6); }
+    .nav-links { display: flex; align-items: center; gap: 24px; }
+    .nav-links a { font-size: 13px; font-weight: 500; color: #594139; text-decoration: none; transition: color 0.2s; position: relative; padding-bottom: 2px; }
+    .nav-links a::after { content: ''; position: absolute; bottom: -1px; left: 0; width: 0; height: 1px; background: #a43700; transition: width 0.3s cubic-bezier(0.16,1,0.3,1); }
+    .nav-links a:hover { color: #a43700; }
+    .nav-links a:hover::after { width: 100%; }
+    .nav-login { font-size: 12.5px; font-weight: 600; color: #594139; padding: 8px 14px; border-radius: 100px; text-decoration: none; white-space: nowrap; transition: color 0.2s; }
+    .nav-login:hover { color: #a43700; }
+    .nav-pill { background: #1e1b17; color: #fff8f1; font-size: 12.5px; font-weight: 700; padding: 8px 18px; border-radius: 100px; text-decoration: none; transition: opacity 0.2s, transform 0.15s cubic-bezier(0.16,1,0.3,1); white-space: nowrap; }
+    .nav-pill:hover { opacity: 0.82; transform: translateY(-1px); }
+    .nav-logo { display: flex; align-items: center; gap: 9px; text-decoration: none; }
+    .nav-wordmark { font-size: 16px; font-weight: 800; color: #1e1b17; letter-spacing: -0.03em; }
+    .nav-icon { width: 30px; height: 30px; border-radius: 8px; background: white; display: flex; align-items: center; justify-content: center; }
+
+    /* ── BUTTONS ── */
+    .btn-secondary { display: inline-flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 600; color: #594139; text-decoration: none; padding: 13px 22px; border-radius: 100px; border: 1.5px solid rgba(164,55,0,0.18); transition: border-color 0.2s, color 0.2s; }
+    .btn-secondary:hover { border-color: #a43700; color: #a43700; }
+
+    /* ── HAMBURGER ── */
+    .nav-burger { display: none; align-items: center; justify-content: center; width: 36px; height: 36px; background: none; border: none; cursor: pointer; padding: 6px; border-radius: 8px; transition: background 0.2s; }
+    .nav-burger:hover { background: rgba(164,55,0,0.07); }
+    .nav-burger-icon { display: flex; flex-direction: column; gap: 5px; width: 18px; }
+    .nav-burger-icon span { display: block; height: 1.5px; width: 100%; background: #1e1b17; border-radius: 2px; transform-origin: center; transition: transform 0.35s cubic-bezier(0.16,1,0.3,1), opacity 0.2s, width 0.35s cubic-bezier(0.16,1,0.3,1); }
+    .nav-burger.open .nav-burger-icon span:nth-child(1) { transform: translateY(6.5px) rotate(45deg); }
+    .nav-burger.open .nav-burger-icon span:nth-child(2) { opacity: 0; width: 0; }
+    .nav-burger.open .nav-burger-icon span:nth-child(3) { transform: translateY(-6.5px) rotate(-45deg); }
+
+    /* ── MOBILE MENU ── */
+    #mobile-menu { position: fixed; inset: 0; z-index: 200; background: rgba(255,248,241,0.98); backdrop-filter: blur(20px); display: flex; flex-direction: column; align-items: center; justify-content: center; pointer-events: none; opacity: 0; transform: scale(0.97); transition: opacity 0.3s cubic-bezier(0.16,1,0.3,1), transform 0.35s cubic-bezier(0.16,1,0.3,1); }
+    #mobile-menu.open { opacity: 1; transform: scale(1); pointer-events: all; }
+    .mobile-nav-links { display: flex; flex-direction: column; align-items: center; gap: 8px; width: 100%; padding: 0 32px; }
+    .mobile-nav-links a { font-size: 32px; font-weight: 700; font-family: 'Bricolage Grotesque', sans-serif; color: #1e1b17; text-decoration: none; letter-spacing: -0.02em; padding: 12px 0; width: 100%; text-align: center; border-bottom: 1px solid rgba(164,55,0,0.08); transition: color 0.2s; }
+    .mobile-nav-links a:first-child { border-top: 1px solid rgba(164,55,0,0.08); }
+    .mobile-nav-links a:hover { color: #a43700; }
+    .mobile-nav-cta { display: flex; flex-direction: column; align-items: center; gap: 12px; margin-top: 40px; width: 100%; padding: 0 32px; }
+    .mobile-nav-cta .nav-pill { display: block; text-align: center; padding: 14px 32px; font-size: 15px; width: 100%; max-width: 320px; }
+    .mobile-nav-cta .nav-login { font-size: 14px; padding: 0; color: #594139; }
+    .mobile-nav-cta .nav-login:hover { color: #a43700; }
+
+    /* ── LEGAL HERO ── */
+    .legal-hero { background: radial-gradient(ellipse at 70% 50%, rgba(164,55,0,0.10) 0%, transparent 55%), #1e1b17; padding: 140px 48px 0; text-align: center; }
+    .legal-hero-inner { max-width: 680px; margin: 0 auto; }
+    .overline { display: inline-flex; align-items: center; gap: 6px; font-size: 10.5px; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; color: #ffb59a; margin-bottom: 28px; background: rgba(255,255,255,0.10); border-radius: 100px; padding: 5px 14px; }
+    .legal-h1 { font-family: 'Bricolage Grotesque', 'Plus Jakarta Sans', sans-serif; font-size: clamp(34px, 5vw, 52px); font-weight: 800; line-height: 1.06; letter-spacing: -0.02em; color: #fff8f1; text-wrap: balance; margin-bottom: 24px; }
+    .legal-sub { font-size: 16px; color: rgba(255,248,241,0.68); line-height: 1.75; max-width: 50ch; margin: 0 auto 16px; }
+    .legal-updated { font-size: 12px; font-weight: 600; color: #ffb59a; margin-bottom: 56px; display: block; }
+
+    /* ── QUICK NAV INDEX ── */
+    .legal-nav-index { background: radial-gradient(ellipse at 70% 50%, rgba(164,55,0,0.10) 0%, transparent 55%), #1e1b17; padding: 0 48px 80px; }
+    .legal-nav-box { max-width: 680px; margin: 0 auto; background: rgba(255,255,255,0.05); border-radius: 16px; border: 1px solid rgba(255,255,255,0.08); padding: 28px 32px; }
+    .legal-nav-box-title { font-size: 10.5px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: rgba(255,248,241,0.38); margin-bottom: 18px; }
+    .legal-nav-list { list-style: none; display: flex; flex-direction: column; gap: 11px; }
+    .legal-nav-list a { font-size: 13.5px; color: rgba(255,248,241,0.7); text-decoration: none; display: flex; align-items: center; gap: 10px; transition: color 0.2s; }
+    .legal-nav-list a::before { content: ''; width: 5px; height: 5px; border-radius: 50%; background: rgba(255,181,154,0.5); flex-shrink: 0; }
+    .legal-nav-list a:hover { color: #fff8f1; }
+
+    /* ── LEGAL BODY ── */
+    .legal-body { background: #fff8f1; }
+    .legal-body-inner { max-width: 760px; margin: 0 auto; padding: 80px 40px; }
+    .legal-section { border-bottom: 1px solid rgba(164,55,0,0.08); padding: 48px 0; }
+    .legal-section:first-child { padding-top: 0; }
+    .legal-section:last-child { border-bottom: none; padding-bottom: 0; }
+    .legal-h2 { font-family: 'Bricolage Grotesque', 'Plus Jakarta Sans', sans-serif; font-size: 24px; font-weight: 800; color: #1e1b17; letter-spacing: -0.02em; margin-bottom: 20px; }
+    .legal-h3 { font-size: 17px; font-weight: 700; color: #1e1b17; margin: 32px 0 12px; letter-spacing: -0.01em; }
+    .legal-section > .legal-h3:first-of-type { margin-top: 0; }
+    .legal-p { font-size: 15px; color: #594139; line-height: 1.8; margin-bottom: 16px; }
+    .legal-p:last-child { margin-bottom: 0; }
+    .legal-ul { list-style: none; display: flex; flex-direction: column; gap: 8px; margin: 14px 0 16px; }
+    .legal-ul li { padding-left: 22px; position: relative; font-size: 15px; color: #594139; line-height: 1.7; }
+    .legal-ul li::before { content: '—'; position: absolute; left: 0; color: #a43700; font-weight: 700; }
+    .legal-a { color: #a43700; font-weight: 600; text-decoration: none; }
+    .legal-a:hover { opacity: 0.78; }
+
+    /* ── FOOTER ── */
+    footer { border-top: 1px solid rgba(164,55,0,0.08); padding: 64px 72px 48px; max-width: 1280px; margin: 0 auto; }
+    .footer-inner { display: flex; justify-content: space-between; align-items: flex-start; gap: 48px; }
+    .footer-brand-col { display: flex; flex-direction: column; }
+    .footer-brand { font-size: 15px; font-weight: 800; color: #1e1b17; letter-spacing: -0.025em; }
+    .footer-note { font-size: 11.5px; color: #8c7168; line-height: 1.6; max-width: 36ch; margin-top: 48px; }
+    .footer-cols { display: flex; gap: 56px; flex-shrink: 0; }
+    .footer-col { display: flex; flex-direction: column; gap: 12px; }
+    .footer-col-title { font-size: 11px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: #1e1b17; margin-bottom: 4px; }
+    .footer-col a { font-size: 13px; color: #8c7168; text-decoration: none; transition: color 0.2s; }
+    .footer-col a:hover { color: #a43700; }
+
+    /* ── CLARA FLOAT WIDGET ── */
+    #clara-fab { position: fixed; bottom: 28px; right: 28px; z-index: 200; width: 56px; height: 56px; border-radius: 50%; overflow: hidden; box-shadow: 0 8px 24px rgba(164,55,0,0.32); cursor: pointer; border: none; padding: 0; transition: transform 0.2s cubic-bezier(0.16,1,0.3,1), box-shadow 0.2s; }
+    #clara-fab:hover { transform: scale(1.08); box-shadow: 0 12px 32px rgba(164,55,0,0.42); }
+    #clara-fab:active { transform: scale(0.96); }
+    #clara-fab img { width: 100%; height: 100%; object-fit: cover; object-position: center center; display: block; }
+    #clara-drawer { position: fixed; bottom: 96px; right: 28px; z-index: 199; width: 380px; height: 560px; background: white; border-radius: 24px; box-shadow: 0 24px 80px rgba(0,0,0,0.18), 0 0 0 1px rgba(164,55,0,0.08); display: flex; flex-direction: column; overflow: hidden; transform: translateY(16px) scale(0.97); opacity: 0; pointer-events: none; transition: transform 0.3s cubic-bezier(0.16,1,0.3,1), opacity 0.3s; }
+    #clara-drawer.open { transform: translateY(0) scale(1); opacity: 1; pointer-events: all; }
+    .drawer-hd { background: #fff8f1; border-bottom: 1px solid rgba(164,55,0,0.08); padding: 14px 18px; display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
+    .drawer-hd-left { display: flex; align-items: center; gap: 10px; }
+    .drawer-avatar { width: 32px; height: 32px; border-radius: 50%; overflow: hidden; flex-shrink: 0; }
+    .drawer-avatar img { width: 100%; height: 100%; object-fit: cover; object-position: center top; display: block; }
+    .drawer-name { font-size: 13px; font-weight: 700; color: #1e1b17; }
+    .drawer-status { font-size: 10.5px; color: #556338; font-weight: 600; display: flex; align-items: center; gap: 3px; }
+    .drawer-close { width: 28px; height: 28px; border-radius: 8px; border: none; background: transparent; cursor: pointer; display: flex; align-items: center; justify-content: center; color: #8c7168; transition: background 0.15s; }
+    .drawer-close:hover { background: rgba(164,55,0,0.06); color: #a43700; }
+    .drawer-close svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; }
+    .online { width: 5px; height: 5px; border-radius: 50%; background: #556338; }
+    #drawer-msgs { flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 12px; background: #fafaf8; scrollbar-width: thin; scrollbar-color: rgba(164,55,0,0.15) transparent; }
+    .dm-clara { background: white; border: 1px solid rgba(164,55,0,0.08); border-radius: 14px 14px 14px 3px; padding: 10px 13px; font-size: 12.5px; line-height: 1.55; color: #1e1b17; max-width: 88%; align-self: flex-start; }
+    .dm-clara strong { color: #a43700; }
+    .dm-user { background: #a43700; color: white; border-radius: 14px 14px 3px 14px; padding: 10px 13px; font-size: 12.5px; line-height: 1.55; max-width: 80%; align-self: flex-end; }
+    .dm-chips { display: flex; flex-wrap: wrap; gap: 6px; align-self: flex-start; }
+    .dm-chip { font-size: 11px; font-weight: 600; color: #a43700; background: rgba(164,55,0,0.06); border: 1px solid rgba(164,55,0,0.15); border-radius: 100px; padding: 5px 11px; cursor: pointer; transition: background 0.15s; }
+    .dm-chip:hover { background: rgba(164,55,0,0.12); }
+    .dm-typing { display: flex; align-items: center; gap: 5px; padding: 10px 13px; background: white; border: 1px solid rgba(164,55,0,0.08); border-radius: 14px; width: fit-content; }
+    .dm-dot { width: 5px; height: 5px; border-radius: 50%; background: #c0a898; animation: bounce 1.2s ease-in-out infinite; }
+    .dm-dot:nth-child(2) { animation-delay: 0.15s; }
+    .dm-dot:nth-child(3) { animation-delay: 0.3s; }
+    @keyframes bounce { 0%,80%,100%{transform:scale(0.7);opacity:0.5} 40%{transform:scale(1);opacity:1} }
+    .no-key-banner { margin: 10px; border-radius: 10px; background: #fffbeb; border: 1px solid #fcd34d; padding: 10px 14px; font-size: 11.5px; color: #92400e; display: flex; align-items: center; gap: 8px; }
+    .no-key-banner svg { width: 14px; height: 14px; stroke: #d97706; fill: none; stroke-width: 2; stroke-linecap: round; flex-shrink: 0; }
+    .no-key-link { color: #a43700; font-weight: 700; cursor: pointer; text-decoration: underline; }
+    #drawer-input-bar { border-top: 1px solid rgba(164,55,0,0.08); padding: 10px 12px; display: flex; align-items: flex-end; gap: 8px; background: white; flex-shrink: 0; }
+    #drawer-input { flex: 1; resize: none; border: 1px solid rgba(164,55,0,0.12); border-radius: 14px; padding: 9px 13px; font-size: 12.5px; color: #1e1b17; font-family: inherit; background: #fafaf8; outline: none; max-height: 100px; transition: border-color 0.2s; }
+    #drawer-input:focus { border-color: rgba(164,55,0,0.35); }
+    #drawer-send { width: 34px; height: 34px; border-radius: 50%; background: #a43700; border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: opacity 0.2s, transform 0.15s; flex-shrink: 0; }
+    #drawer-send:disabled { opacity: 0.3; }
+    #drawer-send:not(:disabled):hover { transform: scale(1.08); }
+    #drawer-send svg { width: 13px; height: 13px; fill: white; }
+
+    /* ── REVEAL ── */
+    .reveal { opacity: 0; transform: translateY(24px) scale(0.988); transition: opacity 0.85s cubic-bezier(0.16,1,0.3,1), transform 0.85s cubic-bezier(0.16,1,0.3,1); }
+    .reveal.in { opacity: 1; transform: translateY(0) scale(1); }
+    .reveal-d1 { transition-delay: 0.08s; }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 960px) {
+      #nav { width: calc(100vw - 32px); padding: 10px 16px; gap: 16px; justify-content: space-between; }
+      .nav-links, .nav-login, .nav-pill { display: none; }
+      .nav-burger { display: flex; }
+      #clara-drawer { width: calc(100vw - 32px); right: 16px; }
+      footer { padding: 40px 24px; }
+      .footer-inner { flex-direction: column; gap: 40px; }
+      .footer-cols { gap: 32px; }
+      .footer-note { margin-top: 16px; }
+      .legal-hero { padding: 120px 24px 0; }
+      .legal-nav-index { padding: 0 24px 60px; }
+      .legal-body-inner { padding: 60px 24px; }
+    }
+    @media (max-width: 600px) {
+      #clara-drawer { bottom: 0 !important; right: 0 !important; width: 100vw !important; height: 85dvh !important; border-radius: 20px 20px 0 0 !important; }
+      #clara-fab { bottom: 16px; right: 16px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- MOBILE MENU -->
+<div id="mobile-menu" role="dialog" aria-modal="true" aria-label="Menú de navegación">
+  <nav class="mobile-nav-links">
+    <a href="index.html#how">Proceso</a>
+    <a href="index.html#features">Funciones</a>
+    <a href="index.html" onclick="event.preventDefault(); closeMenu(); openClara();">Clara</a>
+  </nav>
+  <div class="mobile-nav-cta">
+    <a href="signup.html" class="nav-pill">Empezar gratis</a>
+    <a href="login.html" class="nav-login">Ya tengo cuenta</a>
+  </div>
+</div>
+
+<!-- NAV -->
+<nav id="nav">
+  <a href="index.html" class="nav-logo">
+    <div class="nav-icon">
+      <svg width="100%" height="100%" viewBox="0 0 20 19" xmlns="http://www.w3.org/2000/svg" style="padding:4px;fill-rule:evenodd;clip-rule:evenodd"><path d="M13.006,11.97c-0.192,0.068 -0.391,0.12 -0.596,0.155l-3.004,-4.643l2.47,-2.707c0.376,0.01 0.738,0.076 1.079,0.19l3.095,-3.41l0.555,0.504l-2.936,3.234c0.566,0.337 1.034,0.82 1.353,1.398l4.336,-1.116l0.187,0.726l-4.227,1.088c0.043,0.14 0.078,0.284 0.104,0.431c0.038,0.213 0.058,0.432 0.058,0.656c0,0.358 -0.051,0.704 -0.146,1.032c-0.003,0.012 -0.007,0.023 -0.01,0.035l3.983,1.696l-0.294,0.69l-3.978,-1.694c-0.307,0.567 -0.758,1.046 -1.304,1.386l2.624,3.821l-0.618,0.424l-2.686,-3.912c-0.015,0.005 -0.03,0.011 -0.045,0.016Zm-1.824,-11.97l4.655,0l-6.717,7.362l7.235,11.182l-4.655,0l-5.174,-8.564l-2.796,2.973l0,5.591l-3.732,0l0,-18.544l3.732,0l0,8.235l7.451,-8.235Z" style="fill:#a43700"/></svg>
+    </div>
+    <span class="nav-wordmark">Klaro</span>
+  </a>
+  <div class="nav-links">
+    <a href="index.html#how">Proceso</a>
+    <a href="index.html#features">Funciones</a>
+    <a href="index.html" onclick="event.preventDefault(); openClara();">Clara</a>
+  </div>
+  <a href="signup.html" class="nav-pill">Empezar gratis</a>
+  <button class="nav-burger" id="nav-burger" aria-label="Abrir menú" aria-expanded="false" aria-controls="mobile-menu">
+    <div class="nav-burger-icon"><span></span><span></span><span></span></div>
+  </button>
+</nav>
+
+<!-- LEGAL HERO -->
+<div class="legal-hero">
+  <div class="legal-hero-inner">
+    <div class="overline">Cookies</div>
+    <h1 class="legal-h1">Usamos las cookies<br>justas y necesarias.</h1>
+    <p class="legal-sub">Sin rastreadores publicitarios. Sin venta de datos. Solo lo que necesitamos para que Klaro funcione bien.</p>
+    <span class="legal-updated">Última actualización: enero 2026</span>
+  </div>
+</div>
+
+<!-- QUICK NAV INDEX -->
+<div class="legal-nav-index">
+  <div class="legal-nav-box">
+    <p class="legal-nav-box-title">Contenido</p>
+    <ul class="legal-nav-list">
+      <li><a href="#que-es">¿Qué es una cookie?</a></li>
+      <li><a href="#tipos">Cookies que usamos</a></li>
+      <li><a href="#terceros">Cookies de terceros</a></li>
+      <li><a href="#control">Cómo controlar las cookies</a></li>
+      <li><a href="#cambios">Cambios en esta política</a></li>
+      <li><a href="#contacto">Contacto</a></li>
+    </ul>
+  </div>
+</div>
+
+<!-- LEGAL BODY -->
+<div class="legal-body">
+  <div class="legal-body-inner">
+
+    <section id="que-es" class="legal-section reveal">
+      <h2 class="legal-h2">1. ¿Qué es una cookie?</h2>
+      <p class="legal-p">Una cookie es un pequeño archivo de texto que se guarda en tu dispositivo cuando visitas un sitio web. Sirve para que el sitio recuerde información entre visitas: por ejemplo, que ya iniciaste sesión o cuál es tu idioma preferido.</p>
+      <p class="legal-p">Las cookies no son virus ni programas. No pueden acceder a otros archivos de tu dispositivo.</p>
+    </section>
+
+    <section id="tipos" class="legal-section reveal">
+      <h2 class="legal-h2">2. Cookies que usamos</h2>
+
+      <h3 class="legal-h3">Cookies estrictamente necesarias</h3>
+      <p class="legal-p">Son las que hacen que la web y la app funcionen. Sin ellas, cosas como iniciar sesión o mantener tu sesión activa no funcionarían. No requieren tu consentimiento porque son indispensables.</p>
+      <p class="legal-p">Ejemplos:</p>
+      <ul class="legal-ul">
+        <li><strong style="color:#1e1b17">Cookie de sesión:</strong> mantiene tu sesión iniciada mientras usas Klaro.</li>
+        <li><strong style="color:#1e1b17">Cookie de preferencias:</strong> recuerda configuraciones básicas (idioma, tema).</li>
+      </ul>
+      <p class="legal-p">Duración: sesión (se borran al cerrar el navegador) o máximo 12 meses.</p>
+
+      <h3 class="legal-h3">Cookies analíticas (opcionales)</h3>
+      <p class="legal-p">Nos ayudan a entender cómo se usa Klaro: qué páginas se visitan más, dónde abandonan los usuarios, qué funciona y qué no. Esta información la usamos para mejorar el producto.</p>
+      <p class="legal-p">Estas cookies solo se activan si das tu consentimiento. Los datos son anónimos: no podemos identificarte a partir de ellos.</p>
+      <p class="legal-p">Duración: máximo 12 meses.</p>
+    </section>
+
+    <section id="terceros" class="legal-section reveal">
+      <h2 class="legal-h2">3. Cookies de terceros</h2>
+      <p class="legal-p"><strong style="color:#1e1b17">Klaro no instala cookies publicitarias de terceros.</strong> No usamos Google Ads, Meta Pixel ni ningún sistema de retargeting publicitario.</p>
+      <p class="legal-p">Si en el futuro integramos algún servicio de terceros que use cookies (por ejemplo, un widget de soporte), lo indicaremos en esta política antes de activarlo y solicitaremos tu consentimiento.</p>
+    </section>
+
+    <section id="control" class="legal-section reveal">
+      <h2 class="legal-h2">4. Cómo controlar las cookies</h2>
+      <p class="legal-p">Tienes varias formas de gestionar las cookies:</p>
+      <ul class="legal-ul">
+        <li><strong style="color:#1e1b17">Panel de preferencias de Klaro:</strong> al entrar por primera vez, te mostramos un banner donde puedes aceptar solo las necesarias o también las analíticas opcionales. Puedes cambiar tu elección en cualquier momento desde la configuración de tu cuenta.</li>
+        <li><strong style="color:#1e1b17">Configuración del navegador:</strong> todos los navegadores modernos permiten ver, bloquear o eliminar cookies.</li>
+      </ul>
+      <p class="legal-p" style="margin-top:8px;">Enlaces directos:</p>
+      <ul class="legal-ul">
+        <li>Chrome: <code style="font-size:13px;color:#594139;">chrome://settings/cookies</code></li>
+        <li>Firefox: <code style="font-size:13px;color:#594139;">about:preferences#privacy</code></li>
+        <li>Safari: Preferencias → Privacidad</li>
+        <li>Edge: <code style="font-size:13px;color:#594139;">edge://settings/privacy</code></li>
+      </ul>
+      <p class="legal-p">Ten en cuenta que bloquear todas las cookies puede afectar al funcionamiento de Klaro (por ejemplo, no podrías mantener la sesión iniciada).</p>
+    </section>
+
+    <section id="cambios" class="legal-section reveal">
+      <h2 class="legal-h2">5. Cambios en esta política</h2>
+      <p class="legal-p">Si modificamos esta política de cookies, actualizaremos la fecha «Última actualización» al inicio de la página y, si los cambios son significativos, te lo notificaremos por correo electrónico.</p>
+    </section>
+
+    <section id="contacto" class="legal-section reveal">
+      <h2 class="legal-h2">6. Contacto</h2>
+      <p class="legal-p">¿Tienes preguntas sobre las cookies que usamos? Escríbenos a <a href="mailto:privacidad@klaro.app" class="legal-a">privacidad@klaro.app</a></p>
+      <p class="legal-p" style="margin-top:20px;">Para más información sobre cómo tratamos tus datos en general, consulta nuestra Política de privacidad.</p>
+      <a href="privacidad.html" class="legal-a" style="display:inline-block;margin-top:4px;">Ver protección de datos →</a>
+    </section>
+
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-brand-col">
+      <a href="index.html" class="nav-logo" style="text-decoration:none;">
+        <div class="nav-icon">
+          <svg width="100%" height="100%" viewBox="0 0 20 19" xmlns="http://www.w3.org/2000/svg" style="padding:4px;fill-rule:evenodd;clip-rule:evenodd"><path d="M13.006,11.97c-0.192,0.068 -0.391,0.12 -0.596,0.155l-3.004,-4.643l2.47,-2.707c0.376,0.01 0.738,0.076 1.079,0.19l3.095,-3.41l0.555,0.504l-2.936,3.234c0.566,0.337 1.034,0.82 1.353,1.398l4.336,-1.116l0.187,0.726l-4.227,1.088c0.043,0.14 0.078,0.284 0.104,0.431c0.038,0.213 0.058,0.432 0.058,0.656c0,0.358 -0.051,0.704 -0.146,1.032c-0.003,0.012 -0.007,0.023 -0.01,0.035l3.983,1.696l-0.294,0.69l-3.978,-1.694c-0.307,0.567 -0.758,1.046 -1.304,1.386l2.624,3.821l-0.618,0.424l-2.686,-3.912c-0.015,0.005 -0.03,0.011 -0.045,0.016Zm-1.824,-11.97l4.655,0l-6.717,7.362l7.235,11.182l-4.655,0l-5.174,-8.564l-2.796,2.973l0,5.591l-3.732,0l0,-18.544l3.732,0l0,8.235l7.451,-8.235Z" style="fill:#a43700"/></svg>
+        </div>
+        <span class="nav-wordmark">Klaro</span>
+      </a>
+      <p class="footer-note">© 2026 Klaro · Orientación informativa, no asesoría fiscal oficial.</p>
+    </div>
+    <div class="footer-cols">
+      <div class="footer-col">
+        <p class="footer-col-title">Klaro</p>
+        <a href="sobre-klaro.html">Sobre Klaro</a>
+        <a href="privacidad.html">Protección de datos</a>
+        <a href="cookies.html">Política de cookies</a>
+        <a href="condiciones.html">Condiciones generales</a>
+        <a href="programa.html">Contenido del programa</a>
+      </div>
+      <div class="footer-col">
+        <p class="footer-col-title">Cuenta</p>
+        <a href="login.html">Entrar</a>
+        <a href="signup.html">Crear cuenta</a>
+        <a href="mailto:juangomezvara@gmail.com" title="Klaro">Soporte</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<!-- CLARA FLOAT WIDGET -->
+<button id="clara-fab" onclick="toggleClara()" aria-label="Abrir Clara">
+  <img src="assets/clara-002.jpg" alt="Clara" />
+</button>
+
+<div id="clara-drawer">
+  <div class="drawer-hd">
+    <div class="drawer-hd-left">
+      <div class="drawer-avatar"><img src="assets/clara-002.jpg" alt="Clara" /></div>
+      <div>
+        <div class="drawer-name">Clara</div>
+        <div class="drawer-status"><span class="online"></span>Asesora fiscal</div>
+      </div>
+    </div>
+    <button class="drawer-close" onclick="toggleClara()">
+      <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+  </div>
+  <div id="no-key-banner" class="no-key-banner" style="display:flex;">
+    <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" fill="none" stroke-width="2" stroke-linecap="round"/></svg>
+    <div><strong>Vista previa.</strong> <a href="signup.html" class="no-key-link">Crea tu cuenta gratis</a> para guardar tus conversaciones.</div>
+  </div>
+  <div id="drawer-msgs">
+    <div class="dm-clara">¡Hola! Soy Clara, tu asesora fiscal para <strong>freelancers en Alemania</strong>. Pregúntame lo que necesites, en español.</div>
+    <div class="dm-chips">
+      <span class="dm-chip" onclick="sendMsg('¿Qué impuestos pago como Freiberufler?')">¿Qué impuestos pago?</span>
+      <span class="dm-chip" onclick="sendMsg('¿Cuándo vence mi UStVA del Q2?')">¿Cuándo vence UStVA?</span>
+      <span class="dm-chip" onclick="sendMsg('¿Puedo deducir el home office?')">Home office</span>
+    </div>
+  </div>
+  <div id="drawer-input-bar">
+    <textarea id="drawer-input" rows="1" placeholder="Pregunta a Clara…"></textarea>
+    <button id="drawer-send" disabled onclick="sendFromInput()">
+      <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+    </button>
+  </div>
+</div>
+
+<script>
+// ── NAV SCROLL ─────────────────────────────────────────────
+const nav = document.getElementById('nav');
+window.addEventListener('scroll', () => {
+  nav.classList.toggle('scrolled', window.scrollY > 60);
+}, { passive: true });
+
+// ── NAV PILL MAGNETIC ──────────────────────────────────────
+const navPill = document.querySelector('.nav-pill');
+if (navPill) {
+  navPill.addEventListener('mousemove', e => {
+    const r = navPill.getBoundingClientRect();
+    const dx = (e.clientX - r.left - r.width/2) / r.width * 6;
+    const dy = (e.clientY - r.top - r.height/2) / r.height * 4;
+    navPill.style.transform = `translate(${dx}px, ${dy-1}px)`;
+  });
+  navPill.addEventListener('mouseleave', () => { navPill.style.transform = ''; });
+}
+
+// ── REVEAL ─────────────────────────────────────────────────
+const obs = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('in'); });
+}, { threshold: 0.08, rootMargin: '0px 0px -24px 0px' });
+document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+
+// ── CLARA WIDGET ───────────────────────────────────────────
+let drawerOpen = false;
+let chatHistory = [];
+
+function toggleClara() {
+  drawerOpen = !drawerOpen;
+  document.getElementById('clara-drawer').classList.toggle('open', drawerOpen);
+}
+function openClara(prefill) {
+  drawerOpen = true;
+  document.getElementById('clara-drawer').classList.add('open');
+  if (prefill) {
+    document.getElementById('drawer-input').value = prefill;
+    updateSendBtn();
+    setTimeout(() => sendFromInput(), 200);
+  }
+}
+
+const drawerInput = document.getElementById('drawer-input');
+const drawerSend  = document.getElementById('drawer-send');
+function updateSendBtn() { drawerSend.disabled = !drawerInput.value.trim(); }
+drawerInput.addEventListener('input', () => {
+  drawerInput.style.height = 'auto';
+  drawerInput.style.height = Math.min(drawerInput.scrollHeight, 100) + 'px';
+  updateSendBtn();
+});
+drawerInput.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendFromInput(); }
+});
+function sendFromInput() {
+  const text = drawerInput.value.trim();
+  if (!text) return;
+  drawerInput.value = '';
+  drawerInput.style.height = 'auto';
+  updateSendBtn();
+  sendMsg(text);
+}
+
+function getDemoReply(text) {
+  const t = text.toLowerCase();
+  if (/ustv|iva|trimest/i.test(t)) return `La **UStVA** es tu declaración trimestral de IVA. Vence el **día 10 del mes siguiente** a cada trimestre:\n\n• Q1: **10 de abril** · Q2: **10 de julio** · Q3: **10 de octubre** · Q4: **10 de enero**\n\n⚠️ Orientación informativa, no asesoría fiscal oficial. {"sugerencias": ["¿Cómo me registro en ELSTER?", "¿Qué pasa si pago tarde?"]}`;
+  if (/home.?offic|teletrab|6.?€/i.test(t)) return `Puedes deducir **6€ por día**, hasta **210 días al año → 1.260€** deducibles. No necesitas un cuarto exclusivo.\n\n⚠️ Orientación informativa, no asesoría oficial. {"sugerencias": ["¿Puedo deducir equipo y software?", "¿Cómo lo registro en el EÜR?"]}`;
+  if (/freiberuf|gewerb|diferenc/i.test(t)) return `• **Freiberufler:** diseñadores, programadores, consultores. Solo **Einkommensteuer + UStVA**.\n• **Gewerbetreibender:** también **Gewerbesteuer** si el beneficio supera los 24.500€/año.\n\n⚠️ Orientación informativa, no asesoría oficial. {"sugerencias": ["¿Cómo me registro como Freiberufler?", "¿Qué impuestos pago en total?"]}`;
+  if (/impuest|cuánto.*(pago|pagar)|renta|einkomm/i.test(t)) return `Como Freiberufler pagas **Einkommensteuer** (0% hasta 12.096€ → 14% → 42%) y **UStVA** trimestral. Regla práctica: aparta el **30-35%** de cada ingreso.\n\n⚠️ Orientación informativa, no asesoría oficial. {"sugerencias": ["¿Cómo calculo mi reserva fiscal?", "¿Qué es el Grundfreibetrag?"]}`;
+  return `¡Hola! Soy Clara, tu asesora fiscal para freelancers hispanohablantes en Alemania. Puedo ayudarte con impuestos, deducciones, plazos y facturas. {"sugerencias": ["¿Qué impuestos pago como Freiberufler?", "¿Cuánto puedo deducir de home office?", "¿Cuándo vence mi UStVA?"]}`;
+}
+
+async function sendMsg(text) {
+  const msgs = document.getElementById('drawer-msgs');
+  const ub = document.createElement('div');
+  ub.className = 'dm-user';
+  ub.textContent = text;
+  msgs.appendChild(ub);
+  const typing = document.createElement('div');
+  typing.className = 'dm-typing';
+  typing.innerHTML = '<div class="dm-dot"></div><div class="dm-dot"></div><div class="dm-dot"></div>';
+  msgs.appendChild(typing);
+  msgs.scrollTop = msgs.scrollHeight;
+  chatHistory.push({ role: 'user', content: text });
+  let reply = '';
+  try {
+    let usedBackend = false;
+    try {
+      const res = await fetch('/api/clara', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ messages: chatHistory }), signal: AbortSignal.timeout(3500) });
+      if (res.ok) { const data = await res.json(); reply = data.content?.[0]?.text || data.reply || ''; usedBackend = true; }
+    } catch {}
+    if (!usedBackend) { await new Promise(r => setTimeout(r, 640 + Math.random() * 400)); reply = getDemoReply(text); }
+    typing.remove();
+    chatHistory.push({ role: 'assistant', content: reply });
+    const clean = reply.replace(/\{"sugerencias"[\s\S]*?\}/g, '').trim();
+    const cb = document.createElement('div');
+    cb.className = 'dm-clara';
+    cb.innerHTML = clean.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>');
+    msgs.appendChild(cb);
+    const sugMatch = reply.match(/\{"sugerencias":\s*\[([\s\S]*?)\]\}/);
+    if (sugMatch) {
+      try {
+        const sugs = JSON.parse('{"sugerencias":[' + sugMatch[1] + ']}').sugerencias;
+        if (sugs.length) {
+          const chips = document.createElement('div');
+          chips.className = 'dm-chips';
+          sugs.forEach(s => { const c = document.createElement('span'); c.className = 'dm-chip'; c.textContent = s; c.onclick = () => sendMsg(s); chips.appendChild(c); });
+          msgs.appendChild(chips);
+        }
+      } catch {}
+    }
+  } catch (err) {
+    typing.remove();
+    const eb = document.createElement('div');
+    eb.className = 'dm-clara';
+    eb.innerHTML = `<span style="color:#ba1a1a;">Error: ${err.message}</span>`;
+    msgs.appendChild(eb);
+  }
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+// ── HAMBURGER ──────────────────────────────────────────────
+(function () {
+  const burger = document.getElementById('nav-burger');
+  const menu   = document.getElementById('mobile-menu');
+  function openMenu() { menu.classList.add('open'); burger.classList.add('open'); burger.setAttribute('aria-expanded','true'); burger.setAttribute('aria-label','Cerrar menú'); document.body.style.overflow = 'hidden'; }
+  function closeMenu() { menu.classList.remove('open'); burger.classList.remove('open'); burger.setAttribute('aria-expanded','false'); burger.setAttribute('aria-label','Abrir menú'); document.body.style.overflow = ''; }
+  window.closeMenu = closeMenu;
+  burger.addEventListener('click', () => menu.classList.contains('open') ? closeMenu() : openMenu());
+  menu.querySelectorAll('a').forEach(a => a.addEventListener('click', closeMenu));
+  document.addEventListener('keydown', e => { if (e.key === 'Escape' && menu.classList.contains('open')) closeMenu(); });
+})();
+</script>
+</body>
+</html>
