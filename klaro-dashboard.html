@@ -670,6 +670,42 @@
 
     </div><!-- /bottom grid -->
 
+
+    <!-- ══ DOCUMENTOS ════════════════════════════════════════════════ -->
+    <div class="rounded-2xl p-6 fade-in-4"
+         style="background:#fff8f1;border:1px solid rgba(164,55,0,0.07);box-shadow:0 1px 6px rgba(164,55,0,.04)">
+
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="font-bold text-[#1e1b17] text-sm">Documentos</h3>
+        <span id="doc-count-badge" class="text-[10px] font-bold px-2 py-0.5 rounded-lg"
+              style="background:rgba(164,55,0,.08);color:#a43700">0 archivos</span>
+      </div>
+
+      <!-- Upload zone -->
+      <div id="upload-zone"
+           class="rounded-xl border-2 border-dashed flex flex-col items-center justify-center gap-2 py-6 cursor-pointer transition-all"
+           style="border-color:rgba(164,55,0,.2);background:rgba(164,55,0,.02)"
+           onclick="document.getElementById('file-input').click()"
+           ondragover="event.preventDefault();this.style.borderColor='#a43700';this.style.background='rgba(164,55,0,.06)'"
+           ondragleave="this.style.borderColor='rgba(164,55,0,.2)';this.style.background='rgba(164,55,0,.02)'"
+           ondrop="handleDrop(event)">
+        <svg class="w-7 h-7" style="color:rgba(164,55,0,.4)" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5"/>
+        </svg>
+        <p class="text-sm font-semibold text-center" style="color:#594139">Arrastra archivos o <span style="color:#a43700">haz clic</span></p>
+        <p class="text-xs" style="color:rgba(89,65,57,.5)">PDF, JPG, PNG · máx. 10 MB</p>
+        <div id="upload-progress" class="hidden w-40 h-1.5 rounded-full overflow-hidden" style="background:rgba(164,55,0,.1)">
+          <div id="upload-bar" class="h-full transition-all duration-300 rounded-full" style="background:#a43700;width:0%"></div>
+        </div>
+      </div>
+      <input id="file-input" type="file" class="hidden" accept=".pdf,.jpg,.jpeg,.png,.webp" onchange="handleFileSelect(event)" />
+
+      <!-- Documents list -->
+      <div id="doc-list" class="mt-3 space-y-2"></div>
+
+    </div><!-- /documentos -->
+
+
     <!-- Bottom padding -->
     <div class="h-4"></div>
 
@@ -690,31 +726,124 @@
 </a>
 
 <script>
+// ── Helpers ───────────────────────────────────────────────────────────
+function _esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function _fmtBytes(b){ if(!b||b<1024) return (b||0)+' B'; if(b<1048576) return (b/1024).toFixed(0)+' KB'; return (b/1048576).toFixed(1)+' MB'; }
+function _fmtDate(iso){ if(!iso) return ''; const d=new Date(iso); return d.toLocaleDateString('es-DE',{day:'2-digit',month:'short',year:'numeric'}); }
+function _fileExt(n){ const e=(n||'').split('.').pop().toUpperCase(); return e.length<=4?e:'FILE'; }
+
+// ── Documents ─────────────────────────────────────────────────────────
+let _docUid = null;
+
+async function loadDocuments(uid) {
+  _docUid = uid;
+  const { data } = await _sb.from('documents').select('*').eq('user_id', uid).order('created_at', { ascending: false });
+  renderDocuments(data || []);
+}
+
+function renderDocuments(docs) {
+  const badge = document.getElementById('doc-count-badge');
+  const list  = document.getElementById('doc-list');
+  const stat  = document.getElementById('stat-docs');
+  if (badge) badge.textContent = docs.length + (docs.length === 1 ? ' archivo' : ' archivos');
+  if (stat)  stat.textContent  = docs.length + (docs.length === 1 ? ' documento subido' : ' documentos subidos');
+  if (!list) return;
+  if (docs.length === 0) { list.innerHTML = ''; return; }
+  list.innerHTML = docs.map(d => `
+    <div class="flex items-center gap-3 px-3 py-2.5 rounded-xl" style="background:#f4ede5">
+      <div class="w-8 h-8 rounded-lg flex-shrink-0 flex items-center justify-center text-[9px] font-black"
+           style="background:rgba(164,55,0,.12);color:#a43700">${_fileExt(d.name)}</div>
+      <div class="flex-1 min-w-0">
+        <p class="text-sm font-semibold truncate" style="color:#1e1b17">${_esc(d.name)}</p>
+        <p class="text-xs" style="color:#594139">${_fmtBytes(d.size_bytes)} · ${_fmtDate(d.created_at)}</p>
+      </div>
+      <button onclick="downloadDoc('${_esc(d.storage_path)}','${_esc(d.name)}')"
+              class="w-8 h-8 rounded-lg flex-shrink-0 flex items-center justify-center transition-all hover:opacity-70"
+              style="background:rgba(164,55,0,.1)" title="Descargar">
+        <svg class="w-4 h-4" style="color:#a43700" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
+        </svg>
+      </button>
+      <button onclick="deleteDoc('${d.id}','${_esc(d.storage_path)}')"
+              class="w-8 h-8 rounded-lg flex-shrink-0 flex items-center justify-center transition-all hover:opacity-70"
+              style="background:rgba(220,38,38,.08)" title="Eliminar">
+        <svg class="w-4 h-4" style="color:#dc2626" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/>
+        </svg>
+      </button>
+    </div>
+  `).join('');
+}
+
+async function uploadFile(file) {
+  if (!_docUid) return;
+  if (file.size > 10 * 1024 * 1024) { alert('El archivo supera el límite de 10 MB.'); return; }
+  const zone = document.getElementById('upload-zone');
+  const prog = document.getElementById('upload-progress');
+  const bar  = document.getElementById('upload-bar');
+  zone.style.pointerEvents = 'none';
+  if (prog) { prog.classList.remove('hidden'); bar.style.width = '30%'; }
+  const path = `${_docUid}/${Date.now()}-${file.name}`;
+  const { error } = await _sb.storage.from('documents').upload(path, file, { upsert: false });
+  if (error) {
+    alert('Error al subir: ' + error.message);
+    zone.style.pointerEvents = '';
+    if (prog) { prog.classList.add('hidden'); bar.style.width = '0%'; }
+    return;
+  }
+  if (prog) bar.style.width = '70%';
+  await _sb.from('documents').insert({
+    user_id: _docUid, name: file.name, type: file.type,
+    storage_path: path, year: new Date().getFullYear(), size_bytes: file.size,
+  });
+  if (prog) bar.style.width = '100%';
+  setTimeout(async () => {
+    zone.style.pointerEvents = '';
+    if (prog) { prog.classList.add('hidden'); bar.style.width = '0%'; }
+    await loadDocuments(_docUid);
+  }, 400);
+}
+
+function handleFileSelect(e) { const f = e.target.files[0]; if (f) uploadFile(f); e.target.value = ''; }
+
+function handleDrop(e) {
+  e.preventDefault();
+  const zone = document.getElementById('upload-zone');
+  zone.style.borderColor = 'rgba(164,55,0,.2)';
+  zone.style.background  = 'rgba(164,55,0,.02)';
+  const f = e.dataTransfer.files[0];
+  if (f) uploadFile(f);
+}
+
+async function downloadDoc(path, name) {
+  const { data, error } = await _sb.storage.from('documents').createSignedUrl(path, 3600);
+  if (error) { alert('Error al descargar: ' + error.message); return; }
+  const a = document.createElement('a'); a.href = data.signedUrl; a.download = name; a.click();
+}
+
+async function deleteDoc(id, path) {
+  if (!confirm('¿Eliminar este documento?')) return;
+  await _sb.storage.from('documents').remove([path]);
+  await _sb.from('documents').delete().eq('id', id);
+  await loadDocuments(_docUid);
+}
+
+// ── Bootstrap ─────────────────────────────────────────────────────────
 (async () => {
   const { data: { session } } = await _sb.auth.getSession();
   if (!session) return;
   const uid = session.user.id;
 
   // Expenses total
-  const { data: expenses } = await _sb
-    .from('expenses')
-    .select('amount')
-    .eq('user_id', uid);
+  const { data: expenses } = await _sb.from('expenses').select('amount').eq('user_id', uid);
   if (expenses && expenses.length > 0) {
     const total = expenses.reduce((s, e) => s + (Number(e.amount) || 0), 0);
     const el = document.getElementById('stat-gastos');
     if (el) el.textContent = '€' + total.toLocaleString('de-DE', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
   }
 
-  // Document count
-  const { count } = await _sb
-    .from('documents')
-    .select('*', { count: 'exact', head: true })
-    .eq('user_id', uid);
-  const docsEl = document.getElementById('stat-docs');
-  if (docsEl && count !== null) {
-    docsEl.textContent = count + (count === 1 ? ' documento subido' : ' documentos subidos');
-  }
+  // Documents — loads list and updates both badges
+  await loadDocuments(uid);
 })();
 </script>
 
