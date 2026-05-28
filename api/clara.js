@@ -70,7 +70,7 @@ module.exports = async function handler(req, res) {
         'content-type': 'application/json',
       },
       body: JSON.stringify({
-                  model: 'claude-3-5-haiku-20241022',
+        model: 'claude-haiku-4-5-20251001',
         max_tokens: 1024,
         system: systemPrompt,
         messages: messages.slice(-10),
@@ -79,7 +79,7 @@ module.exports = async function handler(req, res) {
 
     if (!upstream.ok) {
       const err = await upstream.json().catch(() => ({}));
-      return res.status(upstream.status).json({ error: err.error?.message || 'Anthropic API error' });
+      return res.status(upstream.status).json({ error: err.error?.message || 'Anthropic API error', _debug: err });
     }
 
     const data = await upstream.json();
