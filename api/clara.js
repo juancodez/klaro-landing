@@ -79,7 +79,7 @@ module.exports = async function handler(req, res) {
 
     if (!upstream.ok) {
       const err = await upstream.json().catch(() => ({}));
-      return res.status(upstream.status).json({ error: err.error?.message || 'Anthropic API error', _debug: err });
+      return res.status(upstream.status).json({ error: err.error?.message || 'Anthropic API error' });
     }
 
     const data = await upstream.json();
