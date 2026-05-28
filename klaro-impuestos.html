@@ -195,8 +195,8 @@
         <div class="relative z-10 flex flex-col h-full justify-between">
           <div class="flex items-start justify-between">
             <div>
-              <p class="text-xs font-semibold uppercase tracking-widest mb-1" style="color:rgba(255,255,255,.7)">IVA a Pagar · Q2 2026</p>
-              <p class="big-card-amount text-white" id="iva-neto-current">€1.254,50</p>
+              <p class="text-xs font-semibold uppercase tracking-widest mb-1" style="color:rgba(255,255,255,.7)" id="iva-big-label">IVA a Pagar · Q2 2026</p>
+              <p class="big-card-amount text-white" id="iva-big-card">€1.254,50</p>
             </div>
             <!-- Cálculo Verificado badge -->
             <span class="flex items-center gap-1 text-[10px] font-bold px-2.5 py-1 rounded-full flex-shrink-0" style="background:rgba(255,255,255,.18);color:#fff;border:1px solid rgba(255,255,255,.25)">
@@ -258,7 +258,7 @@
           <div class="flex items-start justify-between mb-4">
             <div>
               <div class="flex items-center gap-2 mb-1">
-                <p class="text-sm font-bold text-[#1e1b17]">UStVA Q1 2026</p>
+                <p class="text-sm font-bold text-[#1e1b17]" id="iva-q-prev-title">UStVA Q1 2026</p>
                 <span class="badge-red text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
                   <svg class="w-2.5 h-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
                   Vencido
@@ -267,7 +267,7 @@
               <p class="text-xs" style="color:#594139">IVA Trimestral · Umsatzsteuervoranmeldung</p>
             </div>
             <div class="text-right flex-shrink-0">
-              <p class="text-xl font-extrabold text-[#1e1b17] leading-none" id="iva-neto-prev">€1.254,50</p>
+              <p class="text-xl font-extrabold text-[#1e1b17] leading-none" id="iva-q-prev-amount">€1.254,50</p>
               <p class="text-[10px] mt-0.5" style="color:#594139">IVA facturado</p>
             </div>
           </div>
@@ -275,7 +275,7 @@
           <div class="flex flex-wrap gap-3 mb-4">
             <div class="flex items-center gap-1.5 text-xs" style="color:#594139">
               <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-              Periodo: <span class="font-semibold text-[#1e1b17]">Ene–Mar 2026</span>
+              Periodo: <span class="font-semibold text-[#1e1b17]" id="iva-q-prev-periodo">Ene–Mar 2026</span>
             </div>
             <div class="flex items-center gap-1.5 text-xs" style="color:#DC2626">
               <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
@@ -304,13 +304,13 @@
           <div class="flex items-start justify-between mb-4">
             <div>
               <div class="flex items-center gap-2 mb-1">
-                <p class="text-sm font-bold text-[#1e1b17]">UStVA Q2 2026</p>
+                <p class="text-sm font-bold text-[#1e1b17]" id="iva-q-curr-title">UStVA Q2 2026</p>
                 <span class="badge-amber text-[10px] font-bold px-2 py-0.5 rounded-full">Pendiente</span>
               </div>
               <p class="text-xs" style="color:#594139">IVA Trimestral · Umsatzsteuervoranmeldung</p>
             </div>
             <div class="text-right flex-shrink-0">
-              <p class="text-xl font-extrabold text-[#1e1b17] leading-none">€1.254,50</p>
+              <p class="text-xl font-extrabold text-[#1e1b17] leading-none" id="iva-q-curr-amount">€1.254,50</p>
               <p class="text-[10px] mt-0.5" style="color:#594139">estimado</p>
             </div>
           </div>
@@ -718,7 +718,7 @@
         <!-- Right breakdown side -->
         <div class="col-span-12 lg:col-span-5">
           <div class="rounded-2xl p-4 h-full" style="background:#f4ede5;border:1px solid rgba(164,55,0,0.07)">
-            <p class="text-xs font-bold text-[#1e1b17] mb-3 uppercase tracking-widest">Resumen IVA Q2 2026</p>
+            <p class="text-xs font-bold text-[#1e1b17] mb-3 uppercase tracking-widest" id="iva-resumen-title">Resumen IVA Q2 2026</p>
 
             <!-- Base ingresos -->
             <div class="flex justify-between items-center py-2" style="border-bottom:1px solid rgba(164,55,0,0.06)">
@@ -738,7 +738,7 @@
                 <div class="w-2 h-2 rounded-full" style="background:#a43700"></div>
                 <span class="text-xs font-medium" style="color:#594139">IVA cobrado (Umsatzsteuer)</span>
               </div>
-              <span class="text-sm font-bold text-[#1e1b17]" id="iva-facturado-current">€1.254,50</span>
+              <span class="text-sm font-bold text-[#1e1b17]" id="iva-resumen-cobrado">€1.254,50</span>
             </div>
 
             <!-- IVA pagado (Vorsteuer) -->
@@ -747,13 +747,13 @@
                 <div class="w-2 h-2 rounded-full" style="background:#D97706"></div>
                 <span class="text-xs font-medium" style="color:#594139">IVA pagado (Vorsteuer)</span>
               </div>
-              <span class="text-sm font-bold" style="color:#D97706" id="vorsteuer-current">− €188,10</span>
+              <span class="text-sm font-bold" style="color:#D97706" id="iva-resumen-vorsteuer">− €188,10</span>
             </div>
 
             <!-- Net -->
             <div class="flex justify-between items-center pt-3 mt-0.5">
               <span class="text-xs font-bold text-[#1e1b17]">A pagar al Finanzamt</span>
-              <span class="text-base font-extrabold" style="color:#a43700">€1.066,40</span>
+              <span class="text-base font-extrabold" style="color:#a43700" id="iva-resumen-neto">€1.066,40</span>
             </div>
 
             <!-- Mini bar chart -->
@@ -1093,83 +1093,90 @@
 (async function loadTaxData() {
   await new Promise(r => setTimeout(r, 200));
 
-  const { data: { session } } = await _sb.auth.getSession();
+  const { data: { session } } = await db.auth.getSession();
   if (!session) return;
   const uid = session.user.id;
 
-  const year = new Date().getFullYear();
+  const now  = new Date();
+  const year = now.getFullYear();
+  const month = now.getMonth() + 1;
 
-  const { data: invoices } = await _sb
-    .from('invoices')
-    .select('amount, status, date')
-    .eq('user_id', uid)
-    .gte('date', `${year}-01-01`)
-    .lte('date', `${year}-12-31`);
+  const currentQ = month <= 3 ? 1 : month <= 6 ? 2 : month <= 9 ? 3 : 4;
+  const prevQ    = currentQ > 1 ? currentQ - 1 : 4;
+  const prevYear = currentQ === 1 ? year - 1 : year;
 
-  const { data: expenses } = await _sb
-    .from('expenses')
-    .select('amount, date')
-    .eq('user_id', uid)
-    .gte('date', `${year}-01-01`)
-    .lte('date', `${year}-12-31`);
+  const Q_META = {
+    1: { start: `${year}-01-01`,     end: `${year}-03-31`,     label: `Ene–Mar ${year}`,  vence: `10 abr ${year}` },
+    2: { start: `${year}-04-01`,     end: `${year}-06-30`,     label: `Abr–Jun ${year}`,  vence: `10 jul ${year}` },
+    3: { start: `${year}-07-01`,     end: `${year}-09-30`,     label: `Jul–Sep ${year}`,  vence: `10 oct ${year}` },
+    4: { start: `${year}-10-01`,     end: `${year}-12-31`,     label: `Oct–Dic ${year}`,  vence: `10 ene ${year + 1}` },
+  };
+  const PQ_META = {
+    1: { start: `${prevYear}-01-01`, end: `${prevYear}-03-31`, label: `Ene–Mar ${prevYear}` },
+    2: { start: `${prevYear}-04-01`, end: `${prevYear}-06-30`, label: `Abr–Jun ${prevYear}` },
+    3: { start: `${prevYear}-07-01`, end: `${prevYear}-09-30`, label: `Jul–Sep ${prevYear}` },
+    4: { start: `${prevYear}-10-01`, end: `${prevYear}-12-31`, label: `Oct–Dic ${prevYear}` },
+  };
 
-  const inv = invoices || [];
-  const exp = expenses || [];
+  const [{ data: invAll }, { data: expAll }] = await Promise.all([
+    db.from('invoices').select('amount, status, date').eq('user_id', uid),
+    db.from('expenses').select('amount, date').eq('user_id', uid),
+  ]);
 
-  function quarterRange(q) {
-    const starts = { 1: '01-01', 2: '04-01', 3: '07-01', 4: '10-01' };
-    const ends   = { 1: '03-31', 2: '06-30', 3: '09-30', 4: '12-31' };
-    return { start: `${year}-${starts[q]}`, end: `${year}-${ends[q]}` };
-  }
+  const inv = invAll || [];
+  const exp = expAll || [];
 
-  function calcQuarter(q) {
-    const { start, end } = quarterRange(q);
-    const qInv = inv.filter(i => i.date >= start && i.date <= end && i.status === 'paid');
-    const qExp = exp.filter(e => e.date >= start && e.date <= end);
-
+  function calcQ(meta) {
+    const qInv = inv.filter(i => i.status === 'paid' && i.date >= meta.start && i.date <= meta.end);
+    const qExp = exp.filter(e => e.date >= meta.start && e.date <= meta.end);
     const baseIngresos = qInv.reduce((s, i) => s + parseFloat(i.amount || 0), 0);
     const baseGastos   = qExp.reduce((s, e) => s + parseFloat(e.amount || 0), 0);
     const ivaFacturado = baseIngresos * 0.19;
     const vorsteuer    = baseGastos   * 0.19;
     const netoPagar    = Math.max(0, ivaFacturado - vorsteuer);
-
     return { baseIngresos, baseGastos, ivaFacturado, vorsteuer, netoPagar };
   }
 
-  const fmt = (n) => '€' + n.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  const curr = calcQ(Q_META[currentQ]);
+  const prev = calcQ(PQ_META[prevQ]);
 
-  const currentMonth = new Date().getMonth() + 1;
-  const currentQ = currentMonth <= 3 ? 1 : currentMonth <= 6 ? 2 : currentMonth <= 9 ? 3 : 4;
-  const prevQ    = currentQ > 1 ? currentQ - 1 : 4;
+  const fmt = n => '€' + n.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
 
-  const dataCurrentQ = calcQuarter(currentQ);
-  const dataPrevQ    = calcQuarter(prevQ);
+  // Big card — trimestre actual
+  set('iva-big-label',          `IVA a Pagar · Q${currentQ} ${year}`);
+  set('iva-big-card',           fmt(curr.netoPagar));
 
-  const setIfExists = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+  // UStVA card trimestre actual
+  set('iva-q-curr-title',       `UStVA Q${currentQ} ${year}`);
+  set('iva-q-curr-amount',      fmt(curr.netoPagar));
 
-  setIfExists('iva-neto-current',      fmt(dataCurrentQ.netoPagar));
-  setIfExists('iva-facturado-current', fmt(dataCurrentQ.ivaFacturado));
-  setIfExists('vorsteuer-current',     fmt(dataCurrentQ.vorsteuer));
-  setIfExists('base-ingresos-current', fmt(dataCurrentQ.baseIngresos));
-  setIfExists('base-gastos-current',   fmt(dataCurrentQ.baseGastos));
+  // UStVA card trimestre anterior
+  set('iva-q-prev-title',       `UStVA Q${prevQ} ${prevYear}`);
+  set('iva-q-prev-amount',      fmt(prev.ivaFacturado));
+  set('iva-q-prev-periodo',     PQ_META[prevQ].label);
+  set('iva-facturado-prev',     fmt(prev.ivaFacturado));
+  set('vorsteuer-prev',         `− ${fmt(prev.vorsteuer)}`);
 
-  setIfExists('iva-neto-prev',         fmt(dataPrevQ.netoPagar));
-  setIfExists('iva-facturado-prev',    fmt(dataPrevQ.ivaFacturado));
-  setIfExists('vorsteuer-prev',        fmt(dataPrevQ.vorsteuer));
+  // Resumen panel trimestre actual
+  set('iva-resumen-title',      `Resumen IVA Q${currentQ} ${year}`);
+  set('base-ingresos-current',  fmt(curr.baseIngresos));
+  set('base-gastos-current',    fmt(curr.baseGastos));
+  set('iva-resumen-cobrado',    fmt(curr.ivaFacturado));
+  set('iva-resumen-vorsteuer',  `− ${fmt(curr.vorsteuer)}`);
+  set('iva-resumen-neto',       fmt(curr.netoPagar));
 
-  const now = new Date();
-  const { start } = quarterRange(currentQ);
-  const { end }   = quarterRange(currentQ);
-  const qStart = new Date(start);
-  const qEnd   = new Date(end);
+  // Barra de progreso del trimestre actual
+  const qStart    = new Date(Q_META[currentQ].start);
+  const qEnd      = new Date(Q_META[currentQ].end);
   const totalDays   = (qEnd - qStart) / 86400000;
   const elapsedDays = Math.min((now - qStart) / 86400000, totalDays);
-  const progressPct = Math.round((elapsedDays / totalDays) * 100);
+  const pct = Math.round((elapsedDays / totalDays) * 100);
 
   const progressBar = document.getElementById('quarter-progress-bar');
-  if (progressBar) progressBar.style.width = progressPct + '%';
+  if (progressBar) progressBar.style.width = pct + '%';
   const progressLabel = document.getElementById('quarter-progress-label');
-  if (progressLabel) progressLabel.textContent = `${progressPct}% del trimestre transcurrido`;
+  if (progressLabel) progressLabel.textContent = `${pct}% del trimestre (${Math.round(elapsedDays)} días)`;
 })();
 </script>
 </body>
