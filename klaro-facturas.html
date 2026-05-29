@@ -82,6 +82,8 @@
     @keyframes shimmer { 0% { background-position: -400px 0; } 100% { background-position: 400px 0; } }
     .skeleton { background: linear-gradient(90deg, rgba(164,55,0,0.05) 25%, rgba(164,55,0,0.1) 50%, rgba(164,55,0,0.05) 75%); background-size: 800px 100%; animation: shimmer 1.4s infinite linear; border-radius: 12px; }
   </style>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="auth.js"></script>
 </head>
@@ -1005,28 +1007,127 @@
     }
   }
 
-  /* ─ Print / PDF ─ */
+  /* ─ PDF download via jsPDF ─ */
   function printInvoice(inv) {
-    const net = parseFloat(inv.amount || 0);
-    const vatRate = parseFloat(inv.vat_rate || inv.tax_rate || 19) / 100;
-    const vat = net * vatRate;
-    const gross = net + vat;
-    const fmt = n => '€ ' + n.toLocaleString('de-DE', {minimumFractionDigits:2, maximumFractionDigits:2});
-    const fmtDate = d => new Date(d).toLocaleDateString('de-DE', {day:'2-digit',month:'2-digit',year:'numeric'});
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
 
-    document.getElementById('pi-from-name').textContent = document.querySelector('[data-user-name]')?.textContent || '';
-    document.getElementById('pi-steuernummer').textContent = localStorage.getItem('klaro_steuernummer') ? 'St.-Nr.: ' + localStorage.getItem('klaro_steuernummer') : '';
-    document.getElementById('pi-invoice-number').textContent = inv.invoice_number || (inv.id ? inv.id.slice(0,8).toUpperCase() : '0001');
-    document.getElementById('pi-date').textContent = fmtDate(inv.date || inv.created_at || new Date());
-    document.getElementById('pi-client').textContent = inv.client_name || '—';
-    document.getElementById('pi-items').innerHTML = '<tr><td>' + escHtml(inv.description || 'Servicios profesionales') + '</td><td style="text-align:right">' + fmt(net) + '</td></tr>';
-    document.getElementById('pi-net').textContent = fmt(net);
-    document.getElementById('pi-vat-label').textContent = 'MwSt. ' + Math.round(vatRate * 100) + '%';
-    document.getElementById('pi-vat').textContent = fmt(vat);
-    document.getElementById('pi-gross').textContent = fmt(gross);
-    document.getElementById('pi-footer-year').textContent = new Date().getFullYear();
+    const net      = parseFloat(inv.amount || 0);
+    const taxRate  = parseFloat(inv.vat_rate || inv.tax_rate || 19);
+    const isKlein  = taxRate === 0 || localStorage.getItem('klaro_kleinunternehmer') === 'true';
+    const vat      = isKlein ? 0 : net * (taxRate / 100);
+    const gross    = net + vat;
+    const userName = document.querySelector('[data-user-name]')?.textContent?.trim() || '';
+    const stNr     = localStorage.getItem('klaro_steuernummer') || '';
+    const invDate  = new Date(inv.date || inv.created_at || new Date());
+    const fmtDate  = d => d.toLocaleDateString('de-DE', {day:'2-digit', month:'2-digit', year:'numeric'});
+    const fmtEurPdf = n => '€ ' + n.toLocaleString('de-DE', {minimumFractionDigits:2, maximumFractionDigits:2});
 
-    window.print();
+    const ORANGE = [164, 55, 0];
+    const DARK   = [30, 27, 23];
+    const MUTED  = [89, 65, 57];
+
+    // ── Header ──
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(22);
+    doc.setTextColor(...ORANGE);
+    doc.text('Klaro', 20, 24);
+
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(10);
+    doc.setTextColor(...MUTED);
+    if (userName) doc.text(userName, 20, 31);
+    if (stNr)     doc.text('St.-Nr.: ' + stNr, 20, 36);
+
+    // RECHNUNG label (right)
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(18);
+    doc.setTextColor(...DARK);
+    doc.text('RECHNUNG', 190, 24, { align: 'right' });
+
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(10);
+    doc.setTextColor(...MUTED);
+    const invNum = inv.invoice_number || (inv.id ? inv.id.slice(0,8).toUpperCase() : '0001');
+    doc.text('Nr. ' + invNum, 190, 31, { align: 'right' });
+    doc.text('Datum: ' + fmtDate(invDate), 190, 36, { align: 'right' });
+
+    // Divider
+    doc.setDrawColor(...ORANGE);
+    doc.setLineWidth(0.4);
+    doc.line(20, 42, 190, 42);
+
+    // ── Bill-to ──
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(9);
+    doc.setTextColor(...MUTED);
+    doc.text('RECHNUNGSEMPFÄNGER', 20, 52);
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(11);
+    doc.setTextColor(...DARK);
+    doc.text(inv.client_name || '—', 20, 58);
+    if (inv.client_email) { doc.setFontSize(9); doc.setTextColor(...MUTED); doc.text(inv.client_email, 20, 63); }
+
+    // ── Items table ──
+    doc.autoTable({
+      startY: 75,
+      head: [['Beschreibung', 'Betrag']],
+      body: [[inv.description || 'Servicios profesionales', fmtEurPdf(net)]],
+      styles: { font: 'helvetica', fontSize: 10, textColor: DARK },
+      headStyles: { fillColor: ORANGE, textColor: [255,255,255], fontStyle: 'bold', fontSize: 9 },
+      columnStyles: { 1: { halign: 'right', cellWidth: 40 } },
+      margin: { left: 20, right: 20 },
+    });
+
+    // ── Totals ──
+    const afterTable = doc.lastAutoTable.finalY + 6;
+    const col1 = 140, col2 = 190;
+
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(10);
+    doc.setTextColor(...MUTED);
+    doc.text('Nettobetrag', col1, afterTable);
+    doc.setTextColor(...DARK);
+    doc.text(fmtEurPdf(net), col2, afterTable, { align: 'right' });
+
+    if (isKlein) {
+      doc.setFontSize(8);
+      doc.setTextColor(...MUTED);
+      doc.text('Gemäß §19 UStG wird keine Umsatzsteuer berechnet.', 20, afterTable + 8);
+      doc.setDrawColor(...DARK);
+      doc.setLineWidth(0.3);
+      doc.line(col1, afterTable + 13, 190, afterTable + 13);
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(12);
+      doc.setTextColor(...DARK);
+      doc.text('Gesamtbetrag', col1, afterTable + 19);
+      doc.text(fmtEurPdf(gross), col2, afterTable + 19, { align: 'right' });
+    } else {
+      doc.setTextColor(...MUTED);
+      doc.text('MwSt. ' + Math.round(taxRate) + '%', col1, afterTable + 7);
+      doc.setTextColor(...DARK);
+      doc.text(fmtEurPdf(vat), col2, afterTable + 7, { align: 'right' });
+      doc.setDrawColor(...DARK);
+      doc.setLineWidth(0.3);
+      doc.line(col1, afterTable + 12, 190, afterTable + 12);
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(12);
+      doc.setTextColor(...DARK);
+      doc.text('Gesamtbetrag', col1, afterTable + 18);
+      doc.text(fmtEurPdf(gross), col2, afterTable + 18, { align: 'right' });
+    }
+
+    // ── Footer ──
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(8);
+    doc.setTextColor(...MUTED);
+    doc.setDrawColor(224, 191, 180);
+    doc.setLineWidth(0.2);
+    doc.line(20, 272, 190, 272);
+    doc.text('Zahlbar innerhalb von 14 Tagen nach Rechnungsdatum.', 20, 277);
+    doc.text('Generado con Klaro · ' + new Date().getFullYear(), 190, 277, { align: 'right' });
+
+    doc.save('Rechnung-' + invNum + '.pdf');
   }
 
   /* ─ Init ─ */

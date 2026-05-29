@@ -9,6 +9,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/@accountable/jsvat@1.3.4/dist/jsvat.umd.js"></script>
   <script>
     tailwind.config = {
       theme: {
@@ -360,8 +361,10 @@
               <label class="block text-xs font-semibold mb-1.5" style="color:#594139">USt-IdNr (IVA intracomunitario)</label>
               <input id="prof-ustid" type="text" value="" placeholder="DE123456789"
                      class="w-full rounded-xl px-3.5 py-2.5 text-sm font-mono"
-                     style="background:#f4ede5;border:1px solid rgba(164,55,0,0.12);color:#1e1b17;outline:none"/>
-              <p class="text-[10px] mt-1" style="color:rgba(89,65,57,.5)">Solo si facturas a clientes de la UE</p>
+                     style="background:#f4ede5;border:1px solid rgba(164,55,0,0.12);color:#1e1b17;outline:none"
+                     oninput="validateUstId(this.value)" />
+              <span id="ustid-validation-msg" class="text-xs mt-1 block" style="min-height:1rem"></span>
+              <p class="text-[10px] mt-0.5" style="color:rgba(89,65,57,.5)">Solo si facturas a clientes de la UE</p>
             </div>
 
             <div>
@@ -431,7 +434,7 @@
               </div>
               <div>
                 <label class="block text-xs font-semibold mb-1.5" style="color:#594139">Steuer-ID (IdNr)</label>
-                <input type="text" value="12 345 678 901" placeholder="XX XXX XXX XXX"
+                <input type="text" value="" placeholder="XX XXX XXX XXX"
                        class="klaro-input w-full rounded-xl px-3.5 py-2.5 text-sm font-mono"
                        style="background:#f4ede5;border:1px solid rgba(164,55,0,0.15);color:#1e1b17" />
               </div>
@@ -439,7 +442,7 @@
 
             <div>
               <label class="block text-xs font-semibold mb-1.5" style="color:#594139">Finanzamt</label>
-              <input type="text" value="Finanzamt Berlin Mitte" placeholder="ej. Finanzamt München"
+              <input type="text" value="" placeholder="ej. Finanzamt München"
                      class="klaro-input w-full rounded-xl px-3.5 py-2.5 text-sm"
                      style="background:#f4ede5;border:1px solid rgba(164,55,0,0.15);color:#1e1b17" />
             </div>
@@ -944,7 +947,90 @@
     } else {
       showToast('Perfil guardado ✓', true);
     }
+
+    // ── Also persist fiscal profile to user_profiles ────────────────────
+    var fiscalData = {
+      user_id: session.user.id,
+      steuernummer: document.getElementById('prof-steuernummer')?.value || '',
+      ust_id_nr: document.getElementById('prof-ustid')?.value || '',
+      tax_type: document.getElementById('prof-tax-type')?.value || 'freiberufler',
+      kleinunternehmer: kleinunternehmerActive,
+      finanzamt: document.querySelector('input[placeholder="ej. Finanzamt München"]')?.value || ''
+    };
+    try {
+      await _sb.from('user_profiles').upsert(fiscalData, { onConflict: 'user_id' });
+    } catch(e) {
+      console.warn('user_profiles table not yet created:', e.message);
+    }
   }
+
+  // ── Real-time USt-IdNr validation ─────────────────────────────────────
+  function validateUstId(value) {
+    var msg = document.getElementById('ustid-validation-msg');
+    if (!msg) return;
+    if (!value || value.trim() === '') {
+      msg.textContent = '';
+      return;
+    }
+    try {
+      var result = jsvat.checkVAT(value.trim());
+      if (result.isValid) {
+        msg.textContent = '✓ Número válido';
+        msg.style.color = '#16a34a';
+      } else {
+        msg.textContent = '✗ Formato inválido (ej: DE123456789)';
+        msg.style.color = '#dc2626';
+      }
+    } catch(e) {
+      msg.textContent = '✗ Formato inválido (ej: DE123456789)';
+      msg.style.color = '#dc2626';
+    }
+  }
+
+  // ── Load fiscal profile from user_profiles on page open ───────────────
+  (async function loadUserProfiles() {
+    var s = await _sb.auth.getSession();
+    var session = s.data.session;
+    if (!session) return;
+    try {
+      var res = await _sb.from('user_profiles').select('*').eq('user_id', session.user.id).single();
+      var fp = res.data;
+      if (!fp) return;
+      if (fp.steuernummer) {
+        var snEl = document.getElementById('prof-steuernummer');
+        if (snEl) snEl.value = fp.steuernummer;
+      }
+      if (fp.ust_id_nr) {
+        var uiEl = document.getElementById('prof-ustid');
+        if (uiEl) {
+          uiEl.value = fp.ust_id_nr;
+          validateUstId(fp.ust_id_nr);
+        }
+      }
+      if (fp.tax_type) {
+        var ttEl = document.getElementById('prof-tax-type');
+        if (ttEl) ttEl.value = fp.tax_type;
+      }
+      if (fp.kleinunternehmer !== undefined && fp.kleinunternehmer !== null) {
+        var shouldBeActive = fp.kleinunternehmer === true || fp.kleinunternehmer === 'true';
+        if (shouldBeActive !== kleinunternehmerActive) toggleKleinunternehmer();
+        // Also sync the radio buttons in the lower card
+        var kleinRadio = document.querySelector('input[value="klein"]');
+        var normalRadio = document.querySelector('input[value="normal"]');
+        if (kleinRadio && normalRadio) {
+          kleinRadio.checked = shouldBeActive;
+          normalRadio.checked = !shouldBeActive;
+          updateVat();
+        }
+      }
+      if (fp.finanzamt) {
+        var faEl = document.querySelector('input[placeholder="ej. Finanzamt München"]');
+        if (faEl) faEl.value = fp.finanzamt;
+      }
+    } catch(e) {
+      console.warn('No se pudo cargar el perfil fiscal:', e.message);
+    }
+  })();
 </script>
 </body>
 </html>
