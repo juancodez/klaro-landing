@@ -77,6 +77,9 @@
 </head>
 <body class="bg-[#f4ede5] text-[#1e1b17] overflow-hidden h-screen flex">
 
+<!-- Deadline notification toasts -->
+<div id="notif-stack" class="fixed top-4 right-4 z-50 flex flex-col gap-2" style="max-width:340px"></div>
+
 <!-- Empty state banner (shown only when user has no invoices or expenses) -->
 <div id="empty-state-banner" class="hidden fixed top-20 left-1/2 -translate-x-1/2 z-30 w-full max-w-lg px-4">
   <div class="rounded-2xl p-4 flex items-center gap-4 shadow-lg" style="background:#fff8f1;border:1px solid rgba(164,55,0,0.15)">
@@ -975,7 +978,104 @@ function _renderChart(invoices, expenses) {
 
   // Action Center + Clara recommendations
   loadActionCenter(uid, inv, exp);
+  checkDeadlineNotifications(uid);
 })();
+
+// ── DEADLINE NOTIFICATIONS ────────────────────────────────────────
+const GERMAN_FISCAL_DEADLINES = (() => {
+  const y = new Date().getFullYear();
+  return [
+    { label: 'UStVA Q1',          due: new Date(y, 3, 10),   type: 'ustVA',  q: 1, href: 'klaro-impuestos.html' },
+    { label: 'UStVA Q2',          due: new Date(y, 6, 10),   type: 'ustVA',  q: 2, href: 'klaro-impuestos.html' },
+    { label: 'UStVA Q3',          due: new Date(y, 9, 10),   type: 'ustVA',  q: 3, href: 'klaro-impuestos.html' },
+    { label: 'UStVA Q4',          due: new Date(y+1, 0, 10), type: 'ustVA',  q: 4, href: 'klaro-impuestos.html' },
+    { label: 'Einkommensteuer',    due: new Date(y+1, 6, 31), type: 'einkom', q: null, href: 'klaro-impuestos.html' },
+  ];
+})();
+
+async function checkDeadlineNotifications(uid) {
+  const now = new Date();
+  const NOTIF_KEY = 'klaro_notif_dismissed_' + now.toISOString().slice(0, 10);
+  const dismissed = JSON.parse(localStorage.getItem(NOTIF_KEY) || '[]');
+
+  // Check which declarations are already filed
+  let filed = [];
+  try {
+    const { data } = await _sb.from('tax_declarations')
+      .select('declaration_type,quarter,year,status')
+      .eq('user_id', uid).eq('status', 'filed');
+    filed = data || [];
+  } catch(e) { /* table may not exist yet */ }
+
+  const toasts = [];
+  for (const dl of GERMAN_FISCAL_DEADLINES) {
+    const daysLeft = Math.round((dl.due - now) / 86400000);
+    if (daysLeft < 0 || daysLeft > 30) continue; // only 0-30 day window
+
+    const notifId = dl.type + '_' + (dl.q || 'annual') + '_' + dl.due.getFullYear();
+    if (dismissed.includes(notifId)) continue;
+
+    const isFiled = filed.some(f =>
+      f.declaration_type === dl.type &&
+      f.quarter === dl.q &&
+      f.year === dl.due.getFullYear()
+    );
+    if (isFiled) continue;
+
+    toasts.push({ ...dl, daysLeft, notifId });
+  }
+
+  // Show max 2 toasts, most urgent first
+  toasts.sort((a, b) => a.daysLeft - b.daysLeft);
+  toasts.slice(0, 2).forEach((t, i) => {
+    setTimeout(() => showDeadlineToast(t), i * 400);
+  });
+}
+
+function showDeadlineToast({ label, daysLeft, notifId, href }) {
+  const stack = document.getElementById('notif-stack');
+  if (!stack) return;
+
+  const urgency = daysLeft <= 7
+    ? { bg: '#FEF2F2', border: 'rgba(220,38,38,.2)', icon: '#DC2626', dot: '#DC2626' }
+    : { bg: '#FFFBEB', border: 'rgba(217,119,6,.2)', icon: '#D97706', dot: '#D97706' };
+
+  const el = document.createElement('div');
+  el.className = 'rounded-2xl p-4 shadow-lg flex items-start gap-3 fade-in';
+  el.style.cssText = `background:${urgency.bg};border:1px solid ${urgency.border};animation:fade-up .3s ease-out both`;
+  el.innerHTML = `
+    <div class="w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0" style="background:${urgency.icon}15">
+      <svg class="w-4 h-4" style="color:${urgency.icon}" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/>
+      </svg>
+    </div>
+    <div class="flex-1 min-w-0">
+      <p class="text-sm font-bold text-[#1e1b17] leading-tight">${label}</p>
+      <p class="text-xs mt-0.5" style="color:#594139">
+        ${daysLeft === 0 ? 'Vence hoy' : daysLeft === 1 ? 'Vence mañana' : `Faltan ${daysLeft} días`}
+      </p>
+      <a href="${href}" class="text-xs font-bold mt-1.5 inline-block" style="color:${urgency.icon}">Ver declaración →</a>
+    </div>
+    <button onclick="dismissNotif('${notifId}', this.closest('div.rounded-2xl'))"
+            class="text-[#594139] hover:text-[#1e1b17] transition-colors flex-shrink-0 mt-0.5" style="opacity:.5">
+      <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+      </svg>
+    </button>`;
+
+  stack.appendChild(el);
+
+  // Auto-dismiss after 12 seconds
+  setTimeout(() => el.remove(), 12000);
+}
+
+function dismissNotif(notifId, el) {
+  const key = 'klaro_notif_dismissed_' + new Date().toISOString().slice(0, 10);
+  const dismissed = JSON.parse(localStorage.getItem(key) || '[]');
+  dismissed.push(notifId);
+  localStorage.setItem(key, JSON.stringify(dismissed));
+  if (el) el.remove();
+}
 
 // ── ACTION CENTER ─────────────────────────────────────────────────
 async function loadActionCenter(uid, inv, exp) {
