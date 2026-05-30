@@ -98,6 +98,184 @@
 </div>
 
 <!-- ═══════════════════════════════════════════════════════════════════
+     ONBOARDING OVERLAY — shown once, skipped if fiscal_profiles exists
+════════════════════════════════════════════════════════════════════ -->
+<div id="onboarding-overlay" class="hidden fixed inset-0 z-[100] flex items-center justify-center" style="background:rgba(30,27,23,0.65);backdrop-filter:blur(4px)">
+  <div class="bg-[#fff8f1] rounded-3xl shadow-2xl w-full max-w-md mx-4 overflow-hidden" style="border:1px solid rgba(164,55,0,0.12)">
+
+    <!-- Progress bar -->
+    <div class="h-1 bg-[#f4ede5]">
+      <div id="ob-progress" class="h-1 rounded-full transition-all duration-500" style="background:linear-gradient(90deg,#a43700,#e8622a);width:14%"></div>
+    </div>
+
+    <!-- Header -->
+    <div class="px-7 pt-6 pb-2 flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <div class="w-7 h-7 rounded-lg flex items-center justify-center" style="background:rgba(164,55,0,0.1)">
+          <svg class="w-4 h-4" style="color:#a43700" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/></svg>
+        </div>
+        <p class="text-xs font-bold uppercase tracking-widest" style="color:#a43700">Diagnóstico fiscal</p>
+      </div>
+      <p id="ob-step-counter" class="text-xs font-semibold" style="color:rgba(89,65,57,.5)">1 de 7</p>
+    </div>
+
+    <!-- Steps container -->
+    <div id="ob-steps" class="px-7 pb-7">
+
+      <!-- STEP 1: tipo_autonomo -->
+      <div class="ob-step" data-step="1">
+        <h3 class="text-lg font-black text-[#1e1b17] mb-1 mt-3">¿Cómo estás dado/a de alta?</h3>
+        <p class="text-sm mb-5" style="color:#594139">Determina tus obligaciones fiscales.</p>
+        <div class="space-y-2.5" id="ob-tipo">
+          <label class="ob-option flex items-start gap-3 p-4 rounded-2xl cursor-pointer transition-all" style="border:1.5px solid rgba(164,55,0,0.15);background:#f4ede5">
+            <input type="radio" name="tipo_autonomo" value="freiberufler" class="mt-0.5 accent-[#a43700]" />
+            <div>
+              <p class="text-sm font-bold text-[#1e1b17]">Freiberufler/a</p>
+              <p class="text-xs mt-0.5" style="color:#594139">Profesional liberal — diseño, programación, consultoría, etc.</p>
+            </div>
+          </label>
+          <label class="ob-option flex items-start gap-3 p-4 rounded-2xl cursor-pointer transition-all" style="border:1.5px solid rgba(164,55,0,0.15);background:#f4ede5">
+            <input type="radio" name="tipo_autonomo" value="gewerbetreibender" class="mt-0.5 accent-[#a43700]" />
+            <div>
+              <p class="text-sm font-bold text-[#1e1b17]">Gewerbetreibende/r</p>
+              <p class="text-xs mt-0.5" style="color:#594139">Actividad comercial — tienda, e-commerce, servicios físicos, etc.</p>
+            </div>
+          </label>
+        </div>
+      </div>
+
+      <!-- STEP 2: inicio_actividad -->
+      <div class="ob-step hidden" data-step="2">
+        <h3 class="text-lg font-black text-[#1e1b17] mb-1 mt-3">¿Cuándo empezaste tu actividad?</h3>
+        <p class="text-sm mb-5" style="color:#594139">Año de inicio como autónomo/a en Alemania.</p>
+        <div class="grid grid-cols-3 gap-2.5" id="ob-inicio">
+          <label class="ob-option text-center p-3 rounded-2xl cursor-pointer transition-all" style="border:1.5px solid rgba(164,55,0,0.15);background:#f4ede5">
+            <input type="radio" name="inicio_actividad" value="2022" class="hidden" /><p class="text-sm font-bold text-[#1e1b17]">2022 o antes</p>
+          </label>
+          <label class="ob-option text-center p-3 rounded-2xl cursor-pointer transition-all" style="border:1.5px solid rgba(164,55,0,0.15);background:#f4ede5">
+            <input type="radio" name="inicio_actividad" value="2023" class="hidden" /><p class="text-sm font-bold text-[#1e1b17]">2023</p>
+          </label>
+          <label class="ob-option text-center p-3 rounded-2xl cursor-pointer transition-all" style="border:1.5px solid rgba(164,55,0,0.15);background:#f4ede5">
+            <input type="radio" name="inicio_actividad" value="2024" class="hidden" /><p class="text-sm font-bold text-[#1e1b17]">2024</p>
+          </label>
+          <label class="ob-option text-center p-3 rounded-2xl cursor-pointer transition-all" style="border:1.5px solid rgba(164,55,0,0.15);background:#f4ede5">
+            <input type="radio" name="inicio_actividad" value="2025" class="hidden" /><p class="text-sm font-bold text-[#1e1b17]">2025</p>
+          </label>
+          <label class="ob-option text-center p-3 rounded-2xl cursor-pointer transition-all" style="border:1.5px solid rgba(164,55,0,0.15);background:#f4ede5">
+            <input type="radio" name="inicio_actividad" value="2026" class="hidden" /><p class="text-sm font-bold text-[#1e1b17]">2026</p>
+          </label>
+        </div>
+      </div>
+
+      <!-- STEP 3: ingresos_anuales -->
+      <div class="ob-step hidden" data-step="3">
+        <h3 class="text-lg font-black text-[#1e1b17] mb-1 mt-3">¿Cuánto facturaste en 2025?</h3>
+        <p class="text-sm mb-5" style="color:#594139">Ingresos brutos aproximados — clave para Kleinunternehmer.</p>
+        <div class="space-y-2.5" id="ob-ingresos">
+          <label class="ob-option flex items-center gap-3 p-4 rounded-2xl cursor-pointer transition-all" style="border:1.5px solid rgba(164,55,0,0.15);background:#f4ede5">
+            <input type="radio" name="ingresos_anuales" value="<10000" class="accent-[#a43700]" /><p class="text-sm font-bold text-[#1e1b17]">Menos de €10.000</p>
+          </label>
+          <label class="ob-option flex items-center gap-3 p-4 rounded-2xl cursor-pointer transition-all" style="border:1.5px solid rgba(164,55,0,0.15);background:#f4ede5">
+            <input type="radio" name="ingresos_anuales" value="10000-25000" class="accent-[#a43700]" /><p class="text-sm font-bold text-[#1e1b17]">€10.000 – €25.000</p>
+          </label>
+          <label class="ob-option flex items-center gap-3 p-4 rounded-2xl cursor-pointer transition-all" style="border:1.5px solid rgba(164,55,0,0.15);background:#f4ede5">
+            <input type="radio" name="ingresos_anuales" value="25000-50000" class="accent-[#a43700]" /><p class="text-sm font-bold text-[#1e1b17]">€25.000 – €50.000</p>
+          </label>
+          <label class="ob-option flex items-center gap-3 p-4 rounded-2xl cursor-pointer transition-all" style="border:1.5px solid rgba(164,55,0,0.15);background:#f4ede5">
+            <input type="radio" name="ingresos_anuales" value=">50000" class="accent-[#a43700]" /><p class="text-sm font-bold text-[#1e1b17]">Más de €50.000</p>
+          </label>
+        </div>
+      </div>
+
+      <!-- STEP 4: clientes_extranjero -->
+      <div class="ob-step hidden" data-step="4">
+        <h3 class="text-lg font-black text-[#1e1b17] mb-1 mt-3">¿Facturas a clientes fuera de Alemania?</h3>
+        <p class="text-sm mb-5" style="color:#594139">Afecta al IVA y al Reverse Charge en facturas UE.</p>
+        <div class="space-y-2.5">
+          <label class="ob-option flex items-center gap-3 p-4 rounded-2xl cursor-pointer transition-all" style="border:1.5px solid rgba(164,55,0,0.15);background:#f4ede5">
+            <input type="radio" name="clientes_extranjero" value="true" class="accent-[#a43700]" /><p class="text-sm font-bold text-[#1e1b17]">Sí, tengo clientes en el extranjero</p>
+          </label>
+          <label class="ob-option flex items-center gap-3 p-4 rounded-2xl cursor-pointer transition-all" style="border:1.5px solid rgba(164,55,0,0.15);background:#f4ede5">
+            <input type="radio" name="clientes_extranjero" value="false" class="accent-[#a43700]" /><p class="text-sm font-bold text-[#1e1b17]">No, solo clientes en Alemania</p>
+          </label>
+        </div>
+      </div>
+
+      <!-- STEP 5: tiene_steuernummer -->
+      <div class="ob-step hidden" data-step="5">
+        <h3 class="text-lg font-black text-[#1e1b17] mb-1 mt-3">¿Ya tienes tu Steuernummer?</h3>
+        <p class="text-sm mb-5" style="color:#594139">El número fiscal del Finanzamt, obligatorio para facturar.</p>
+        <div class="space-y-2.5">
+          <label class="ob-option flex items-center gap-3 p-4 rounded-2xl cursor-pointer transition-all" style="border:1.5px solid rgba(164,55,0,0.15);background:#f4ede5">
+            <input type="radio" name="tiene_steuernummer" value="true" class="accent-[#a43700]" /><p class="text-sm font-bold text-[#1e1b17]">Sí, ya la tengo</p>
+          </label>
+          <label class="ob-option flex items-center gap-3 p-4 rounded-2xl cursor-pointer transition-all" style="border:1.5px solid rgba(164,55,0,0.15);background:#f4ede5">
+            <input type="radio" name="tiene_steuernummer" value="false" class="accent-[#a43700]" /><p class="text-sm font-bold text-[#1e1b17]">No, aún la estoy esperando</p>
+          </label>
+        </div>
+      </div>
+
+      <!-- STEP 6: actividad -->
+      <div class="ob-step hidden" data-step="6">
+        <h3 class="text-lg font-black text-[#1e1b17] mb-1 mt-3">¿Cuál es tu actividad principal?</h3>
+        <p class="text-sm mb-5" style="color:#594139">Para personalizar las deducciones que Clara te sugiere.</p>
+        <div class="grid grid-cols-2 gap-2.5" id="ob-actividad">
+          <label class="ob-option text-center p-3.5 rounded-2xl cursor-pointer transition-all" style="border:1.5px solid rgba(164,55,0,0.15);background:#f4ede5">
+            <input type="radio" name="actividad" value="diseño" class="hidden" /><p class="text-sm font-bold text-[#1e1b17]">🎨 Diseño</p>
+          </label>
+          <label class="ob-option text-center p-3.5 rounded-2xl cursor-pointer transition-all" style="border:1.5px solid rgba(164,55,0,0.15);background:#f4ede5">
+            <input type="radio" name="actividad" value="desarrollo" class="hidden" /><p class="text-sm font-bold text-[#1e1b17]">💻 Desarrollo</p>
+          </label>
+          <label class="ob-option text-center p-3.5 rounded-2xl cursor-pointer transition-all" style="border:1.5px solid rgba(164,55,0,0.15);background:#f4ede5">
+            <input type="radio" name="actividad" value="marketing" class="hidden" /><p class="text-sm font-bold text-[#1e1b17]">📣 Marketing</p>
+          </label>
+          <label class="ob-option text-center p-3.5 rounded-2xl cursor-pointer transition-all" style="border:1.5px solid rgba(164,55,0,0.15);background:#f4ede5">
+            <input type="radio" name="actividad" value="consultoría" class="hidden" /><p class="text-sm font-bold text-[#1e1b17]">📊 Consultoría</p>
+          </label>
+          <label class="ob-option text-center p-3.5 rounded-2xl cursor-pointer transition-all" style="border:1.5px solid rgba(164,55,0,0.15);background:#f4ede5">
+            <input type="radio" name="actividad" value="traducción" class="hidden" /><p class="text-sm font-bold text-[#1e1b17]">🌐 Traducción</p>
+          </label>
+          <label class="ob-option text-center p-3.5 rounded-2xl cursor-pointer transition-all" style="border:1.5px solid rgba(164,55,0,0.15);background:#f4ede5">
+            <input type="radio" name="actividad" value="otra" class="hidden" /><p class="text-sm font-bold text-[#1e1b17]">✏️ Otra</p>
+          </label>
+        </div>
+      </div>
+
+      <!-- STEP 7: is_kleinunternehmer -->
+      <div class="ob-step hidden" data-step="7">
+        <h3 class="text-lg font-black text-[#1e1b17] mb-1 mt-3">¿Eres Kleinunternehmer/in?</h3>
+        <p class="text-sm mb-5" style="color:#594139">§19 UStG — ingresos &lt; €25.000/año, sin IVA en facturas.</p>
+        <div class="space-y-2.5">
+          <label class="ob-option flex items-center gap-3 p-4 rounded-2xl cursor-pointer transition-all" style="border:1.5px solid rgba(164,55,0,0.15);background:#f4ede5">
+            <input type="radio" name="is_kleinunternehmer" value="true" class="accent-[#a43700]" /><p class="text-sm font-bold text-[#1e1b17]">Sí, soy Kleinunternehmer/in</p>
+          </label>
+          <label class="ob-option flex items-center gap-3 p-4 rounded-2xl cursor-pointer transition-all" style="border:1.5px solid rgba(164,55,0,0.15);background:#f4ede5">
+            <input type="radio" name="is_kleinunternehmer" value="false" class="accent-[#a43700]" /><p class="text-sm font-bold text-[#1e1b17]">No, presento UStVA trimestral</p>
+          </label>
+          <label class="ob-option flex items-center gap-3 p-4 rounded-2xl cursor-pointer transition-all" style="border:1.5px solid rgba(164,55,0,0.15);background:#f4ede5">
+            <input type="radio" name="is_kleinunternehmer" value="nosé" class="accent-[#a43700]" /><p class="text-sm font-bold text-[#1e1b17]">No lo sé — Clara me ayudará</p>
+          </label>
+        </div>
+      </div>
+
+      <!-- Botones nav -->
+      <div class="flex items-center justify-between mt-6">
+        <button id="ob-back" onclick="obBack()" class="hidden text-sm font-semibold px-4 py-2.5 rounded-xl transition-all hover:bg-[#a43700]/5" style="color:#594139">
+          ← Atrás
+        </button>
+        <div id="ob-back-placeholder" class="w-24"></div>
+        <button id="ob-next" onclick="obNext()" disabled
+          class="text-sm font-bold px-5 py-2.5 rounded-xl text-white transition-all hover:opacity-90 active:scale-95 disabled:opacity-40"
+          style="background:#a43700;box-shadow:0 2px 10px rgba(164,55,0,.25)">
+          Continuar →
+        </button>
+      </div>
+
+    </div><!-- /ob-steps -->
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════
      SIDEBAR
 ════════════════════════════════════════════════════════════════════ -->
 <aside class="hidden md:flex flex-col w-64 h-screen flex-shrink-0 bg-[#fff8f1] z-40" style="border-right:1px solid rgba(164,55,0,0.08)">
@@ -924,12 +1102,21 @@ function _renderChart(invoices, expenses) {
     dateEl.textContent = s.charAt(0).toUpperCase() + s.slice(1);
   }
 
-  // Dynamic greeting (use email prefix until profile loads)
+  // Greeting: read from profiles table, fallback to email prefix
   const greetEl = document.getElementById('topbar-greeting');
-  if (greetEl) {
-    const raw = session.user.user_metadata?.full_name || session.user.email.split('@')[0];
-    greetEl.textContent = `¡Hola, ${raw.split(' ')[0]}! 👋`;
-  }
+  (async () => {
+    try {
+      const { data: prof } = await _sb.from('profiles').select('full_name').eq('id', uid).maybeSingle();
+      const raw = prof?.full_name || session.user.user_metadata?.full_name || session.user.email.split('@')[0];
+      if (greetEl) greetEl.textContent = `¡Hola, ${raw.split(' ')[0]}! 👋`;
+    } catch (_) {
+      const raw = session.user.user_metadata?.full_name || session.user.email.split('@')[0];
+      if (greetEl) greetEl.textContent = `¡Hola, ${raw.split(' ')[0]}! 👋`;
+    }
+  })();
+
+  // Check onboarding (show overlay if no fiscal_profiles row)
+  if (typeof _obInit === 'function') _obInit(uid);
 
   // Dynamic deadlines
   _deadlinePill('dl-q1',     '2026-04-10');
@@ -1285,6 +1472,122 @@ async function loadActionCenter(uid, inv, exp) {
       }
     });
   })();
+</script>
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     ONBOARDING JS
+════════════════════════════════════════════════════════════════════ -->
+<script>
+(function () {
+  var TOTAL = 7;
+  var current = 1;
+  var answers = {};
+
+  // ── Option click → select + style ───────────────────────────────
+  document.querySelectorAll('.ob-option').forEach(function (lbl) {
+    lbl.addEventListener('click', function () {
+      var radio = lbl.querySelector('input[type="radio"]');
+      if (!radio) return;
+      var name = radio.name;
+      // Deselect siblings
+      document.querySelectorAll('input[name="' + name + '"]').forEach(function (r) {
+        r.closest('.ob-option').style.borderColor = 'rgba(164,55,0,0.15)';
+        r.closest('.ob-option').style.background  = '#f4ede5';
+      });
+      // Select this
+      radio.checked = true;
+      lbl.style.borderColor = '#a43700';
+      lbl.style.background  = 'rgba(164,55,0,0.07)';
+      answers[name] = radio.value;
+      // Enable next button
+      document.getElementById('ob-next').disabled = false;
+    });
+  });
+
+  // ── Step navigation ──────────────────────────────────────────────
+  window.obNext = async function () {
+    if (current === TOTAL) {
+      await obSave();
+      return;
+    }
+    // Validate current step has answer
+    var stepFields = { 1:'tipo_autonomo', 2:'inicio_actividad', 3:'ingresos_anuales', 4:'clientes_extranjero', 5:'tiene_steuernummer', 6:'actividad', 7:'is_kleinunternehmer' };
+    if (!answers[stepFields[current]]) return;
+
+    showStep(current + 1);
+  };
+
+  window.obBack = function () {
+    if (current > 1) showStep(current - 1);
+  };
+
+  function showStep(n) {
+    document.querySelectorAll('.ob-step').forEach(function (s) { s.classList.add('hidden'); });
+    document.querySelector('[data-step="' + n + '"]').classList.remove('hidden');
+    current = n;
+
+    // Progress bar
+    document.getElementById('ob-progress').style.width = Math.round((n / TOTAL) * 100) + '%';
+    document.getElementById('ob-step-counter').textContent = n + ' de ' + TOTAL;
+
+    // Back button
+    var backBtn = document.getElementById('ob-back');
+    var backPh  = document.getElementById('ob-back-placeholder');
+    if (n > 1) { backBtn.classList.remove('hidden'); backPh.classList.add('hidden'); }
+    else       { backBtn.classList.add('hidden');    backPh.classList.remove('hidden'); }
+
+    // Next button label
+    var nextBtn = document.getElementById('ob-next');
+    nextBtn.textContent = n === TOTAL ? 'Finalizar ✓' : 'Continuar →';
+
+    // Re-enable next if already answered
+    var fieldNames = { 1:'tipo_autonomo', 2:'inicio_actividad', 3:'ingresos_anuales', 4:'clientes_extranjero', 5:'tiene_steuernummer', 6:'actividad', 7:'is_kleinunternehmer' };
+    nextBtn.disabled = !answers[fieldNames[n]];
+  }
+
+  // ── Save to Supabase ─────────────────────────────────────────────
+  async function obSave() {
+    var nextBtn = document.getElementById('ob-next');
+    nextBtn.disabled = true;
+    nextBtn.textContent = 'Guardando…';
+
+    try {
+      var s = await _sb.auth.getSession();
+      var uid = s.data.session.user.id;
+
+      var payload = {
+        user_id:             uid,
+        tipo_autonomo:       answers.tipo_autonomo       || null,
+        inicio_actividad:    answers.inicio_actividad    || null,
+        ingresos_anuales:    answers.ingresos_anuales    || null,
+        clientes_extranjero: answers.clientes_extranjero === 'true',
+        tiene_steuernummer:  answers.tiene_steuernummer  === 'true',
+        actividad:           answers.actividad           || null,
+        is_kleinunternehmer: answers.is_kleinunternehmer === 'true',
+        updated_at:          new Date().toISOString(),
+      };
+
+      var { error } = await _sb.from('fiscal_profiles').upsert(payload, { onConflict: 'user_id' });
+      if (error) throw error;
+
+      // Hide overlay
+      document.getElementById('onboarding-overlay').classList.add('hidden');
+    } catch (e) {
+      nextBtn.disabled = false;
+      nextBtn.textContent = 'Reintentar';
+      console.error('onboarding save error:', e.message);
+    }
+  }
+
+  // ── Check on load: show overlay only if no fiscal_profiles row ───
+  window._obInit = async function (uid) {
+    var { data } = await _sb.from('fiscal_profiles').select('user_id').eq('user_id', uid).maybeSingle();
+    if (!data) {
+      document.getElementById('onboarding-overlay').classList.remove('hidden');
+      document.getElementById('onboarding-overlay').classList.add('flex');
+    }
+  };
+})();
 </script>
 </body>
 </html>
