@@ -395,8 +395,8 @@
           <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
           <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
         </svg>
-        <span class="absolute top-1.5 right-1.5 w-2 h-2 rounded-full border-2 border-[#fff8f1]"
-              style="background:#a43700"></span>
+        <span id="bell-dot" class="absolute top-1.5 right-1.5 w-2 h-2 rounded-full border-2 border-[#fff8f1]"
+              style="background:#a43700;display:none"></span>
       </button>
 
       <!-- Diagnóstico fiscal CTA -->
@@ -431,7 +431,7 @@
           </div>
         </div>
         <p id="stat-ingresos" data-stat="ingresos" class="text-2xl font-black text-[#1e1b17] leading-none">—</p>
-        <p class="text-xs font-semibold mt-2 text-green-600">+12% vs Q3</p>
+        <p id="stat-mes" class="text-xs font-semibold mt-2" style="color:#594139"></p>
       </div>
 
       <!-- 2. Gastos 2026 -->
@@ -482,7 +482,7 @@
           </div>
         </div>
         <p id="stat-iva" data-stat="iva" class="text-2xl font-black text-[#1e1b17] leading-none">—</p>
-        <p class="text-xs font-semibold mt-2" style="color:#a43700">Vence en 85d</p>
+        <p id="stat-iva-vence" class="text-xs font-semibold mt-2" style="color:#a43700"></p>
       </div>
 
     </div><!-- /hero stats -->
@@ -657,58 +657,12 @@
 
         <div class="flex items-center justify-between mb-4">
           <h3 class="font-bold text-[#1e1b17] text-sm">Próximos pasos</h3>
-          <span class="text-[10px] font-bold px-2 py-0.5 rounded-lg"
-                style="background:rgba(164,55,0,.08);color:#a43700">4 tareas</span>
+          <span id="tasks-count-badge" class="text-[10px] font-bold px-2 py-0.5 rounded-lg"
+                style="background:rgba(164,55,0,.08);color:#a43700">—</span>
         </div>
 
-        <div class="space-y-1">
-
-          <!-- Step 1: DONE -->
-          <div class="flex items-start gap-3 px-3 py-3 rounded-xl"
-               style="background:rgba(34,197,94,.05)">
-            <!-- Check circle -->
-            <div class="step-dot mt-0.5 w-5 h-5 rounded-full flex-shrink-0 flex items-center justify-center"
-                 style="background:#22c55e">
-              <svg class="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
-                <polyline points="20 6 9 17 4 12"/>
-              </svg>
-            </div>
-            <div class="flex-1 min-w-0">
-              <p class="text-sm font-medium step-done">Registrar Steuernummer en Finanzamt Berlin</p>
-            </div>
-          </div>
-
-          <!-- Step 2: PENDING + HOY -->
-          <div class="flex items-start gap-3 px-3 py-3 rounded-xl hover:bg-[#a43700]/04 transition-colors">
-            <div class="mt-0.5 w-5 h-5 rounded-full flex-shrink-0 border-2 flex items-center justify-center"
-                 style="border-color:rgba(164,55,0,.3)"></div>
-            <div class="flex-1 min-w-0">
-              <p class="text-sm font-semibold text-[#1e1b17]">Subir facturas enero–marzo 2026</p>
-            </div>
-            <span class="flex-shrink-0 text-[9px] font-black px-2 py-0.5 rounded-lg"
-                  style="background:rgba(239,68,68,.12);color:#dc2626">HOY</span>
-          </div>
-
-          <!-- Step 3: PENDING -->
-          <div class="flex items-start gap-3 px-3 py-3 rounded-xl hover:bg-[#a43700]/04 transition-colors">
-            <div class="mt-0.5 w-5 h-5 rounded-full flex-shrink-0 border-2 flex items-center justify-center"
-                 style="border-color:rgba(164,55,0,.3)"></div>
-            <div class="flex-1 min-w-0">
-              <p class="text-sm font-semibold text-[#1e1b17]">Revisar gastos deducibles Q1</p>
-            </div>
-          </div>
-
-          <!-- Step 4: PENDING + HOY -->
-          <div class="flex items-start gap-3 px-3 py-3 rounded-xl hover:bg-[#a43700]/04 transition-colors">
-            <div class="mt-0.5 w-5 h-5 rounded-full flex-shrink-0 border-2 flex items-center justify-center"
-                 style="border-color:rgba(239,68,68,.5)"></div>
-            <div class="flex-1 min-w-0">
-              <p class="text-sm font-semibold text-[#1e1b17]">Preparar UStVA Q1 (vence 10 abril)</p>
-            </div>
-            <span class="flex-shrink-0 text-[9px] font-black px-2 py-0.5 rounded-lg"
-                  style="background:rgba(239,68,68,.12);color:#dc2626">HOY</span>
-          </div>
-
+        <div id="tasks-list" class="space-y-1">
+          <div class="py-4 text-center text-xs" style="color:rgba(89,65,57,.4)">Cargando tareas…</div>
         </div><!-- /steps -->
 
         <!-- Clara prompt row -->
@@ -1078,8 +1032,9 @@ function _renderChart(invoices, expenses) {
       <span class="text-[10px] font-semibold" data-bar-label style="color:rgba(89,65,57,.5)">${MONTHS_SHORT[m]}</span>
     </div>`;
     totalsHtml += `<div class="text-center">
-      <p class="text-xs font-bold" style="color:${isNow ? '#a43700' : '#1e1b17'}">${fmt(ing[m])}</p>
-      <p class="text-[10px]" style="color:#594139">${MONTHS_FULL[m]}</p>
+      <p class="text-xs font-bold" style="color:${isNow ? '#a43700' : '#1e1b17'}">Ingresos: ${fmt(ing[m])}</p>
+      <p class="text-xs" style="color:#594139">Gastos: ${fmt(gas[m])}</p>
+      <p class="text-[10px]" style="color:rgba(89,65,57,.45)">${MONTHS_FULL[m]}</p>
     </div>`;
   }
   barsEl.innerHTML = barsHtml;
@@ -1102,31 +1057,10 @@ function _renderChart(invoices, expenses) {
     dateEl.textContent = s.charAt(0).toUpperCase() + s.slice(1);
   }
 
-  // Greeting + sidebar user chip — read from profiles table, fallback to email prefix
+  // Greeting — fast from session metadata; auth.js handles sidebar chip via profiles fetch
   const greetEl = document.getElementById('topbar-greeting');
-  (async () => {
-    try {
-      const { data: prof } = await _sb.from('profiles').select('full_name').eq('id', uid).maybeSingle();
-      const raw = prof?.full_name || session.user.user_metadata?.full_name || session.user.email.split('@')[0];
-      if (greetEl) greetEl.textContent = `¡Hola, ${raw.split(' ')[0]}! 👋`;
-      const nameEl = document.querySelector('[data-user-name]');
-      const initEl = document.querySelector('[data-user-initials]');
-      if (nameEl) nameEl.textContent = raw;
-      if (initEl) {
-        const parts = raw.trim().split(/\s+/);
-        initEl.textContent = parts.length > 1
-          ? (parts[0][0] + parts[1][0]).toUpperCase()
-          : raw.slice(0, 2).toUpperCase();
-      }
-    } catch (_) {
-      const raw = session.user.user_metadata?.full_name || session.user.email.split('@')[0];
-      if (greetEl) greetEl.textContent = `¡Hola, ${raw.split(' ')[0]}! 👋`;
-      const nameEl = document.querySelector('[data-user-name]');
-      const initEl = document.querySelector('[data-user-initials]');
-      if (nameEl) nameEl.textContent = raw;
-      if (initEl) initEl.textContent = raw.slice(0, 2).toUpperCase();
-    }
-  })();
+  const _rawName = session.user.user_metadata?.full_name || session.user.email.split('@')[0];
+  if (greetEl) greetEl.textContent = `¡Hola, ${_rawName.split(' ')[0]}! 👋`;
 
   // Check onboarding (show overlay if no fiscal_profiles row)
   if (typeof _obInit === 'function') _obInit(uid);
@@ -1135,6 +1069,26 @@ function _renderChart(invoices, expenses) {
   _deadlinePill('dl-q1',     '2026-04-10');
   _deadlinePill('dl-q2',     '2026-07-10');
   _deadlinePill('dl-income', '2026-07-31');
+
+  // stat-mes: current month + year on Ingresos card
+  const _statMesEl = document.getElementById('stat-mes');
+  if (_statMesEl) {
+    const _mn = new Date().toLocaleDateString('es-ES', { month: 'long', year: 'numeric' });
+    _statMesEl.textContent = _mn.charAt(0).toUpperCase() + _mn.slice(1);
+  }
+
+  // stat-iva-vence: next UStVA deadline; hidden for Kleinunternehmer
+  const _ivaVenceEl = document.getElementById('stat-iva-vence');
+  if (_ivaVenceEl) {
+    const { data: _fp } = await _sb.from('fiscal_profiles').select('is_kleinunternehmer').eq('user_id', uid).maybeSingle();
+    if (_fp?.is_kleinunternehmer) {
+      _ivaVenceEl.style.display = 'none';
+    } else {
+      const _n = new Date(), _y = _n.getFullYear();
+      const _next = [new Date(_y,3,10),new Date(_y,6,10),new Date(_y,9,10),new Date(_y+1,0,10)].find(d => d > _n);
+      if (_next) _ivaVenceEl.textContent = `Vence en ${Math.round((_next-_n)/86400000)}d`;
+    }
+  }
 
   const fmt = n => '€' + Math.round(n).toLocaleString('de-DE');
 
@@ -1179,6 +1133,8 @@ function _renderChart(invoices, expenses) {
   // Action Center + Clara recommendations
   loadActionCenter(uid, inv, exp);
   checkDeadlineNotifications(uid);
+  await loadTasks(uid);
+  await updateVencimientos(uid);
 })();
 
 // ── DEADLINE NOTIFICATIONS ────────────────────────────────────────
@@ -1422,6 +1378,78 @@ async function loadActionCenter(uid, inv, exp) {
       </div>`).join('');
     if (recsSection) recsSection.classList.remove('hidden');
   }
+}
+
+// ── TASKS (Próximos pasos) ────────────────────────────────────────
+async function loadTasks(uid) {
+  const container = document.getElementById('tasks-list');
+  const badge     = document.getElementById('tasks-count-badge');
+  if (!container) return;
+
+  const { data } = await _sb.from('tasks')
+    .select('id, title, priority, status, due_date')
+    .eq('user_id', uid)
+    .neq('status', 'completed')
+    .order('priority', { ascending: true })
+    .order('due_date',  { ascending: true, nullsFirst: false });
+
+  const list = data || [];
+  if (badge) badge.textContent = list.length + (list.length === 1 ? ' tarea' : ' tareas');
+
+  if (list.length === 0) {
+    container.innerHTML = `
+      <div class="flex items-start gap-3 px-3 py-3 rounded-xl" style="background:rgba(34,197,94,.05)">
+        <div class="mt-0.5 w-5 h-5 rounded-full flex-shrink-0 flex items-center justify-center" style="background:#22c55e">
+          <svg class="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+        <p class="text-sm font-medium" style="text-decoration:line-through;color:#9e8880">Crear cuenta en Klaro</p>
+      </div>
+      <div class="px-3 py-5 text-center">
+        <p class="text-sm font-medium" style="color:#9e8880">Clara te asignará tareas cuando completes el diagnóstico.</p>
+        <a href="klaro-clara.html" class="text-xs font-bold mt-2 inline-block" style="color:#a43700">Hablar con Clara →</a>
+      </div>`;
+    return;
+  }
+
+  const DOT = { red:'rgba(239,68,68,.5)', amber:'rgba(217,119,6,.4)', green:'rgba(5,150,105,.3)' };
+  const today = new Date(); today.setHours(0,0,0,0);
+
+  container.innerHTML = list.slice(0, 5).map(t => {
+    const dotColor = DOT[t.priority] || DOT.amber;
+    let duePill = '';
+    if (t.due_date) {
+      const diff = Math.round((new Date(t.due_date) - today) / 86400000);
+      if (diff === 0)   duePill = `<span class="flex-shrink-0 text-[9px] font-black px-2 py-0.5 rounded-lg" style="background:rgba(239,68,68,.12);color:#dc2626">HOY</span>`;
+      else if (diff < 0) duePill = `<span class="flex-shrink-0 text-[9px] font-black px-2 py-0.5 rounded-lg" style="background:rgba(239,68,68,.12);color:#dc2626">VENCIDA</span>`;
+      else if (diff <= 7) duePill = `<span class="flex-shrink-0 text-[9px] font-black px-2 py-0.5 rounded-lg" style="background:rgba(255,184,48,.15);color:#b45309">${diff}d</span>`;
+    }
+    return `<div class="flex items-start gap-3 px-3 py-3 rounded-xl hover:bg-[#a43700]/04 transition-colors">
+      <div class="mt-0.5 w-5 h-5 rounded-full flex-shrink-0 border-2 flex items-center justify-center" style="border-color:${dotColor}"></div>
+      <p class="flex-1 text-sm font-semibold text-[#1e1b17]">${_esc(t.title)}</p>
+      ${duePill}
+    </div>`;
+  }).join('');
+}
+
+// ── VENCIMIENTOS — mark filed declarations ────────────────────────
+async function updateVencimientos(uid) {
+  let filed = [];
+  try {
+    const { data } = await _sb.from('tax_declarations')
+      .select('declaration_type, quarter, year, status')
+      .eq('user_id', uid).eq('status', 'filed');
+    filed = data || [];
+  } catch(e) { return; }
+
+  const y = new Date().getFullYear();
+  const markFiled = id => {
+    const el = document.getElementById(id);
+    if (el) { el.textContent = 'Presentada'; el.style.cssText = 'background:rgba(34,197,94,.12);color:#15803d'; }
+  };
+
+  if (filed.some(f => f.declaration_type === 'ustVA' && f.quarter === 1 && f.year === y)) markFiled('dl-q1');
+  if (filed.some(f => f.declaration_type === 'ustVA' && f.quarter === 2 && f.year === y)) markFiled('dl-q2');
+  if (filed.some(f => f.declaration_type === 'einkommensteuer' && f.year === y - 1)) markFiled('dl-income');
 }
 </script>
 
