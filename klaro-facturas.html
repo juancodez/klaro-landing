@@ -619,25 +619,31 @@
 
   /* ─── Load invoices on page start ─── */
   async function loadInvoices() {
-    const { data: { user } } = await sb.auth.getUser();
-    if (!user) {
+    try {
+      const { data: { user } } = await sb.auth.getUser();
+      if (!user) {
+        document.getElementById('inv-loading').classList.add('hidden');
+        document.getElementById('inv-empty').classList.remove('hidden');
+        return;
+      }
+
+      const { data, error } = await sb.from('invoices')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('date', { ascending: false });
+
+      document.getElementById('inv-loading').classList.add('hidden');
+
+      if (error) { console.error(error); return; }
+
+      allInvoices = data || [];
+      renderInvoiceList();
+      updateRevenueTotal();
+    } catch (e) {
+      console.error('loadInvoices:', e);
       document.getElementById('inv-loading').classList.add('hidden');
       document.getElementById('inv-empty').classList.remove('hidden');
-      return;
     }
-
-    const { data, error } = await sb.from('invoices')
-      .select('*')
-      .eq('user_id', user.id)
-      .order('date', { ascending: false });
-
-    document.getElementById('inv-loading').classList.add('hidden');
-
-    if (error) { console.error(error); return; }
-
-    allInvoices = data || [];
-    renderInvoiceList();
-    updateRevenueTotal();
   }
 
   function renderInvoiceList() {
@@ -746,21 +752,27 @@
   /* ─── Auto-generate invoice number ─── */
   async function generateInvoiceNumber() {
     const year = new Date().getFullYear();
-    const { data: { user } } = await sb.auth.getUser();
-    if (!user) return 'KL-' + year + '-001';
+    try {
+      const { data: { user } } = await sb.auth.getUser();
+      if (!user) return 'KL-' + year + '-001';
 
-    const { count } = await sb.from('invoices')
-      .select('id', { count: 'exact', head: true })
-      .eq('user_id', user.id);
+      const { count } = await sb.from('invoices')
+        .select('id', { count: 'exact', head: true })
+        .eq('user_id', user.id);
 
-    const num = ((count || 0) + 1).toString().padStart(3, '0');
-    return 'KL-' + year + '-' + num;
+      const num = ((count || 0) + 1).toString().padStart(3, '0');
+      return 'KL-' + year + '-' + num;
+    } catch (e) {
+      return 'KL-' + year + '-001';
+    }
   }
 
   async function initInvoiceNumber() {
-    const num = await generateInvoiceNumber();
-    document.getElementById('inv-number').value = num;
-    updatePreview();
+    try {
+      const num = await generateInvoiceNumber();
+      document.getElementById('inv-number').value = num;
+      updatePreview();
+    } catch (e) { /* non-critical */ }
   }
 
   /* ─── Save to Supabase ─── */
@@ -772,7 +784,13 @@
     if (!client) { showToast('Añade el nombre del cliente antes de guardar.', 'error'); return false; }
     if (!amount || isNaN(amount) || amount <= 0) { showToast('Añade un importe válido.', 'error'); return false; }
 
-    const { data: { user } } = await sb.auth.getUser();
+    let user;
+    try {
+      const { data } = await sb.auth.getUser();
+      user = data?.user;
+    } catch (e) {
+      showToast('Error de conexión. Comprueba tu red.', 'error'); return false;
+    }
     if (!user) { showToast('Sesión expirada. Por favor, inicia sesión de nuevo.', 'error'); return false; }
 
     const taxRate = ivaRate === 'rc' ? 0 : Math.round((ivaRate || 0) * 100);

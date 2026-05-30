@@ -1,3 +1,5 @@
+const { createClient } = require('@supabase/supabase-js');
+
 const SYSTEM = `Eres Clara, la asesora fiscal inteligente de Klaro. Tu único propósito es ayudar a freelancers y autónomos hispanohablantes que trabajan en Alemania con sus obligaciones fiscales alemanas.
 
 DOMINIO — solo respondes sobre impuestos alemanes para autónomos:
@@ -45,20 +47,41 @@ module.exports = async function handler(req, res) {
   const apiKey = process.env.ANTHROPIC_API_KEY || req.headers['x-api-key'];
   if (!apiKey) return res.status(401).json({ needsKey: true });
 
-  const { messages, userProfile } = req.body || {};
+  const { messages, userProfile, userId } = req.body || {};
   if (!Array.isArray(messages) || messages.length === 0) {
     return res.status(400).json({ error: 'messages array required' });
   }
 
-  // Inject user profile context into system prompt when available
+  // Fix 1: fetch full fiscal profile from Supabase using service role key
+  let fullProfile = userProfile || null;
+  if (userId && process.env.SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY) {
+    try {
+      const sb = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY);
+      const [{ data: prof }, { data: fp }] = await Promise.all([
+        sb.from('profiles').select('full_name, city, tax_number').eq('id', userId).maybeSingle(),
+        sb.from('fiscal_profiles').select('tipo_autonomo, is_kleinunternehmer, ingresos_anuales, clientes_extranjero, actividad, tiene_steuernummer').eq('user_id', userId).maybeSingle(),
+      ]);
+      fullProfile = { ...(prof || {}), ...(fp || {}) };
+    } catch (e) { /* non-critical — fall back to frontend-provided profile */ }
+  }
+
+  // Inject profile context into system prompt
   let systemPrompt = SYSTEM;
-  if (userProfile) {
+  const p = fullProfile;
+  if (p && Object.keys(p).length > 0) {
     const ctx = [];
-    if (userProfile.full_name) ctx.push(`• Nombre: ${userProfile.full_name}`);
-    if (userProfile.city)      ctx.push(`• Ciudad: ${userProfile.city}`);
-    if (userProfile.tax_number) ctx.push(`• Steuernummer: registrada`);
-    else                        ctx.push(`• Steuernummer: aún no registrada`);
-    systemPrompt += `\n\nPERFIL DEL USUARIO (personaliza la respuesta cuando sea relevante):\n${ctx.join('\n')}`;
+    if (p.full_name)            ctx.push(`• Nombre: ${p.full_name}`);
+    if (p.city)                 ctx.push(`• Ciudad: ${p.city}`);
+    if (p.tipo_autonomo)        ctx.push(`• Tipo: ${p.tipo_autonomo}`);
+    if (p.actividad)            ctx.push(`• Actividad: ${p.actividad}`);
+    if (p.ingresos_anuales)     ctx.push(`• Ingresos anuales estimados: ${p.ingresos_anuales} €`);
+    if (p.is_kleinunternehmer != null) ctx.push(`• Kleinunternehmer: ${p.is_kleinunternehmer ? 'sí' : 'no'}`);
+    if (p.clientes_extranjero != null) ctx.push(`• Clientes en el extranjero: ${p.clientes_extranjero ? 'sí' : 'no'}`);
+    const hasTax = p.tax_number || p.tiene_steuernummer;
+    ctx.push(`• Steuernummer: ${hasTax ? 'registrada' : 'aún no registrada'}`);
+    if (ctx.length > 0) {
+      systemPrompt += `\n\nPERFIL DEL USUARIO (personaliza la respuesta cuando sea relevante):\n${ctx.join('\n')}`;
+    }
   }
 
   try {
@@ -83,6 +106,18 @@ module.exports = async function handler(req, res) {
     }
 
     const data = await upstream.json();
+    const replyText = data.content[0]?.text;
+
+    // Fix 2: persist conversation to chat_messages (non-blocking)
+    if (userId && replyText && process.env.SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY) {
+      const lastUserMsg = messages[messages.length - 1]?.content;
+      const sb = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY);
+      sb.from('chat_messages').insert([
+        { user_id: userId, role: 'user',      content: lastUserMsg },
+        { user_id: userId, role: 'assistant', content: replyText },
+      ]).then(({ error }) => { if (error) console.error('chat_messages insert:', error.message); });
+    }
+
     return res.status(200).json({ content: data.content[0] });
   } catch (err) {
     return res.status(500).json({ error: err.message });

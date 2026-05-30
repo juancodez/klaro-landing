@@ -638,7 +638,7 @@
         const res  = await fetch(API_URL, {
           method: 'POST',
           headers,
-          body: JSON.stringify({ messages: chatHistory, userProfile }),
+          body: JSON.stringify({ messages: chatHistory, userProfile, userId: currentUserId }),
         });
         const data = await res.json();
 
@@ -657,7 +657,6 @@
           const sugs      = extractSuggestions(rawText);
           chatHistory.push({ role: 'assistant', content: rawText });
           appendClara(rawText, sugs);
-          savePair(text, rawText);
         } else {
           appendClara('Ups, algo salió mal. Inténtalo de nuevo.');
         }
@@ -702,11 +701,6 @@
     c.innerHTML = '';
     appendClara('Chat reiniciado. ¡Hola de nuevo! ¿En qué puedo ayudarte con tus impuestos en Alemania?', ['¿Qué es la UStVA?','¿Cuándo vence el IVA?','¿Puedo deducir home office?']);
   }
-
-  // Close modal on backdrop click
-  document.getElementById('key-modal').addEventListener('click', function(e) {
-    if (e.target === this) closeKeyModal();
-  });
 
   // ── Init ──────────────────────────────────────────────────────────────
   document.getElementById('chat-input').focus();
