@@ -1102,16 +1102,29 @@ function _renderChart(invoices, expenses) {
     dateEl.textContent = s.charAt(0).toUpperCase() + s.slice(1);
   }
 
-  // Greeting: read from profiles table, fallback to email prefix
+  // Greeting + sidebar user chip — read from profiles table, fallback to email prefix
   const greetEl = document.getElementById('topbar-greeting');
   (async () => {
     try {
       const { data: prof } = await _sb.from('profiles').select('full_name').eq('id', uid).maybeSingle();
       const raw = prof?.full_name || session.user.user_metadata?.full_name || session.user.email.split('@')[0];
       if (greetEl) greetEl.textContent = `¡Hola, ${raw.split(' ')[0]}! 👋`;
+      const nameEl = document.querySelector('[data-user-name]');
+      const initEl = document.querySelector('[data-user-initials]');
+      if (nameEl) nameEl.textContent = raw;
+      if (initEl) {
+        const parts = raw.trim().split(/\s+/);
+        initEl.textContent = parts.length > 1
+          ? (parts[0][0] + parts[1][0]).toUpperCase()
+          : raw.slice(0, 2).toUpperCase();
+      }
     } catch (_) {
       const raw = session.user.user_metadata?.full_name || session.user.email.split('@')[0];
       if (greetEl) greetEl.textContent = `¡Hola, ${raw.split(' ')[0]}! 👋`;
+      const nameEl = document.querySelector('[data-user-name]');
+      const initEl = document.querySelector('[data-user-initials]');
+      if (nameEl) nameEl.textContent = raw;
+      if (initEl) initEl.textContent = raw.slice(0, 2).toUpperCase();
     }
   })();
 
