@@ -291,7 +291,7 @@
           <!-- Q1 IVA breakdown (populated by loadTaxData) -->
           <div class="flex gap-4 mb-4 text-xs" style="color:#594139">
             <span>IVA facturado: <span class="font-bold text-[#1e1b17]" id="iva-facturado-prev">—</span></span>
-            <span>Vorsteuer: <span class="font-bold" style="color:#D97706" id="vorsteuer-prev">− €188,10</span></span>
+            <span>Vorsteuer: <span class="font-bold" style="color:#D97706" id="vorsteuer-prev">—</span></span>
           </div>
           <!-- Alert bar -->
           <div class="flex items-center gap-2 p-3 rounded-xl mb-4 text-xs font-medium" style="background:#FEF2F2;border:1px solid rgba(220,38,38,.15);color:#991B1B">
@@ -630,7 +630,7 @@
             </div>
           </div>
           <p class="text-sm leading-relaxed mb-4" style="color:#594139">
-            Klaro ha detectado <span class="font-bold text-[#1e1b17]">€990 en gastos deducibles</span> (Betriebsausgaben) este trimestre: software, equipos y gastos de home office. Aplicar estas deducciones puede reducir tu base imponible en el Einkommensteuer 2026.
+            — hasta que haya datos reales
           </p>
           <div class="flex flex-wrap gap-2">
             <span class="flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-full" style="background:#F0FDF4;color:#059669;border:1px solid rgba(5,150,105,.2)">
@@ -656,13 +656,13 @@
             <!-- Base ingresos -->
             <div class="flex justify-between items-center py-2" style="border-bottom:1px solid rgba(164,55,0,0.06)">
               <span class="text-[11px] font-medium" style="color:#594139">Base ingresos</span>
-              <span class="text-xs font-semibold text-[#1e1b17]" id="base-ingresos-current">€6.602,63</span>
+              <span class="text-xs font-semibold text-[#1e1b17]" id="base-ingresos-current">—</span>
             </div>
 
             <!-- Base gastos -->
             <div class="flex justify-between items-center py-2" style="border-bottom:1px solid rgba(164,55,0,0.06)">
               <span class="text-[11px] font-medium" style="color:#594139">Base gastos</span>
-              <span class="text-xs font-semibold text-[#1e1b17]" id="base-gastos-current">€990,00</span>
+              <span class="text-xs font-semibold text-[#1e1b17]" id="base-gastos-current">—</span>
             </div>
 
             <!-- IVA cobrado -->
@@ -680,31 +680,31 @@
                 <div class="w-2 h-2 rounded-full" style="background:#D97706"></div>
                 <span class="text-xs font-medium" style="color:#594139">IVA pagado (Vorsteuer)</span>
               </div>
-              <span class="text-sm font-bold" style="color:#D97706" id="iva-resumen-vorsteuer">− €188,10</span>
+              <span class="text-sm font-bold" style="color:#D97706" id="iva-resumen-vorsteuer">—</span>
             </div>
 
             <!-- Net -->
             <div class="flex justify-between items-center pt-3 mt-0.5">
               <span class="text-xs font-bold text-[#1e1b17]">A pagar al Finanzamt</span>
-              <span class="text-base font-extrabold" style="color:#a43700" id="iva-resumen-neto">€1.066,40</span>
+              <span class="text-base font-extrabold" style="color:#a43700" id="iva-resumen-neto">—</span>
             </div>
 
             <!-- Mini bar chart -->
             <div class="mt-4 space-y-2">
               <div>
                 <div class="flex justify-between text-[10px] mb-1" style="color:#594139">
-                  <span>Umsatzsteuer</span><span class="font-semibold">100%</span>
+                  <span>Umsatzsteuer</span><span class="font-semibold" id="bar-umsatzsteuer-pct">—</span>
                 </div>
                 <div class="h-1.5 rounded-full overflow-hidden" style="background:rgba(164,55,0,0.1)">
-                  <div class="h-1.5 rounded-full" style="width:100%;background:#a43700"></div>
+                  <div class="h-1.5 rounded-full" id="bar-umsatzsteuer" style="width:0%;background:#a43700"></div>
                 </div>
               </div>
               <div>
                 <div class="flex justify-between text-[10px] mb-1" style="color:#594139">
-                  <span>Vorsteuer</span><span class="font-semibold">15%</span>
+                  <span>Vorsteuer</span><span class="font-semibold" id="bar-vorsteuer-pct">—</span>
                 </div>
                 <div class="h-1.5 rounded-full overflow-hidden" style="background:rgba(164,55,0,0.1)">
-                  <div class="h-1.5 rounded-full" style="width:15%;background:#D97706"></div>
+                  <div class="h-1.5 rounded-full" id="bar-vorsteuer" style="width:0%;background:#D97706"></div>
                 </div>
               </div>
             </div>

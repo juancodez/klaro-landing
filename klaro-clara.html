@@ -162,11 +162,6 @@
       </div>
     </div>
     <div class="flex items-center gap-3">
-      <!-- API key button -->
-      <button onclick="openKeyModal()" title="Configurar API key" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all hover:bg-[#a43700]/8" style="color:#594139;border:1px solid rgba(164,55,0,0.15)">
-        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-        API Key
-      </button>
       <!-- Bell -->
       <button class="relative w-9 h-9 rounded-xl flex items-center justify-center transition-colors hover:bg-[#a43700]/5" style="color:#594139">
         <svg class="w-[17px] h-[17px]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
@@ -381,19 +376,6 @@
   </div>
 </div>
 
-<!-- ─── API KEY MODAL ─────────────────────────────────────────────── -->
-<div id="key-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center" style="background:rgba(0,0,0,.5)">
-  <div class="bg-white rounded-2xl p-6 w-full max-w-sm shadow-2xl" style="border:1px solid rgba(0,0,0,.08)">
-    <h3 class="font-bold text-[#1e1b17] text-base mb-1">Configurar API Key</h3>
-    <p class="text-sm mb-4" style="color:#594139">Añade tu Anthropic API key para activar la IA real de Clara. Se guarda solo en tu navegador.</p>
-    <input id="modal-key-input" type="password" placeholder="sk-ant-api03-..." class="w-full rounded-xl px-4 py-3 text-sm outline-none mb-3" style="background:#f4ede5;border:1px solid rgba(164,55,0,0.2);color:#1e1b17" />
-    <div class="flex gap-2">
-      <button onclick="closeKeyModal()" class="flex-1 py-2.5 rounded-xl text-sm font-semibold transition-all" style="background:#f4ede5;color:#594139">Cancelar</button>
-      <button onclick="saveModalKey()" class="flex-1 py-2.5 rounded-xl text-sm font-bold text-white transition-all active:scale-95" style="background:#a43700">Guardar</button>
-    </div>
-    <a href="https://console.anthropic.com/settings/keys" target="_blank" class="block text-center text-xs mt-3 font-medium" style="color:#a43700;text-decoration:underline">Obtener API key en Anthropic Console →</a>
-  </div>
-</div>
 
 <!-- ─── SCRIPT ────────────────────────────────────────────────────── -->
 <script>
