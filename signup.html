@@ -10,6 +10,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="auth.js"></script>
   <script>
     tailwind.config = {
       theme: {
@@ -152,16 +153,6 @@
   </div>
 
   <script>
-    const SUPABASE_URL      = 'https://rhyobhcgvrqobouqymqr.supabase.co';
-    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJoeW9iaGNndnJxb2JvdXF5bXFyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYzNjY0MDQsImV4cCI6MjA5MTk0MjQwNH0.Yc7wiTJ8_66uzqusGTU4dEele5B4C6ZCMlYNMf3w_3U';
-    const _sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-    // If already logged in, skip to dashboard
-    (async () => {
-      const { data: { session } } = await _sb.auth.getSession();
-      if (session) window.location.replace('klaro-dashboard.html');
-    })();
-
     function showError(msg) {
       const el = document.getElementById('error-banner');
       el.textContent = msg;
