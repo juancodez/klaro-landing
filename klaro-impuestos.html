@@ -389,29 +389,15 @@
           </button>
         </div>
 
-        <!-- Garantía Klaro -->
-        <div class="bento-card rounded-2xl p-5" style="background:linear-gradient(135deg,#f0fdf4,#dcfce7);border:1px solid rgba(5,150,105,.18)">
-          <div class="flex items-start gap-4">
-            <div class="w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0" style="background:linear-gradient(135deg,#059669,#10b981)">
-              <svg class="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-                <polyline points="9 12 11 14 15 10"/>
-              </svg>
-            </div>
+        <!-- Nota informativa -->
+        <div class="bento-card rounded-2xl p-5" style="background:rgba(164,55,0,0.04);border:1px solid rgba(164,55,0,0.1)">
+          <div class="flex items-start gap-3">
+            <svg class="w-5 h-5 flex-shrink-0 mt-0.5" style="color:#a43700" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+            </svg>
             <div>
-              <p class="text-sm font-bold text-[#1e1b17] mb-1">Garantía Klaro</p>
-              <p class="text-xs leading-relaxed" style="color:#594139">Cubrimos errores hasta <span class="font-bold text-[#059669]">10.000 €</span>. Conexión cifrada con ELSTER. Tus datos nunca se comparten con el Finanzamt sin tu aprobación explícita.</p>
-              <div class="flex flex-wrap gap-2 mt-3">
-                <span class="text-[10px] font-bold px-2.5 py-1 rounded-full" style="background:rgba(5,150,105,.12);color:#059669;border:1px solid rgba(5,150,105,.2)">
-                  SSL/TLS 256-bit
-                </span>
-                <span class="text-[10px] font-bold px-2.5 py-1 rounded-full" style="background:rgba(5,150,105,.12);color:#059669;border:1px solid rgba(5,150,105,.2)">
-                  ELSTER Certificado
-                </span>
-                <span class="text-[10px] font-bold px-2.5 py-1 rounded-full" style="background:rgba(5,150,105,.12);color:#059669;border:1px solid rgba(5,150,105,.2)">
-                  GDPR Compliant
-                </span>
-              </div>
+              <p class="text-sm font-bold text-[#1e1b17] mb-1">Orientación informativa</p>
+              <p class="text-xs leading-relaxed" style="color:#594139">Klaro es una herramienta de apoyo fiscal. Los cálculos son estimaciones basadas en tus datos — no reemplaza a un Steuerberater. Tus datos se protegen con cifrado SSL y nunca se envían automáticamente al Finanzamt.</p>
             </div>
           </div>
         </div>
@@ -845,7 +831,7 @@
   const _SUPA_URL = 'https://rhyobhcgvrqobouqymqr.supabase.co';
   const _SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJoeW9iaGNndnJxb2JvdXF5bXFyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYzNjY0MDQsImV4cCI6MjA5MTk0MjQwNH0.Yc7wiTJ8_66uzqusGTU4dEele5B4C6ZCMlYNMf3w_3U';
   const db = supabase.createClient(_SUPA_URL, _SUPA_KEY);
-  const BUCKET = 'klaro-documents';
+  const BUCKET = 'documents';
 
   let selectedFile = null;
   let currentUserId = null;

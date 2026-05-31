@@ -24,7 +24,6 @@ module.exports = async function handler(req, res) {
       .select('*')
       .eq('user_id', user.id)
       .eq('status', 'open')
-      .order('priority', { ascending: true }) // red < amber < green alphabetically — use due_date instead
       .order('due_date', { ascending: true });
     if (error) return res.status(500).json({ error: error.message });
     return res.status(200).json(data);
