@@ -716,6 +716,121 @@
     </div>
     <!-- END BOTTOM -->
 
+    <!-- ── EÜR ANUAL ─────────────────────────────────────────────── -->
+    <div class="bento-card bg-[#fff8f1] rounded-2xl p-6" style="border:1px solid rgba(164,55,0,0.08)">
+
+      <!-- Header -->
+      <div class="flex flex-wrap items-center justify-between gap-3 mb-5">
+        <h3 class="font-bold text-[#1e1b17] text-sm flex items-center gap-2">
+          <svg class="w-4 h-4" style="color:#a43700" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+            <polyline points="14 2 14 8 20 8"/>
+            <line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>
+          </svg>
+          EÜR · Einnahmenüberschussrechnung
+        </h3>
+        <!-- Year selector -->
+        <div class="flex gap-1">
+          <button id="eur-btn-2024" onclick="loadEUR(2024)"
+            class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all"
+            style="background:rgba(164,55,0,0.06);color:#594139;border:1px solid rgba(164,55,0,0.12)">2024</button>
+          <button id="eur-btn-2025" onclick="loadEUR(2025)"
+            class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all"
+            style="background:rgba(164,55,0,0.06);color:#594139;border:1px solid rgba(164,55,0,0.12)">2025</button>
+          <button id="eur-btn-2026" onclick="loadEUR(2026)"
+            class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all"
+            style="background:rgba(164,55,0,0.06);color:#594139;border:1px solid rgba(164,55,0,0.12)">2026</button>
+        </div>
+      </div>
+
+      <!-- Kleinunternehmer note -->
+      <div id="eur-klein-notice" class="hidden mb-4 flex items-start gap-2 p-3 rounded-xl text-xs"
+        style="background:#EFF6FF;color:#3B82F6;border:1px solid rgba(59,130,246,.2)">
+        <svg class="w-3.5 h-3.5 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+        </svg>
+        Como Kleinunternehmer (§19 UStG) no tienes obligación de UStVA. Tu EÜR incluye ingresos sin IVA.
+      </div>
+
+      <!-- Loading -->
+      <div id="eur-loading" class="flex items-center justify-center py-10 gap-2" style="color:#594139">
+        <svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"/>
+        </svg>
+        <span class="text-xs font-medium">Calculando EÜR…</span>
+      </div>
+
+      <!-- Empty state -->
+      <div id="eur-empty" class="hidden text-center py-10">
+        <div class="w-12 h-12 rounded-2xl flex items-center justify-center mx-auto mb-3" style="background:rgba(164,55,0,0.06)">
+          <svg class="w-6 h-6" style="color:rgba(164,55,0,0.3)" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+            <polyline points="14 2 14 8 20 8"/>
+          </svg>
+        </div>
+        <p class="text-sm font-semibold text-[#1e1b17]">Sin datos para <span id="eur-empty-year">—</span></p>
+        <p class="text-xs mt-1" style="color:#594139">Añade facturas y gastos para ver el resumen EÜR</p>
+      </div>
+
+      <!-- Results -->
+      <div id="eur-results" class="hidden space-y-4">
+
+        <!-- Three stats -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <div class="rounded-2xl p-4" style="background:#f4ede5">
+            <p class="text-[10px] font-bold uppercase tracking-widest mb-2" style="color:#594139">Betriebseinnahmen</p>
+            <p class="text-2xl font-extrabold text-[#1e1b17] leading-none tracking-tight" id="eur-income">—</p>
+            <p class="text-[10px] mt-1.5" style="color:#594139">Ingresos (facturas no borrador)</p>
+          </div>
+          <div class="rounded-2xl p-4" style="background:#f4ede5">
+            <p class="text-[10px] font-bold uppercase tracking-widest mb-2" style="color:#594139">Betriebsausgaben</p>
+            <p class="text-2xl font-extrabold text-[#1e1b17] leading-none tracking-tight" id="eur-expenses">—</p>
+            <p class="text-[10px] mt-1.5" style="color:#594139">Gastos deducibles registrados</p>
+          </div>
+          <div class="rounded-2xl p-4" style="border:1px solid rgba(164,55,0,0.15);background:rgba(164,55,0,0.04)">
+            <p class="text-[10px] font-bold uppercase tracking-widest mb-2" style="color:#a43700">Gewinn / Überschuss</p>
+            <p class="text-2xl font-extrabold leading-none tracking-tight" style="color:#a43700" id="eur-profit">—</p>
+            <p class="text-[10px] mt-1.5" style="color:#594139">Beneficio estimado del año</p>
+          </div>
+        </div>
+
+        <!-- Einkommensteuer estimate -->
+        <div class="rounded-2xl p-5 flex items-center justify-between gap-4"
+          style="background:linear-gradient(135deg,rgba(164,55,0,0.05),rgba(164,55,0,0.02));border:1px solid rgba(164,55,0,0.1)">
+          <div>
+            <p class="text-sm font-bold text-[#1e1b17]">Einkommensteuer estimada</p>
+            <p class="text-xs mt-0.5" style="color:#594139">
+              Grundfreibetrag <span id="eur-grundfreibetrag" class="font-semibold text-[#1e1b17]">—</span> aplicado · tarifa progresiva alemana
+            </p>
+          </div>
+          <p class="text-2xl font-extrabold flex-shrink-0" style="color:#a43700" id="eur-tax">—</p>
+        </div>
+
+        <!-- Export button -->
+        <button id="eur-copy-btn" onclick="copyEUR()"
+          class="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-bold transition-all active:scale-95 hover:opacity-90"
+          style="background:rgba(164,55,0,0.08);color:#a43700;border:1px solid rgba(164,55,0,0.15)">
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <rect x="9" y="9" width="13" height="13" rx="2"/>
+            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+          </svg>
+          Copiar resumen EÜR
+        </button>
+
+        <!-- Disclaimer -->
+        <div class="flex items-start gap-2 p-3 rounded-xl text-[11px] leading-relaxed"
+          style="background:rgba(164,55,0,0.04);color:#594139;border:1px solid rgba(164,55,0,0.07)">
+          <svg class="w-3.5 h-3.5 flex-shrink-0 mt-0.5" style="color:#a43700" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+          </svg>
+          Estimación aproximada — no es asesoría fiscal oficial.
+        </div>
+
+      </div>
+    </div>
+    <!-- END EÜR -->
+
     <!-- Bottom spacer for FAB -->
     <div class="h-6"></div>
 
@@ -1398,6 +1513,121 @@ async function markAsFiled(type, quarter, year) {
   if (progressBar) progressBar.style.width = pct + '%';
   const progressLabel = document.getElementById('quarter-progress-label');
   if (progressLabel) progressLabel.textContent = `${pct}% del trimestre (${Math.round(elapsedDays)} días)`;
+})();
+</script>
+
+<!-- ── EÜR SCRIPT ─────────────────────────────────────────────────── -->
+<script>
+(function() {
+  const EUR_PARAMS = {
+    2026: { grundfreibetrag: 12096 },
+    2025: { grundfreibetrag: 11784 },
+    2024: { grundfreibetrag: 11604 },
+  };
+
+  function estimateEinkommensteuer(profit, year) {
+    const zvE = Math.max(0, profit - EUR_PARAMS[year].grundfreibetrag);
+    if (zvE <= 0) return 0;
+    if (zvE <= 8000)   return zvE * 0.14;
+    if (zvE <= 55000)  return zvE * 0.24;
+    if (zvE <= 265000) return zvE * 0.42;
+    return zvE * 0.45;
+  }
+
+  let _eurYear = new Date().getFullYear();
+  const _validYears = [2024, 2025, 2026];
+  let _eurData = { income: 0, expenses: 0, profit: 0 };
+
+  function setYearBtn(active) {
+    _validYears.forEach(y => {
+      const btn = document.getElementById('eur-btn-' + y);
+      if (!btn) return;
+      if (y === active) {
+        btn.style.background = '#a43700';
+        btn.style.color = '#fff8f1';
+        btn.style.borderColor = '#a43700';
+      } else {
+        btn.style.background = 'rgba(164,55,0,0.06)';
+        btn.style.color = '#594139';
+        btn.style.borderColor = 'rgba(164,55,0,0.12)';
+      }
+    });
+  }
+
+  const fmt = n => '€' + n.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+
+  window.loadEUR = async function(year) {
+    _eurYear = year;
+    setYearBtn(year);
+
+    document.getElementById('eur-loading').classList.remove('hidden');
+    document.getElementById('eur-results').classList.add('hidden');
+    document.getElementById('eur-empty').classList.add('hidden');
+    document.getElementById('eur-klein-notice').classList.add('hidden');
+
+    const { data: { session } } = await _sb.auth.getSession();
+    if (!session) { document.getElementById('eur-loading').classList.add('hidden'); return; }
+    const uid = session.user.id;
+
+    const start = year + '-01-01';
+    const end   = year + '-12-31';
+
+    const [{ data: invData }, { data: expData }, { data: fpData }] = await Promise.all([
+      _sb.from('invoices').select('amount, date, status').eq('user_id', uid).neq('status', 'draft').gte('date', start).lte('date', end),
+      _sb.from('expenses').select('amount, date').eq('user_id', uid).gte('date', start).lte('date', end),
+      _sb.from('fiscal_profiles').select('is_kleinunternehmer').eq('user_id', uid).maybeSingle(),
+    ]);
+
+    document.getElementById('eur-loading').classList.add('hidden');
+
+    if (fpData?.is_kleinunternehmer) {
+      const n = document.getElementById('eur-klein-notice');
+      n.classList.remove('hidden');
+      n.classList.add('flex');
+    }
+
+    const income   = (invData  || []).reduce((s, i) => s + parseFloat(i.amount  || 0), 0);
+    const expenses = (expData  || []).reduce((s, e) => s + parseFloat(e.amount  || 0), 0);
+    const profit   = Math.max(0, income - expenses);
+    const tax      = estimateEinkommensteuer(profit, year);
+    _eurData = { income, expenses, profit };
+
+    if (income === 0 && expenses === 0) {
+      const emptyEl = document.getElementById('eur-empty');
+      emptyEl.classList.remove('hidden');
+      set('eur-empty-year', year);
+      return;
+    }
+
+    set('eur-income',           fmt(income));
+    set('eur-expenses',         fmt(expenses));
+    set('eur-profit',           fmt(profit));
+    set('eur-tax',              fmt(tax));
+    set('eur-grundfreibetrag',  fmt(EUR_PARAMS[year].grundfreibetrag));
+    document.getElementById('eur-results').classList.remove('hidden');
+  };
+
+  window.copyEUR = function() {
+    const fmt2 = n => n.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    const text = [
+      'Einnahmen\xfcberschussrechnung ' + _eurYear,
+      'Betriebseinnahmen: €' + fmt2(_eurData.income),
+      'Betriebsausgaben: €'  + fmt2(_eurData.expenses),
+      'Gewinn/\xdcberschuss: €' + fmt2(_eurData.profit),
+    ].join('\n');
+    navigator.clipboard.writeText(text).then(function() {
+      const btn = document.getElementById('eur-copy-btn');
+      if (!btn) return;
+      const orig = btn.innerHTML;
+      btn.textContent = '✓ Copiado';
+      setTimeout(function() { btn.innerHTML = orig; }, 2000);
+    });
+  };
+
+  // Auto-load on page ready using current year (clamped to valid range)
+  const initYear = _validYears.includes(_eurYear) ? _eurYear : 2026;
+  loadEUR(initYear);
 })();
 </script>
 </body>
