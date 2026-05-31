@@ -616,6 +616,24 @@
   const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
   let allInvoices = [];
+  let userProfile = null;
+
+  async function loadProfile() {
+    try {
+      const { data: { user } } = await sb.auth.getUser();
+      if (!user) return;
+      const [{ data: prof }, { data: fp }] = await Promise.all([
+        sb.from('profiles').select('tax_number').eq('id', user.id).maybeSingle(),
+        sb.from('fiscal_profiles').select('is_kleinunternehmer').eq('user_id', user.id).maybeSingle(),
+      ]);
+      userProfile = {
+        tax_number: prof?.tax_number || '',
+        is_kleinunternehmer: fp?.is_kleinunternehmer || false,
+      };
+    } catch (e) {
+      console.error('loadProfile:', e);
+    }
+  }
 
   /* ─── Load invoices on page start ─── */
   async function loadInvoices() {
@@ -1060,11 +1078,11 @@
 
     const net      = parseFloat(inv.amount || 0);
     const taxRate  = parseFloat(inv.vat_rate || inv.tax_rate || 19);
-    const isKlein  = taxRate === 0 || localStorage.getItem('klaro_kleinunternehmer') === 'true';
+    const isKlein  = taxRate === 0 || (userProfile?.is_kleinunternehmer || false);
     const vat      = isKlein ? 0 : net * (taxRate / 100);
     const gross    = net + vat;
     const userName = document.querySelector('[data-user-name]')?.textContent?.trim() || '';
-    const stNr     = localStorage.getItem('klaro_steuernummer') || '';
+    const stNr     = userProfile?.tax_number || '';
     const invDate  = new Date(inv.date || inv.created_at || new Date());
     const fmtDate  = d => d.toLocaleDateString('de-DE', {day:'2-digit', month:'2-digit', year:'numeric'});
     const fmtEurPdf = n => '€ ' + n.toLocaleString('de-DE', {minimumFractionDigits:2, maximumFractionDigits:2});
@@ -1179,6 +1197,7 @@
   /* ─ Init ─ */
   updatePreview();
   loadInvoices();
+  loadProfile();
   initInvoiceNumber();
 </script>
 

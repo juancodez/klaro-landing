@@ -1332,21 +1332,25 @@ async function markAsFiled(type, quarter, year) {
     4: { start: `${prevYear}-10-01`, end: `${prevYear}-12-31`, label: `Oct–Dic ${prevYear}` },
   };
 
-  const [{ data: invAll }, { data: expAll }] = await Promise.all([
-    db.from('invoices').select('amount, status, date').eq('user_id', uid),
+  const [{ data: invAll }, { data: expAll }, { data: fpData }] = await Promise.all([
+    db.from('invoices').select('amount, status, date, tax_rate').eq('user_id', uid),
     db.from('expenses').select('amount, date').eq('user_id', uid),
+    db.from('fiscal_profiles').select('is_kleinunternehmer').eq('user_id', uid).maybeSingle(),
   ]);
 
   const inv = invAll || [];
   const exp = expAll || [];
+  const isKleinunternehmer = fpData?.is_kleinunternehmer || false;
 
   function calcQ(meta) {
     const qInv = inv.filter(i => i.status === 'paid' && i.date >= meta.start && i.date <= meta.end);
     const qExp = exp.filter(e => e.date >= meta.start && e.date <= meta.end);
     const baseIngresos = qInv.reduce((s, i) => s + parseFloat(i.amount || 0), 0);
     const baseGastos   = qExp.reduce((s, e) => s + parseFloat(e.amount || 0), 0);
-    const ivaFacturado = baseIngresos * 0.19;
-    const vorsteuer    = baseGastos   * 0.19;
+    // Kleinunternehmer (§19 UStG) has no VAT obligation — ivaFacturado and Vorsteuer are both 0
+    const ivaFacturado = isKleinunternehmer ? 0
+      : qInv.reduce((s, i) => s + parseFloat(i.amount || 0) * (parseFloat(i.tax_rate ?? 19) / 100), 0);
+    const vorsteuer    = isKleinunternehmer ? 0 : baseGastos * 0.19;
     const netoPagar    = Math.max(0, ivaFacturado - vorsteuer);
     return { baseIngresos, baseGastos, ivaFacturado, vorsteuer, netoPagar };
   }
