@@ -468,14 +468,14 @@
   }
 
   // ── Check API reachability (GET — zero token cost) ───────────────────
-  async function checkApiConnection() {
+  async function checkApiConnection(retryCount = 0) {
     const dot   = document.getElementById('status-dot');
     const label = document.getElementById('status-label');
     const cDot  = document.getElementById('clara-dot');
     const cStat = document.getElementById('clara-status');
 
     try {
-      const res  = await fetch(API_URL, { signal: AbortSignal.timeout(4000) });
+      const res  = await fetch(API_URL, { signal: AbortSignal.timeout(12000) });
       const data = await res.json();
 
       if (data.hasKey) {
@@ -497,6 +497,14 @@
         document.getElementById('demo-banner').classList.add('hidden');
       }
     } catch {
+      if (retryCount < 1) {
+        dot.style.background   = '#fbbf24';
+        cDot.style.background  = '#fbbf24';
+        label.textContent      = 'Conectando con Clara...';
+        cStat.textContent      = 'Iniciando...';
+        setTimeout(() => checkApiConnection(retryCount + 1), 4000);
+        return;
+      }
       useRealApi = false;
       dot.style.background   = '#f97316';
       cDot.style.background  = '#f97316';
