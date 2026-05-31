@@ -209,7 +209,7 @@
       </button>
       <!-- Avatar -->
       <div class="w-8 h-8 rounded-full flex items-center justify-center text-white font-semibold text-xs cursor-pointer"
-           style="background:linear-gradient(135deg,#a43700,#FFB830)">AG</div>
+           style="background:linear-gradient(135deg,#a43700,#FFB830)" data-user-initials>AG</div>
     </div>
   </header>
 
@@ -610,21 +610,17 @@
 
 <!-- ─── SCRIPT ────────────────────────────────────────────────────── -->
 <script>
-  /* ─── Supabase ─── */
-  const SUPABASE_URL = 'https://rhyobhcgvrqobouqymqr.supabase.co';
-  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJoeW9iaGNndnJxb2JvdXF5bXFyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYzNjY0MDQsImV4cCI6MjA5MTk0MjQwNH0.Yc7wiTJ8_66uzqusGTU4dEele5B4C6ZCMlYNMf3w_3U';
-  const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
   let allInvoices = [];
   let userProfile = null;
 
   async function loadProfile() {
     try {
-      const { data: { user } } = await sb.auth.getUser();
+      const { data: { user } } = await _sb.auth.getUser();
       if (!user) return;
       const [{ data: prof }, { data: fp }] = await Promise.all([
-        sb.from('profiles').select('tax_number').eq('id', user.id).maybeSingle(),
-        sb.from('fiscal_profiles').select('is_kleinunternehmer').eq('user_id', user.id).maybeSingle(),
+        _sb.from('profiles').select('tax_number').eq('id', user.id).maybeSingle(),
+        _sb.from('fiscal_profiles').select('is_kleinunternehmer').eq('user_id', user.id).maybeSingle(),
       ]);
       userProfile = {
         tax_number: prof?.tax_number || '',
@@ -638,27 +634,27 @@
   /* ─── Load invoices on page start ─── */
   async function loadInvoices() {
     try {
-      const { data: { user } } = await sb.auth.getUser();
+      const { data: { user } } = await _sb.auth.getUser();
       if (!user) {
         document.getElementById('inv-loading').classList.add('hidden');
         document.getElementById('inv-empty').classList.remove('hidden');
         return;
       }
 
-      const { data, error } = await sb.from('invoices')
+      const { data, error } = await _sb.from('invoices')
         .select('*')
         .eq('user_id', user.id)
         .order('date', { ascending: false });
 
       document.getElementById('inv-loading').classList.add('hidden');
 
-      if (error) { console.error(error); return; }
+      if (error) { showToast('Error al cargar datos. Intenta de nuevo.', 'error'); document.getElementById('inv-empty').classList.remove('hidden'); return; }
 
       allInvoices = data || [];
       renderInvoiceList();
       updateRevenueTotal();
     } catch (e) {
-      console.error('loadInvoices:', e);
+      showToast('Error al cargar datos. Intenta de nuevo.', 'error');
       document.getElementById('inv-loading').classList.add('hidden');
       document.getElementById('inv-empty').classList.remove('hidden');
     }
@@ -771,10 +767,10 @@
   async function generateInvoiceNumber() {
     const year = new Date().getFullYear();
     try {
-      const { data: { user } } = await sb.auth.getUser();
+      const { data: { user } } = await _sb.auth.getUser();
       if (!user) return 'KL-' + year + '-001';
 
-      const { count } = await sb.from('invoices')
+      const { count } = await _sb.from('invoices')
         .select('id', { count: 'exact', head: true })
         .eq('user_id', user.id);
 
@@ -804,7 +800,7 @@
 
     let user;
     try {
-      const { data } = await sb.auth.getUser();
+      const { data } = await _sb.auth.getUser();
       user = data?.user;
     } catch (e) {
       showToast('Error de conexión. Comprueba tu red.', 'error'); return false;
@@ -827,7 +823,7 @@
       notes:          document.getElementById('inv-notes').value.trim(),
     };
 
-    const { error } = await sb.from('invoices').insert(payload);
+    const { error } = await _sb.from('invoices').insert(payload);
     if (error) { showToast('Error al guardar: ' + error.message, 'error'); return false; }
 
     /* refresh list and regenerate next number */
@@ -840,7 +836,7 @@
 
   /* ─── Status cycle ─── */
   async function cycleStatus(id, newStatus) {
-    const { error } = await sb.from('invoices').update({ status: newStatus }).eq('id', id);
+    const { error } = await _sb.from('invoices').update({ status: newStatus }).eq('id', id);
     if (error) { showToast('Error al actualizar: ' + error.message, 'error'); return; }
     const inv = allInvoices.find(i => i.id === id);
     if (inv) {
@@ -855,7 +851,7 @@
   /* ─── Delete invoice ─── */
   async function deleteInvoice(id) {
     if (!confirm('¿Eliminar esta factura?')) return;
-    const { error } = await sb.from('invoices').delete().eq('id', id);
+    const { error } = await _sb.from('invoices').delete().eq('id', id);
     if (error) { showToast('Error al eliminar: ' + error.message, 'error'); return; }
     allInvoices = allInvoices.filter(i => i.id !== id);
     renderInvoiceList();

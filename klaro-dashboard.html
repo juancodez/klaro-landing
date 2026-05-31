@@ -790,6 +790,15 @@
 </a>
 
 <script>
+// ── Error toast ───────────────────────────────────────────────────────
+function showErrToast() {
+  const el = document.createElement('div');
+  el.style.cssText = 'position:fixed;bottom:24px;right:24px;background:#1e1b17;color:#fff8f1;padding:12px 20px;border-radius:12px;font-size:13px;z-index:999';
+  el.textContent = 'Error al cargar datos. Intenta de nuevo.';
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 3000);
+}
+
 // ── Helpers ───────────────────────────────────────────────────────────
 function _esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 function _fmtBytes(b){ if(!b||b<1024) return (b||0)+' B'; if(b<1048576) return (b/1024).toFixed(0)+' KB'; return (b/1048576).toFixed(1)+' MB'; }
@@ -801,7 +810,8 @@ let _docUid = null;
 
 async function loadDocuments(uid) {
   _docUid = uid;
-  const { data } = await _sb.from('documents').select('*').eq('user_id', uid).order('created_at', { ascending: false });
+  const { data, error } = await _sb.from('documents').select('*').eq('user_id', uid).order('created_at', { ascending: false });
+  if (error) showErrToast();
   renderDocuments(data || []);
 }
 
@@ -1093,10 +1103,11 @@ function _renderChart(invoices, expenses) {
   const fmt = n => '€' + Math.round(n).toLocaleString('de-DE');
 
   // Fetch invoices and expenses in parallel (client_name needed for invoice list)
-  const [{ data: invoices }, { data: expenses }] = await Promise.all([
+  const [{ data: invoices, error: invErr }, { data: expenses, error: expErr }] = await Promise.all([
     _sb.from('invoices').select('amount, status, date, client_name').eq('user_id', uid),
     _sb.from('expenses').select('amount, date').eq('user_id', uid),
   ]);
+  if (invErr || expErr) showErrToast();
 
   const inv = invoices || [];
   const exp = expenses || [];

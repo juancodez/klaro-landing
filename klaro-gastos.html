@@ -99,7 +99,7 @@
       </svg>
       Facturas
     </a>
-    <a href="klaro-gastos.html" class="nav-active flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm transition-all">
+    <a href="klaro-gastos.html" class="nav-active flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm transition-all" style="color:#a43700;background:rgba(164,55,0,0.08);border-radius:12px">
       <svg class="w-[18px] h-[18px] flex-shrink-0" viewBox="0 0 256 256" fill="currentColor"><path d="M72,104a8,8,0,0,1,8-8h96a8,8,0,0,1,0,16H80A8,8,0,0,1,72,104Zm8,40h96a8,8,0,0,0,0-16H80a8,8,0,0,0,0,16ZM232,56V208a8,8,0,0,1-11.58,7.15L192,200.94l-28.42,14.21a8,8,0,0,1-7.16,0L128,200.94,99.58,215.15a8,8,0,0,1-7.16,0L64,200.94,35.58,215.15A8,8,0,0,1,24,208V56A16,16,0,0,1,40,40H216A16,16,0,0,1,232,56Zm-16,0H40V195.06l20.42-10.22a8,8,0,0,1,7.16,0L96,199.06l28.42-14.22a8,8,0,0,1,7.16,0L160,199.06l28.42-14.22a8,8,0,0,1,7.16,0L216,195.06Z"></path></svg>
       Gastos
     </a>
@@ -170,7 +170,7 @@
         </svg>Exportar
       </button>
       <div class="w-8 h-8 rounded-full flex items-center justify-center text-white font-bold text-xs"
-           style="background:linear-gradient(135deg,#a43700,#c94c13)">AG</div>
+           style="background:linear-gradient(135deg,#a43700,#c94c13)" data-user-initials>AG</div>
     </div>
   </header>
 
@@ -554,10 +554,6 @@
 </div>
 
 <script>
-  // Supabase
-  const SUPABASE_URL = 'https://rhyobhcgvrqobouqymqr.supabase.co';
-  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJoeW9iaGNndnJxb2JvdXF5bXFyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYzNjY0MDQsImV4cCI6MjA5MTk0MjQwNH0.Yc7wiTJ8_66uzqusGTU4dEele5B4C6ZCMlYNMf3w_3U';
-  const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
   const CAT_LABELS = {software:'Software',home:'Home office',equipamiento:'Equipamiento',transporte:'Transporte',formacion:'Formación',otros:'Otros'};
   const CAT_EMOJIS = {software:'💻',home:'🏠',equipamiento:'🖥️',transporte:'🚌',formacion:'📚',otros:'📎'};
@@ -577,22 +573,22 @@
     document.getElementById('expense-list').classList.add('hidden');
     document.getElementById('empty-state').classList.add('hidden');
     try {
-      const { data: authData } = await sb.auth.getUser();
+      const { data: authData } = await _sb.auth.getUser();
       const user = authData?.user;
       if (!user) {
         document.getElementById('loading-state').classList.add('hidden');
         document.getElementById('expense-count').textContent = 'Sin sesión';
         return;
       }
-      const { data, error } = await sb.from('expenses').select('*').eq('user_id', user.id).order('date', { ascending: false });
+      const { data, error } = await _sb.from('expenses').select('*').eq('user_id', user.id).order('date', { ascending: false });
       document.getElementById('loading-state').classList.add('hidden');
       document.getElementById('expense-list').classList.remove('hidden');
-      if (error) { console.error(error); document.getElementById('expense-count').textContent = 'Error al cargar'; return; }
+      if (error) { showErrToast(); document.getElementById('expense-count').textContent = 'Error al cargar'; return; }
       allExpenses = data || [];
       renderList();
       updateStats();
     } catch (e) {
-      console.error('loadExpenses:', e);
+      showErrToast();
       document.getElementById('loading-state').classList.add('hidden');
       document.getElementById('expense-list').classList.remove('hidden');
       document.getElementById('expense-count').textContent = 'Error al cargar';
@@ -742,7 +738,7 @@
   }
 
   async function viewReceipt(path) {
-    const { data, error } = await sb.storage.from('documents').createSignedUrl(path, 120);
+    const { data, error } = await _sb.storage.from('documents').createSignedUrl(path, 120);
     if (error) { alert('No se pudo abrir el justificante.'); return; }
     window.open(data.signedUrl, '_blank');
   }
@@ -760,7 +756,7 @@
     btn.disabled = true; btn.textContent = 'Guardando…';
     let userId;
     try {
-      const { data: authData } = await sb.auth.getUser();
+      const { data: authData } = await _sb.auth.getUser();
       userId = authData?.user?.id;
     } catch (e) {
       btn.disabled = false; btn.innerHTML = '<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v14a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>Guardar';
@@ -771,11 +767,11 @@
     if (receiptFile && userId) {
       const safeName = receiptFile.name.replace(/[^a-zA-Z0-9._-]/g, '_');
       const path = `${userId}/receipts/${Date.now()}-${safeName}`;
-      const { error: uploadErr } = await sb.storage.from('documents').upload(path, receiptFile);
+      const { error: uploadErr } = await _sb.storage.from('documents').upload(path, receiptFile);
       if (!uploadErr) receiptPath = path;
     }
 
-    const { error } = await sb.from('expenses').insert({ description: desc, amount, category: cat, date, user_id: userId, receipt_url: receiptPath });
+    const { error } = await _sb.from('expenses').insert({ description: desc, amount, category: cat, date, user_id: userId, receipt_url: receiptPath });
     btn.disabled = false;
     btn.innerHTML = '<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v14a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>Guardar';
     if (error) { alert('Error al guardar: ' + error.message); return; }
@@ -788,7 +784,7 @@
   async function deleteExpense(id, event) {
     event.stopPropagation();
     if (!confirm('¿Eliminar este gasto? Esta acción no se puede deshacer.')) return;
-    const { error } = await sb.from('expenses').delete().eq('id', id);
+    const { error } = await _sb.from('expenses').delete().eq('id', id);
     if (error) { alert('Error al eliminar: ' + error.message); return; }
     allExpenses = allExpenses.filter(e => e.id !== id);
     renderList(); updateStats();
@@ -798,6 +794,14 @@
     const t = document.getElementById('save-toast');
     t.classList.remove('hidden'); t.classList.add('flex');
     setTimeout(() => { t.classList.add('hidden'); t.classList.remove('flex'); }, 2800);
+  }
+
+  function showErrToast() {
+    const el = document.createElement('div');
+    el.style.cssText = 'position:fixed;bottom:24px;right:24px;background:#1e1b17;color:#fff8f1;padding:12px 20px;border-radius:12px;font-size:13px;z-index:999';
+    el.textContent = 'Error al cargar datos. Intenta de nuevo.';
+    document.body.appendChild(el);
+    setTimeout(() => el.remove(), 3000);
   }
 
   function escHtml(s) {
