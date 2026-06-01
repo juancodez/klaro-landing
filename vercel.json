@@ -1,9 +1,11 @@
 {
   "version": 2,
   "functions": {
-    "api/clara.js":        { "maxDuration": 30 },
-    "api/declarations.js": { "maxDuration": 10 },
-    "api/tasks.js":        { "maxDuration": 10 }
+    "api/clara.js":           { "maxDuration": 30 },
+    "api/declarations.js":    { "maxDuration": 10 },
+    "api/tasks.js":           { "maxDuration": 10 },
+    "api/send-invoice.js":    { "maxDuration": 10 },
+    "api/analyze-receipt.js": { "maxDuration": 10 }
   },
   "routes": [
     {
