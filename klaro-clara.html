@@ -250,7 +250,10 @@
             <svg class="w-[14px] h-[14px] text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
           </button>
         </div>
-        <p class="text-[10px] text-center mt-2" style="color:rgba(89,65,57,.5)">Orientación informativa · no asesoría oficial · Klaro 2026</p>
+        <div class="flex items-center justify-between mt-2 px-1">
+          <p class="text-[10px]" style="color:rgba(89,65,57,.5)">Orientación informativa · no asesoría oficial · Klaro 2026</p>
+          <p id="msg-counter" class="text-[10px] font-semibold" style="color:rgba(89,65,57,.5)">5 mensajes gratis</p>
+        </div>
       </div>
     </section>
 
@@ -376,12 +379,14 @@
 <!-- ─── SCRIPT ────────────────────────────────────────────────────── -->
 <script>
   // ── Config ────────────────────────────────────────────────────────────
-  const API_URL   = '/api/clara';
+  const API_URL       = '/api/clara';
+  const FREE_MSG_LIMIT = 5;
   let chatHistory   = [];
   let isLoading     = false;
-  let useRealApi    = false;
+  let useRealApi    = null;   // null=unknown, true=live, false=demo
   let currentUserId = null;
   let userProfile   = null;
+  let _msgCount     = 0;     // AI responses received this session
 
   // ── Supabase persistence ──────────────────────────────────────────────
   function savePair(userText, assistantText) {
@@ -437,8 +442,23 @@
         else appendClara(m.content);
         chatHistory.push({ role: m.role, content: m.content });
       });
+      // Count existing AI responses for free-tier limit
+      _msgCount = (msgs || []).filter(m => m.role === 'assistant').length;
+      _updateLimitUI();
     } catch (e) {
       showErrToast();
+    }
+  }
+
+  // ── Free-tier limit UI ────────────────────────────────────────────────
+  function _updateLimitUI() {
+    const el = document.getElementById('msg-counter');
+    if (!el) return;
+    const remaining = Math.max(0, FREE_MSG_LIMIT - _msgCount);
+    if (_msgCount >= FREE_MSG_LIMIT) {
+      el.innerHTML = '<span style="color:#dc2626;font-weight:700">Límite gratuito alcanzado · <a href="klaro-profile.html" style="color:#a43700;text-decoration:underline">Ver planes →</a></span>';
+    } else {
+      el.textContent = remaining + ' mensaje' + (remaining === 1 ? '' : 's') + ' gratis restante' + (remaining === 1 ? '' : 's');
     }
   }
 
@@ -633,6 +653,12 @@
     const text  = (override ?? input.value).trim();
     if (!text || isLoading) return;
 
+    // Free-tier limit
+    if (_msgCount >= FREE_MSG_LIMIT) {
+      appendClara('Has usado tus **5 mensajes gratuitos**. Para seguir hablando con Clara sin límites, actualiza tu plan. 👉 [Ver planes →](klaro-profile.html)');
+      return;
+    }
+
     input.value = '';
     autoResize(input);
     isLoading = true;
@@ -641,15 +667,15 @@
     appendUser(text);
     appendTyping();
 
-    if (useRealApi) {
+    // useRealApi: null=unchecked(try anyway), true=confirmed, false=confirmed unavailable
+    if (useRealApi !== false) {
       try {
-        const key = getApiKey();
         const headers = { 'Content-Type': 'application/json' };
-        if (key) headers['x-api-key'] = key;
 
         const res  = await fetch(API_URL, {
           method: 'POST',
           headers,
+          signal: AbortSignal.timeout(20000),
           body: JSON.stringify({ messages: chatHistory, userProfile, userId: currentUserId }),
         });
         const data = await res.json();
@@ -658,23 +684,24 @@
 
         if (res.status === 401 || data.needsKey) {
           useRealApi = false;
-          document.getElementById('no-key-banner').classList.remove('hidden');
-          document.getElementById('no-key-banner').classList.add('flex');
           const reply = getCannedResponse(text);
           chatHistory.push({ role: 'assistant', content: reply });
           appendClara(reply);
           savePair(text, reply);
         } else if (data.content?.text) {
+          useRealApi = true;
           const rawText   = data.content.text;
           const sugs      = extractSuggestions(rawText);
           chatHistory.push({ role: 'assistant', content: rawText });
           appendClara(rawText, sugs);
+          savePair(text, rawText);
+          _msgCount++;
+          _updateLimitUI();
         } else {
           appendClara('Ups, algo salió mal. Inténtalo de nuevo.');
         }
       } catch (e) {
         removeTyping();
-        // Server went down mid-session → fall back
         useRealApi = false;
         const reply = getCannedResponse(text);
         chatHistory.push({ role: 'assistant', content: reply });
@@ -682,7 +709,7 @@
         savePair(text, reply);
       }
     } else {
-      // Demo mode — simulate latency
+      // Demo mode — confirmed no API key
       await new Promise(r => setTimeout(r, 700 + Math.random()*500));
       removeTyping();
       const reply = getCannedResponse(text);
