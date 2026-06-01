@@ -378,6 +378,14 @@
 
 <!-- ─── SCRIPT ────────────────────────────────────────────────────── -->
 <script>
+  // ── AbortSignal.timeout polyfill (Safari <16, Firefox <100) ──────────
+  function _timeout(ms) {
+    const ctrl = new AbortController();
+    const id = setTimeout(() => ctrl.abort(new DOMException('Timeout','AbortError')), ms);
+    ctrl.signal.addEventListener('abort', () => clearTimeout(id), { once: true });
+    return ctrl.signal;
+  }
+
   // ── Config ────────────────────────────────────────────────────────────
   const API_URL       = '/api/clara';
   const FREE_MSG_LIMIT = 5;
@@ -499,7 +507,7 @@
     const cStat = document.getElementById('clara-status');
 
     try {
-      const res  = await fetch(API_URL, { signal: AbortSignal.timeout(12000) });
+      const res  = await fetch(API_URL, { signal: _timeout(12000) });
       const data = await res.json();
 
       if (data.hasKey) {
@@ -678,7 +686,7 @@
         const res  = await fetch(API_URL, {
           method: 'POST',
           headers,
-          signal: AbortSignal.timeout(20000),
+          signal: _timeout(25000),
           body: JSON.stringify({ messages: chatHistory, userProfile, userId: currentUserId }),
         });
         const data = await res.json();
@@ -705,11 +713,11 @@
         }
       } catch (e) {
         removeTyping();
-        useRealApi = false;
+        // Network error or timeout — do NOT lock to demo.
+        // Keep useRealApi as-is so next message retries the real API.
         const reply = getCannedResponse(text);
         chatHistory.push({ role: 'assistant', content: reply });
-        appendClara(reply);
-        savePair(text, reply);
+        appendClara('⚠️ Sin conexión al servidor. Respuesta de demostración:\n\n' + reply);
       }
     } else {
       // Demo mode — confirmed no API key
