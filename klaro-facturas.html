@@ -631,7 +631,7 @@
               <div>
                 <p class="text-[10px] font-bold uppercase tracking-widest mb-1.5" style="color:#594139">Datos de pago</p>
                 <p class="text-xs text-navy font-medium" id="prev-pay-method">SEPA / Transferencia</p>
-                <p class="text-xs text-muted mt-1">IBAN: DE89 3704 0044 0532 0130 00<br/>BIC: COBADEFFXXX</p>
+                <p class="text-xs text-muted mt-1" id="prev-iban-line">IBAN: —<br/>BIC: —</p>
               </div>
               <div>
                 <p class="text-[10px] font-bold uppercase tracking-widest mb-1.5" style="color:#594139">Vencimiento</p>
@@ -715,15 +715,17 @@
       const { data: { user } } = await _sb.auth.getUser();
       if (!user) return;
       const [{ data: prof }, { data: fp }] = await Promise.all([
-        _sb.from('profiles').select('tax_number, full_name, address, city, postal_code, company_name, company_service').eq('id', user.id).maybeSingle(),
+        _sb.from('profiles').select('tax_number, steuernummer, full_name, address, city, postal_code, company_name, company_service, iban, bic').eq('id', user.id).maybeSingle(),
         _sb.from('fiscal_profiles').select('is_kleinunternehmer').eq('user_id', user.id).maybeSingle(),
       ]);
       userProfile = {
-        tax_number:          prof?.tax_number    || '',
+        tax_number:          prof?.steuernummer  || prof?.tax_number || '',
         full_name:           prof?.full_name     || '',
         address:             prof?.address       || '',
         city:                prof?.city          || '',
         postal_code:         prof?.postal_code   || '',
+        iban:                prof?.iban          || '',
+        bic:                 prof?.bic           || '',
         is_kleinunternehmer: fp?.is_kleinunternehmer || false,
       };
     } catch (e) {
@@ -1135,6 +1137,13 @@
     const payLabels = { SEPA: 'SEPA / Transferencia', PayPal: 'PayPal', Efectivo: 'Efectivo' };
     document.getElementById('prev-pay-method').textContent = payLabels[payMethod] || payMethod;
     document.getElementById('prev-due').textContent        = fmtDate(due);
+    // IBAN / BIC from real user profile
+    const ibanEl = document.getElementById('prev-iban-line');
+    if (ibanEl) {
+      const iban = userProfile?.iban || '—';
+      const bic  = userProfile?.bic  || '—';
+      ibanEl.innerHTML = `IBAN: ${esc(iban)}<br/>BIC: ${esc(bic)}`;
+    }
 
     const notesEl = document.getElementById('prev-notes-label');
     notesEl.textContent   = notes || '';
@@ -1460,6 +1469,23 @@
         doc.text('Gemäß §19 UStG wird keine Umsatzsteuer berechnet.', ML + 3, bY);
       }
       tY += boxH + 6;
+    }
+
+    // ── Payment details block (IBAN / BIC) ──
+    const ibanStr = userProfile?.iban;
+    const bicStr  = userProfile?.bic;
+    if (ibanStr) {
+      tY += 5;
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(7.5);
+      doc.setTextColor(...ORANGE);
+      doc.text(bilabel('DATOS DE PAGO', 'ZAHLUNGSDATEN'), ML, tY);
+      tY += 4;
+      doc.setFont('helvetica', 'normal');
+      doc.setTextColor(...MUTED);
+      doc.text('IBAN: ' + ibanStr, ML, tY);
+      if (bicStr) { tY += 4; doc.text('BIC: ' + bicStr, ML, tY); }
+      tY += 5;
     }
 
     // ── §14 UStG compliance note ──

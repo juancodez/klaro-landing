@@ -197,7 +197,7 @@
         <div class="relative z-10 flex flex-col h-full justify-between">
           <div class="flex items-start justify-between">
             <div>
-              <p class="text-xs font-semibold uppercase tracking-widest mb-1" style="color:rgba(255,255,255,.7)" id="iva-big-label">IVA a Pagar · Q2 2026</p>
+              <p class="text-xs font-semibold uppercase tracking-widest mb-1" style="color:rgba(255,255,255,.7)" id="iva-big-label">IVA a Pagar · —</p>
               <p class="big-card-amount text-white" id="iva-big-card">—</p>
             </div>
             <!-- Cálculo Verificado badge -->
@@ -207,10 +207,10 @@
             </span>
           </div>
           <div>
-            <p class="text-xs mt-3" style="color:rgba(255,255,255,.75)">Umsatzsteuervoranmeldung — Abr–Jun 2026</p>
+            <p class="text-xs mt-3" style="color:rgba(255,255,255,.75)" id="iva-big-period">Umsatzsteuervoranmeldung</p>
             <div class="flex items-center gap-2 mt-3">
-              <span class="text-xs font-semibold px-2.5 py-1 rounded-lg" style="background:rgba(255,255,255,.15);color:rgba(255,255,255,.9)">Vence 10 jul 2026</span>
-              <span class="text-xs font-semibold px-2.5 py-1 rounded-lg" style="background:rgba(255,255,255,.15);color:rgba(255,255,255,.9)">85 días</span>
+              <span class="text-xs font-semibold px-2.5 py-1 rounded-lg" id="iva-big-due" style="background:rgba(255,255,255,.15);color:rgba(255,255,255,.9)">—</span>
+              <span class="text-xs font-semibold px-2.5 py-1 rounded-lg" id="iva-big-days" style="background:rgba(255,255,255,.15);color:rgba(255,255,255,.9)">—</span>
             </div>
           </div>
         </div>
@@ -1455,6 +1455,16 @@ async function markAsFiled(type, quarter, year) {
   // Big card — trimestre actual
   set('iva-big-label',          `IVA a Pagar · Q${currentQ} ${year}`);
   set('iva-big-card',           fmt(curr.netoPagar));
+  // Dynamic subtitle: period, due date, days remaining
+  const Q_MONTHS = { 1:'Ene–Mar', 2:'Abr–Jun', 3:'Jul–Sep', 4:'Oct–Dic' };
+  const Q_DUE_MONTH = { 1:3, 2:6, 3:9, 4:0 }; // April=3, July=6, Oct=9, Jan=0
+  const dueYear = currentQ === 4 ? year + 1 : year;
+  const dueDate = new Date(dueYear, Q_DUE_MONTH[currentQ], 10);
+  const daysLeft = Math.round((dueDate - new Date()) / 86400000);
+  const dueStr = dueDate.toLocaleDateString('es-DE', { day:'numeric', month:'short', year:'numeric' });
+  set('iva-big-period', `Umsatzsteuervoranmeldung — ${Q_MONTHS[currentQ]} ${year}`);
+  set('iva-big-due',    `Vence ${dueStr}`);
+  set('iva-big-days',   daysLeft < 0 ? 'Vencido' : daysLeft === 0 ? 'Vence hoy' : `${daysLeft} días`);
 
   // UStVA card trimestre actual
   set('iva-q-curr-title',       `UStVA Q${currentQ} ${year}`);
