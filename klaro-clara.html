@@ -666,7 +666,7 @@
 
     // Free-tier limit
     if (_msgCount >= FREE_MSG_LIMIT) {
-      appendClara('Has usado tus **5 mensajes gratuitos**. Para seguir hablando con Clara sin límites, actualiza tu plan. 👉 [Ver planes →](klaro-profile.html)');
+      appendClara('Has usado tus 5 mensajes gratuitos. Para continuar, actualiza tu plan → klaro-profile.html');
       return;
     }
 
@@ -674,54 +674,54 @@
     autoResize(input);
     isLoading = true;
     chatHistory.push({ role: 'user', content: text });
-
     appendUser(text);
     appendTyping();
 
-    // useRealApi: null=unchecked(try anyway), true=confirmed, false=confirmed unavailable
-    if (useRealApi !== false) {
-      try {
-        const headers = { 'Content-Type': 'application/json' };
+    try {
+      // Simple AbortController — works in ALL browsers
+      const ctrl  = new AbortController();
+      const timer = setTimeout(() => ctrl.abort(), 28000);
 
-        const res  = await fetch(API_URL, {
-          method: 'POST',
-          headers,
-          signal: _timeout(25000),
-          body: JSON.stringify({ messages: chatHistory, userProfile, userId: currentUserId }),
-        });
+      const res = await fetch(API_URL, {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        signal:  ctrl.signal,
+        body:    JSON.stringify({
+          messages:    chatHistory,
+          userProfile: userProfile,
+          userId:      currentUserId,
+        }),
+      });
+
+      clearTimeout(timer);
+      removeTyping();
+
+      if (!res.ok) {
+        // Server error — show canned response so user isn't stuck
+        const reply = getCannedResponse(text);
+        chatHistory.push({ role: 'assistant', content: reply });
+        appendClara(reply);
+        savePair(text, reply);
+      } else {
         const data = await res.json();
-
-        removeTyping();
-
-        if (res.status === 401 || data.needsKey) {
-          useRealApi = false;
-          const reply = getCannedResponse(text);
-          chatHistory.push({ role: 'assistant', content: reply });
-          appendClara(reply);
-          savePair(text, reply);
-        } else if (data.content?.text) {
+        if (data.content && data.content.text) {
           useRealApi = true;
-          const rawText   = data.content.text;
-          const sugs      = extractSuggestions(rawText);
+          const rawText = data.content.text;
+          const sugs    = extractSuggestions(rawText);
           chatHistory.push({ role: 'assistant', content: rawText });
           appendClara(rawText, sugs);
           savePair(text, rawText);
           _msgCount++;
           _updateLimitUI();
         } else {
-          appendClara('Ups, algo salió mal. Inténtalo de nuevo.');
+          // Unexpected format — fallback
+          const reply = getCannedResponse(text);
+          chatHistory.push({ role: 'assistant', content: reply });
+          appendClara(reply);
+          savePair(text, reply);
         }
-      } catch (e) {
-        removeTyping();
-        // Network error or timeout — do NOT lock to demo.
-        // Keep useRealApi as-is so next message retries the real API.
-        const reply = getCannedResponse(text);
-        chatHistory.push({ role: 'assistant', content: reply });
-        appendClara('⚠️ Sin conexión al servidor. Respuesta de demostración:\n\n' + reply);
       }
-    } else {
-      // Demo mode — confirmed no API key
-      await new Promise(r => setTimeout(r, 700 + Math.random()*500));
+    } catch (e) {
       removeTyping();
       const reply = getCannedResponse(text);
       chatHistory.push({ role: 'assistant', content: reply });
