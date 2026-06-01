@@ -521,15 +521,18 @@
         document.getElementById('demo-banner').classList.add('hidden');
       }
     } catch {
-      if (retryCount < 1) {
+      // Timeout or network error — do NOT lock to demo mode.
+      // Keep useRealApi = null so sendMessage still tries the real API.
+      // Only show visual feedback.
+      if (retryCount < 3) {
         dot.style.background   = '#fbbf24';
         cDot.style.background  = '#fbbf24';
-        label.textContent      = 'Conectando con Clara...';
-        cStat.textContent      = 'Iniciando...';
-        setTimeout(() => checkApiConnection(retryCount + 1), 4000);
+        label.textContent      = retryCount === 0 ? 'Iniciando Clara...' : 'Reconectando...';
+        cStat.textContent      = 'En espera...';
+        setTimeout(() => checkApiConnection(retryCount + 1), 5000);
         return;
       }
-      useRealApi = false;
+      // After 3 retries (15s+) — show offline but still let sendMessage try
       dot.style.background   = '#f97316';
       cDot.style.background  = '#f97316';
       label.textContent      = 'Modo demo · sin servidor';

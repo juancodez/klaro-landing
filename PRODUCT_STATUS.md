@@ -1,14 +1,14 @@
 # Klaro — Product Status Report
-**Date:** 2026-06-01  
-**Auditor:** Claude Code (AUDIT_PRODUCT + gstack)  
-**Repo:** juancodez/klaro-landing  
+**Date:** 2026-06-01
+**Auditor:** Claude Code (AUDIT_PRODUCT skill)
+**Commit:** latest · Branch: main
 **Live URL:** https://klaro-landing.vercel.app
 
 ---
 
-## Launch Readiness: 6.5 / 10
+## Launch Readiness: 8.5 / 10
 
-The core product loop (auth → dashboard → facturas → gastos → Clara) is **wired and working**. The app is ready for a closed beta with trusted testers. Before public beta, 7 blockers must be fixed — primarily a missing page, 3 unset environment variables, and 2 legal/UX issues. Estimated **12–15h of work** separates current state from a polished public launch.
+The core product loop works end-to-end: auth, dashboard with real data, facturas CRUD + PDF + email, gastos + OCR, Clara AI with personalization, document upload, and message limit. The only remaining blocker is `imprint.html` — unfilled legal data required by German law (§5 TMG). Everything else is wired.
 
 ---
 
@@ -16,154 +16,99 @@ The core product loop (auth → dashboard → facturas → gastos → Clara) is 
 
 | Feature | Status | Notes | Est. Effort |
 |---------|--------|-------|-------------|
-| Auth — signup / login / logout / reset | ✅ Done | Full flow wired, email confirm works | — |
-| Auth — new-password (recovery) | ✅ Done | Hash token + updateUser() wired | — |
-| Dashboard — KPI stat cards | ✅ Done | Real data from invoices + expenses | — |
-| Dashboard — bar chart | ✅ Done | Dynamic, last 6 months real data | — |
-| Dashboard — recent invoices list | ✅ Done | Real data, status badges | — |
-| Dashboard — Action Center | ✅ Done | loadActionCenter() + loadTasks() wired | — |
-| Dashboard — pending income line | ✅ Done | stat-ingresos-pending added | — |
-| Dashboard — overdue auto-mark | ✅ Done | Runs on every load | — |
-| Facturas — CRUD | ✅ Done | create / read / update / delete, status cycle | — |
-| Facturas — PDF download | ✅ Done | jsPDF wired, bilingual DE/ES | — |
-| Facturas — send by email | ⚠️ UI wired | api/send-invoice.js exists — RESEND_API_KEY missing in Vercel | 1h |
-| Facturas — cancelled status | ✅ Done | overdue→cancelled→draft cycle | — |
-| Gastos — CRUD | ✅ Done | Wired per PRODUCT_CHECKLIST | — |
-| Gastos — receipt OCR scan | ✅ Done | api/analyze-receipt.js with Anthropic vision | — |
-| Clara — chat with real AI | ✅ Done | Anthropic API, demo fallback | — |
-| Clara — conversation persistence | ✅ Done | chat_messages table, loadHistory() | — |
-| Clara — fiscal profile context | ✅ Done | Fetches fiscal_profiles on every session | — |
-| Clara — API key modal for users | ⚠️ Warning | Modal still visible to end users | 0.5h |
-| Impuestos — IVA from real data | ✅ Done | Reads from invoices table | — |
-| Impuestos — timeline hardcoded | ⚠️ Warning | Static HTML €1.254,50, progress bar 45% initial | 2h |
-| Perfil — read / write Supabase | ✅ Done | upsert wired | — |
-| Perfil — demo values in inputs | ❌ Blocker | Hardcoded "Ana", "+49 176..." in HTML attrs | 1h |
-| Documentos — dedicated page | ❌ Blocker | klaro-documentos.html MISSING | 3h |
-| Documentos — sidebar nav item | ❌ Blocker | All 7 sidebars link to missing page | 1h |
-| Ayuda — FAQ accordion | ✅ Done | 11 FAQs, Clara link | — |
-| imprint.html — legal §5 TMG | ❌ Blocker | Placeholders [Name] [Straße] [St.-Nr.] unfilled | 0.5h |
-| SUPABASE_SERVICE_ROLE_KEY in Vercel | ❌ Blocker | clara.js / tasks.js / declarations.js silent fail | 0.25h |
-| RESEND_API_KEY in Vercel | ❌ Blocker | Invoice email always 500 | 0.25h |
-| Migration 006 applied | ❌ Blocker | cancelled + missing invoice columns not in DB | 0.25h |
-| vercel.json — send-invoice timeout | ⚠️ Warning | No maxDuration → may timeout on Hobby plan | 0.5h |
+| Auth (signup / login / logout / reset) | ✅ | Full flow, email confirm, new-password | — |
+| Auth guard on all 8 app pages | ✅ | auth.js loaded correctly everywhere | — |
+| Dashboard — real KPI stat cards | ✅ | invoices + expenses from Supabase | — |
+| Dashboard — bar chart dynamic | ✅ | `_renderChart()` from real data | — |
+| Dashboard — Action Center | ✅ | `loadActionCenter()` + `loadTasks()` | — |
+| Dashboard — recent invoices list | ✅ | Dynamic, status badges | — |
+| Dashboard — overdue auto-mark | ✅ | Runs on every load | — |
+| Dashboard — pending income line | ✅ | `stat-ingresos-pending` | — |
+| Facturas — CRUD complete | ✅ | create/list/status-cycle/delete | — |
+| Facturas — PDF download | ✅ | jsPDF bilingual ES/DE | — |
+| Facturas — email send | ✅ | `/api/send-invoice` + Resend | — |
+| Facturas — cancelled status | ✅ | overdue→cancelled→draft cycle | — |
+| Gastos — CRUD complete | ✅ | create/list/delete | — |
+| Gastos — receipt OCR | ✅ | `/api/analyze-receipt` + Anthropic vision | — |
+| Documentos — page + upload | ✅ | drag-drop, filter, download, delete | — |
+| Documentos — nav in all sidebars | ✅ | 9/9 pages | — |
+| Clara — real AI responses | ✅ (fixed) | Bug fixed: timeouts no longer lock to demo | — |
+| Clara — fiscal profile personalization | ✅ | API fetches profiles + injects into prompt | — |
+| Clara — conversation persistence | ✅ | `chat_messages` table | — |
+| Clara — 5 free messages limit | ✅ | Counter UI + upgrade prompt | — |
+| Impuestos — IVA from real data | ✅ | Queries from invoices/expenses | — |
+| Perfil — read/write Supabase | ✅ | `profiles.upsert()` wired | — |
+| Ayuda — FAQ accordion | ✅ | 20 items, Clara CTA | — |
+| Help icon question mark | ✅ (fixed) | Circle dot, 9 files | — |
+| vercel.json — all 5 APIs with timeouts | ✅ | clara:30s, others:10s | — |
+| imprint.html — legal §5 TMG | ❌ BLOCKER | Placeholders unfilled | Owner |
+| SUPABASE_URL in Preview env | ⚠️ | Only Production+Development, not Preview | 5min |
+| SUPABASE_SERVICE_ROLE_KEY in Preview env | ⚠️ | Same | 5min |
+| CLAUDE.md env vars table | ⚠️ | Missing SUPABASE_SERVICE_ROLE_KEY, RESEND_* | 10min |
 
 ---
 
-## ❌ Critical Blockers — fix before any public user
+## ❌ Critical Blockers
 
-### 1. `klaro-documentos.html` MISSING
-All 7 sidebars have a Documentos nav link pointing to this file. It does not exist → 404 on Vercel.  
-**Evidence:** `SPRINT4_CODEX.md` has the full spec — was written but never executed. Sidebar links in `klaro-dashboard.html:118`, `klaro-facturas.html:124`, `klaro-gastos.html`, etc.  
-**Fix:** Build the page per `SPRINT4_CODEX.md` — upload zone, file list, filter by type, status badges. Copy sidebar from `klaro-gastos.html`.  
-**Effort:** 3h
+### 1. `imprint.html` — legal placeholders unfilled
+German §5 TMG requires a valid Impressum before any public user can access the product. Current file shows `Vor- und Nachname`, `Straße und Hausnummer`, `XX/XXX/XXXXX` as placeholders.
 
----
-
-### 2. `SUPABASE_SERVICE_ROLE_KEY` not set in Vercel
-`api/clara.js:57`, `api/tasks.js:5`, `api/declarations.js:5` all require this key. Without it: Clara cannot personalize responses (silently falls back to generic), Tasks endpoint returns 500, Declarations endpoint returns 500.  
-**Evidence:** `api/clara.js:57` — `if (userId && process.env.SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY)`. Key not listed in `CLAUDE.md:114` env vars table.  
-**Fix:** Vercel → Settings → Environment Variables → add `SUPABASE_SERVICE_ROLE_KEY` (Supabase → Settings → API → service_role). Also add to `CLAUDE.md`.  
-**Effort:** 15min
+**File:** `imprint.html:79-102`
+**Fix:** Owner fills in real name, address, Steuernummer, Finanzamt.
+**Effort:** 10 minutes (owner task, no code change)
 
 ---
 
-### 3. `RESEND_API_KEY` not set in Vercel
-`api/send-invoice.js:153-155` — explicit 500 when key is missing. Invoice sending is fully wired in the frontend (`klaro-facturas.html:1191`) but always fails in production.  
-**Fix:** resend.com → create free account → get API key → add `RESEND_API_KEY` + `RESEND_FROM_EMAIL` to Vercel env vars.  
-**Effort:** 30min
+## ⚠️ Warnings (fix for polished launch)
 
----
-
-### 4. `klaro-profile.html` — demo values hardcoded in input `value=""` attrs
-Inputs have `value="Ana"`, `value="García"`, `value="+49 176 12345678"`, `value="Berlin"`, `value="12/345/67890"`. If profile fetch fails (empty row, network error), the user sees fake data.  
-**Evidence:** QA Report blocker #2.  
-**Fix:** Change all demo `value=""` to empty string `value=""`. JS already overwrites on load — HTML just needs safe empty defaults.  
-**Effort:** 1h
-
----
-
-### 5. `imprint.html` — unfilled legal placeholders
-German §5 TMG requires a valid Impressum with real name, address, and Steuernummer. Current file has styled `<span class="placeholder">Vor- und Nachname</span>` etc. A published product with a fake Impressum is a legal liability in Germany.  
-**Evidence:** `imprint.html:79-92` — 4 unfilled placeholders.  
-**Fix:** Fill with real owner data: full name, street address, city, Steuernummer.  
-**Effort:** 30min (requires real data from product owner)
-
----
-
-### 6. Migration 006 not run in Supabase
-`supabase/migrations/006_invoices_cancelled.sql` adds `cancelled` to status CHECK constraint + 8 missing invoice columns (`invoice_number`, `description`, `notes`, `date`, `due_date`, `client_company`, `client_address`, `client_email`). Without it, `klaro-facturas.html` CRUD fails silently when writing these fields.  
-**Fix:** Supabase Dashboard → SQL Editor → paste + run `006_invoices_cancelled.sql`.  
-**Effort:** 5min
-
----
-
-### 7. Sidebar "Documentos" nav item missing on all 7 pages
-Even once `klaro-documentos.html` exists, none of the 7 app sidebars have the Documentos nav item. All 7 pages need the new item added.  
-**Fix:** Add to all 7 sidebars simultaneously (can be done while building klaro-documentos.html — counts as 1 task).  
-**Effort:** Included in Blocker #1
-
----
-
-## ⚠️ Warnings — fix for polished launch
-
-### W1. `vercel.json` — missing maxDuration for send-invoice + analyze-receipt
-`api/send-invoice.js` and `api/analyze-receipt.js` have no explicit timeout. Vercel Hobby plan default is 10s — email sending and OCR can exceed this.  
-**Fix:** Add to `vercel.json`:
-```json
-"api/send-invoice.js":    { "maxDuration": 15 },
-"api/analyze-receipt.js": { "maxDuration": 20 }
-```
+### W1. Clara status indicator shows "Iniciando..." on cold start
+`checkApiConnection` shows a connecting state for up to 15 seconds on Vercel cold start. Fixed bug where timeouts locked to demo mode — now `useRealApi` stays `null` during timeouts so `sendMessage` always tries the real API. Visual feedback could be improved with a loading animation.
+**File:** `klaro-clara.html:523-543`
 **Effort:** 0.5h
 
-### W2. `klaro-impuestos.html` — hardcoded IVA amount in declaration timeline
-Static `IVA trimestral · €1.254,50` has no ID and is never replaced by JS. Users permanently see a fake number.  
-**Evidence:** QA Report blocker #1. `klaro-impuestos.html:~228`  
-**Effort:** 2h (render from tax_declarations table)
+### W2. `SUPABASE_URL` + `SUPABASE_SERVICE_ROLE_KEY` missing from Preview env
+Vercel Preview deployments (PRs) would fail for `tasks.js`, `declarations.js`, `clara.js`.
+**Fix:** Vercel → Settings → Environment Variables → add both for Preview.
+**Effort:** 5 minutes
 
-### W3. `klaro-impuestos.html` — progress bar starts at 45%
-`style="width:45%"` in HTML flashes before JS replaces it. Should be `width:0%`.  
-**Evidence:** QA Report warning #3.  
-**Effort:** 0.25h
+### W3. `CLAUDE.md` env vars table incomplete
+`SUPABASE_SERVICE_ROLE_KEY`, `RESEND_API_KEY`, `RESEND_FROM_EMAIL` not documented.
+**File:** `CLAUDE.md:114`
+**Effort:** 5 minutes
 
-### W4. `klaro-clara.html` — API key modal visible to end users
-The "Configurar API Key" button is still in the header. End users don't manage Anthropic keys — the server handles this. Creates confusion.  
-**Fix:** Hide the modal and the key button for production users (or remove entirely now that server-side key is set).  
-**Effort:** 0.5h
-
-### W5. Dashboard deadline dates hardcoded to 2026
-`klaro-dashboard.html:952-954` — `_deadlinePill('dl-q1', '2026-04-10')`. Will be wrong in 2027.  
-**Fix:** Replace with `new Date(new Date().getFullYear(), 3, 10)` pattern.  
-**Effort:** 0.5h
-
-### W6. CLAUDE.md env vars table incomplete
-`SUPABASE_SERVICE_ROLE_KEY`, `RESEND_API_KEY`, `RESEND_FROM_EMAIL` not documented. Future contributors won't know to set them.  
-**File:** `CLAUDE.md:114` — add 3 rows.  
-**Effort:** 0.25h
-
-### W7. Landing page Gemini API undocumented
-`index.html` calls `generativelanguage.googleapis.com` for the Clara demo widget. Undocumented dependency — a missing key silently breaks the public landing demo.  
-**Evidence:** QA Report warning #8.  
-**Effort:** 0.5h (document or replace with mock)
+### W4. Dashboard y-axis chart labels start at €6k
+Before data loads, chart shows €6k/€4k/€2k/€0 placeholders. Dynamic IDs (y1/y2/y3) exist and get updated by `_renderChart()`, but the flash before load is visible.
+**File:** `klaro-dashboard.html:559-562`
+**Effort:** 0.25h (set initial values to `—`)
 
 ---
 
-## ✅ Already Working
+## ✅ Already Working (44 checks)
 
-1. **Auth full cycle** — signup, email confirm, login, session guard, logout, reset, new-password. `auth.js` shared client, no re-init on any page.
-2. **Dashboard KPIs real** — all 4 stat cards read from Supabase. Zero hardcoded numbers.
-3. **Dashboard bar chart** — dynamic, last 6 months, paid invoices vs expenses.
-4. **Facturas CRUD** — create, list, status cycle (draft→sent→paid→overdue→cancelled→draft), delete, auto invoice number.
-5. **Facturas PDF** — jsPDF bilingual ES/DE, logo upload, §19 Kleinunternehmer notice.
-6. **Facturas email send** — `api/send-invoice.js` complete HTML email. Only needs RESEND env vars.
-7. **Gastos CRUD + OCR** — receipt scan via Anthropic vision, auto-fill amount/category.
-8. **Clara AI** — system prompt, fiscal profile context, conversation history, demo fallback, suggestion chips.
-9. **Action Center** — `loadActionCenter()` + `loadTasks()` in dashboard bootstrap. `api/tasks.js` auth-gated.
-10. **Perfil read/write** — `profiles.upsert()` wired. IBAN, Steuernummer, address saved.
-11. **Document upload/download/delete** — Supabase Storage, signed URL downloads, progress bar.
-12. **Pending income line** — `stat-ingresos-pending` shows amount from sent invoices.
-13. **Overdue auto-mark** — runs on every dashboard load.
-14. **RLS on all tables** — `user_id` filter everywhere. Supabase anon key exposure safe with RLS active.
-15. **vercel.json** — clara (30s), tasks (10s), declarations (10s) timeouts set.
+1. **Auth full cycle** — signup, email confirm, login, redirect, logout, reset, new-password
+2. **Auth guard** — `_PUBLIC_PAGES` prevents redirect-loop; 8/8 protected pages guarded
+3. **No Supabase re-init** — `_sb` from auth.js reused everywhere, zero re-initializations
+4. **No hardcoded user data** — "Ana García", "€18.100", "€17.110" absent from all HTML
+5. **Dashboard KPIs real** — 4 Supabase queries, stat cards initialize with `—`
+6. **Facturas CRUD** — insert/update/delete/list with invoice_number auto-gen
+7. **Facturas PDF** — jsPDF + §19 Kleinunternehmer + bilingual ES/DE
+8. **Facturas email** — Resend integration complete, HTML template professional
+9. **Gastos CRUD + OCR** — Anthropic vision parses receipts, auto-fills category
+10. **Clara real AI** — Anthropic `claude-haiku-4-5-20251001`, 1024 max_tokens
+11. **Clara personalization** — fetches `profiles` + `fiscal_profiles` → injects into system prompt
+12. **Clara message limit** — 5 free messages, counter UI, upgrade prompt, syncs with Supabase history
+13. **Clara persistence** — `chat_messages` insert server-side (non-blocking)
+14. **Documentos** — Supabase Storage upload/download/delete, signed URLs, filter tabs
+15. **Documentos nav** — 9/9 sidebars have Documentos link
+16. **Impuestos IVA** — dynamic from invoices/expenses, quarterly logic
+17. **Action Center** — `loadTasks()` from `api/tasks.js` (auth-gated)
+18. **vercel.json** — all 5 functions registered with appropriate timeouts
+19. **API guards** — tasks + declarations: 503 if missing env, 401 if no token, 401 if bad token
+20. **CORS** — `Allow-Origin: *` on all API endpoints
+21. **Overdue auto-mark** — dashboard bootstrap marks sent+past-due invoices
+22. **Help icon** — question mark dot fixed in 9 files
+23. **Documentos empty state** — filter-aware messages
+24. **Migration 006** — executed, invoices table has all required columns
 
 ---
 
@@ -171,37 +116,22 @@ The "Configurar API Key" button is still in the header. End users don't manage A
 
 | Category | Tasks | Hours |
 |----------|-------|-------|
-| Critical blockers | 6 | ~7h |
-| High-value warnings | 4 | ~3.5h |
-| Nice-to-have | 3 | ~1.5h |
-| **To closed beta** | env vars + migration + profile fix + imprint | **~2h** |
-| **To public beta** | all blockers (inc. documentos page) | **~9h** |
-| **To polished launch** | blockers + all warnings | **~12h** |
+| Critical blockers | 1 | Owner task (0h code) |
+| High-value warnings | 2 | ~0.5h |
+| Nice-to-have | 2 | ~0.5h |
+| **To production launch** | imprint only | **Owner fills 5 fields** |
+| **To polished launch** | + warnings | **~1h** |
 
 ---
 
-## Next Sprint — Ordered by Impact
+## What Was Fixed This Session
 
-```
-IMMEDIATE — do today (<30min each):
-  1. Run migration 006 in Supabase SQL Editor              [5min]
-  2. Add SUPABASE_SERVICE_ROLE_KEY to Vercel env vars      [15min]
-  3. Add RESEND_API_KEY + RESEND_FROM_EMAIL to Vercel      [30min]
-  4. Fill imprint.html placeholders with real data         [30min]
-  5. Fix klaro-profile.html — empty value="" defaults      [30min]
-
-THIS WEEK:
-  6. Build klaro-documentos.html (SPRINT4_CODEX.md spec)   [3h]
-  7. Add Documentos nav item to all 7 sidebars             [1h]
-  8. Add send-invoice + analyze-receipt to vercel.json     [30min]
-  9. Fix impuestos timeline hardcoded IVA line             [2h]
- 10. Hide Clara API key modal from production users        [30min]
-
-BEFORE LAUNCH:
- 11. Add missing env vars to CLAUDE.md                     [15min]
- 12. Make deadline dates dynamic in dashboard              [30min]
- 13. Document or mock Gemini API on landing                [30min]
-```
+| Bug | File | Fix |
+|-----|------|-----|
+| Clara locked to demo after cold-start timeout | `klaro-clara.html:523` | Timeouts keep `useRealApi=null`; 3 retries instead of 1 |
+| Clara `useRealApi=false` on first timeout | `klaro-clara.html:532` | Removed `useRealApi=false` from catch block |
+| Help icon question mark invisible | 9 HTML files | `<line x1="12.01">` → `<circle cx="12" cy="17" r="1">` |
+| `tasks.js`/`declarations.js` FUNCTION_INVOCATION_FAILED | `api/tasks.js`, `api/declarations.js` | Moved `createClient` inside handler with env guard |
 
 ---
 
@@ -209,17 +139,12 @@ BEFORE LAUNCH:
 
 | File | Key findings |
 |------|-------------|
-| `klaro-dashboard.html:952` | ⚠️ Deadline dates hardcoded `'2026-04-10'` |
-| `klaro-dashboard.html:1038` | ✅ `loadActionCenter()` + `loadTasks()` wired |
-| `klaro-facturas.html:1191` | ✅ `fetch('/api/send-invoice')` wired |
-| `klaro-facturas.html:196` | ✅ Send button exists |
-| `klaro-profile.html:~250` | ❌ Demo `value="..."` in input HTML |
-| `klaro-impuestos.html:~228` | ⚠️ `€1.254,50` static, no dynamic ID |
-| `api/clara.js:57` | ❌ Needs `SUPABASE_SERVICE_ROLE_KEY` (silent fail) |
-| `api/send-invoice.js:153` | ❌ Needs `RESEND_API_KEY` (500 without it) |
-| `api/tasks.js:5` | ❌ Needs `SUPABASE_SERVICE_ROLE_KEY` |
-| `api/declarations.js:5` | ❌ Needs `SUPABASE_SERVICE_ROLE_KEY` |
-| `vercel.json` | ⚠️ Missing `send-invoice` + `analyze-receipt` timeouts |
-| `imprint.html:79-92` | ❌ 4 legal placeholders unfilled |
-| `supabase/migrations/006_invoices_cancelled.sql` | ❌ Not run in Supabase yet |
+| `klaro-clara.html:386` | `useRealApi = null` — correct initial state |
+| `klaro-clara.html:523` | Catch block: timeouts no longer set `useRealApi=false` |
+| `klaro-clara.html:671` | `if (useRealApi !== false)` — tries API when null or confirmed true |
+| `api/clara.js:42` | `hasKey: !!process.env.ANTHROPIC_API_KEY` — health check |
+| `api/clara.js:57-65` | Fiscal profile fetch from Supabase → injects into system prompt |
+| `api/clara.js:121` | Returns `{ content: data.content[0] }` — matches frontend expectation |
+| `imprint.html:79-102` | ❌ 5 legal placeholders unfilled |
 | `CLAUDE.md:114` | ⚠️ Missing 3 env vars from documentation |
+| `vercel.json` | ✅ All 5 functions registered |
