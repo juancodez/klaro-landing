@@ -74,6 +74,7 @@
   </style>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="auth.js"></script>
+  <script src="notifications.js"></script>
 </head>
 <body class="bg-[#f4ede5] text-[#1e1b17] overflow-hidden h-screen flex">
 
@@ -82,7 +83,14 @@
 
 <!-- Empty state banner (shown only when user has no invoices or expenses) -->
 <div id="empty-state-banner" class="hidden fixed top-20 left-1/2 -translate-x-1/2 z-30 w-full max-w-lg px-4">
-  <div class="rounded-2xl p-4 flex items-center gap-4 shadow-lg" style="background:#fff8f1;border:1px solid rgba(164,55,0,0.15)">
+  <div class="relative rounded-2xl p-4 flex items-center gap-4 shadow-lg" style="background:#fff8f1;border:1px solid rgba(164,55,0,0.15)">
+    <button onclick="dismissWelcomeBanner()"
+            class="absolute top-2 right-2 w-6 h-6 rounded-full flex items-center justify-center transition-all hover:opacity-60"
+            style="background:rgba(89,65,57,0.08)" title="Cerrar">
+      <svg class="w-3 h-3" style="color:#594139" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+        <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+      </svg>
+    </button>
     <div class="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style="background:rgba(164,55,0,0.08)">
       <svg class="w-5 h-5" style="color:#a43700" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M12 4v16m8-8H4"/></svg>
     </div>
@@ -90,7 +98,7 @@
       <p class="text-sm font-bold" style="color:#1e1b17">Bienvenido/a a Klaro</p>
       <p class="text-xs" style="color:#594139">Empezá añadiendo tu primera factura o gasto para ver tu resumen fiscal.</p>
     </div>
-    <div class="flex gap-2 flex-shrink-0">
+    <div class="flex items-center gap-2 flex-shrink-0">
       <a href="klaro-facturas.html" class="text-xs font-bold px-3 py-2 rounded-xl text-white" style="background:#a43700">+ Factura</a>
       <a href="klaro-gastos.html" class="text-xs font-bold px-3 py-2 rounded-xl" style="background:rgba(164,55,0,0.1);color:#a43700">+ Gasto</a>
     </div>
@@ -308,12 +316,6 @@
       </svg>
       Dashboard
     </a>
-    <a href="klaro-documentos.html" class="flex items-center gap-3 px-4 py-3 rounded-xl text-[#594139] font-medium hover:bg-[#a43700]/5 transition-all text-sm">
-      <svg class="w-[18px] h-[18px] flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-        <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
-      </svg>
-      Documentos
-    </a>
     <a href="klaro-facturas.html" class="flex items-center gap-3 px-4 py-3 rounded-xl text-[#594139] font-medium hover:bg-[#a43700]/5 transition-all text-sm">
       <svg class="w-[18px] h-[18px] flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
         <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
@@ -388,7 +390,7 @@
     <!-- Right: bell + CTA -->
     <div class="flex items-center gap-3">
       <!-- Bell -->
-      <button class="relative w-9 h-9 rounded-xl flex items-center justify-center transition-colors hover:bg-[#a43700]/06"
+      <button id="bell-btn" class="relative w-9 h-9 rounded-xl flex items-center justify-center transition-colors hover:bg-[#a43700]/06"
               style="border:1px solid rgba(164,55,0,0.12);background:#fff8f1">
         <svg class="w-[17px] h-[17px] text-[#594139]" fill="none" viewBox="0 0 24 24"
              stroke="currentColor" stroke-width="2">
@@ -431,7 +433,11 @@
           </div>
         </div>
         <p id="stat-ingresos" data-stat="ingresos" class="text-2xl font-black text-[#1e1b17] leading-none">—</p>
-        <p id="stat-mes" class="text-xs font-semibold mt-2" style="color:#594139"></p>
+        <p id="stat-ingresos-pending" class="text-xs font-medium mt-1 hidden" style="color:#b45309"></p>
+        <p id="stat-mes" class="text-xs font-semibold mt-1" style="color:#594139"></p>
+        <p class="text-[10px] mt-1.5 leading-snug" style="color:rgba(89,65,57,.4)" title="Conecta tu banco próximamente para sincronización automática">
+          🔗 Conecta tu banco próximamente
+        </p>
       </div>
 
       <!-- 2. Gastos 2026 -->
@@ -735,41 +741,6 @@
     </div><!-- /bottom grid -->
 
 
-    <!-- ══ DOCUMENTOS ════════════════════════════════════════════════ -->
-    <div class="rounded-2xl p-6 fade-in-4"
-         style="background:#fff8f1;border:1px solid rgba(164,55,0,0.07);box-shadow:0 1px 6px rgba(164,55,0,.04)">
-
-      <div class="flex items-center justify-between mb-4">
-        <h3 class="font-bold text-[#1e1b17] text-sm">Documentos</h3>
-        <span id="doc-count-badge" class="text-[10px] font-bold px-2 py-0.5 rounded-lg"
-              style="background:rgba(164,55,0,.08);color:#a43700">0 archivos</span>
-      </div>
-
-      <!-- Upload zone -->
-      <div id="upload-zone"
-           class="rounded-xl border-2 border-dashed flex flex-col items-center justify-center gap-2 py-6 cursor-pointer transition-all"
-           style="border-color:rgba(164,55,0,.2);background:rgba(164,55,0,.02)"
-           onclick="document.getElementById('file-input').click()"
-           ondragover="event.preventDefault();this.style.borderColor='#a43700';this.style.background='rgba(164,55,0,.06)'"
-           ondragleave="this.style.borderColor='rgba(164,55,0,.2)';this.style.background='rgba(164,55,0,.02)'"
-           ondrop="handleDrop(event)">
-        <svg class="w-7 h-7" style="color:rgba(164,55,0,.4)" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5"/>
-        </svg>
-        <p class="text-sm font-semibold text-center" style="color:#594139">Arrastra archivos o <span style="color:#a43700">haz clic</span></p>
-        <p class="text-xs" style="color:rgba(89,65,57,.5)">PDF, JPG, PNG · máx. 10 MB</p>
-        <div id="upload-progress" class="hidden w-40 h-1.5 rounded-full overflow-hidden" style="background:rgba(164,55,0,.1)">
-          <div id="upload-bar" class="h-full transition-all duration-300 rounded-full" style="background:#a43700;width:0%"></div>
-        </div>
-      </div>
-      <input id="file-input" type="file" class="hidden" accept=".pdf,.jpg,.jpeg,.png,.webp" onchange="handleFileSelect(event)" />
-
-      <!-- Documents list -->
-      <div id="doc-list" class="mt-3 space-y-2"></div>
-
-    </div><!-- /documentos -->
-
-
     <!-- Bottom padding -->
     <div class="h-4"></div>
 
@@ -791,6 +762,12 @@
 
 <script>
 // ── Error toast ───────────────────────────────────────────────────────
+function dismissWelcomeBanner() {
+  const b = document.getElementById('empty-state-banner');
+  if (b) b.classList.add('hidden');
+  localStorage.setItem('klaro_welcome_dismissed', '1');
+}
+
 function showErrToast() {
   const el = document.createElement('div');
   el.style.cssText = 'position:fixed;bottom:24px;right:24px;background:#1e1b17;color:#fff8f1;padding:12px 20px;border-radius:12px;font-size:13px;z-index:999';
@@ -801,106 +778,6 @@ function showErrToast() {
 
 // ── Helpers ───────────────────────────────────────────────────────────
 function _esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
-function _fmtBytes(b){ if(!b||b<1024) return (b||0)+' B'; if(b<1048576) return (b/1024).toFixed(0)+' KB'; return (b/1048576).toFixed(1)+' MB'; }
-function _fmtDate(iso){ if(!iso) return ''; const d=new Date(iso); return d.toLocaleDateString('es-DE',{day:'2-digit',month:'short',year:'numeric'}); }
-function _fileExt(n){ const e=(n||'').split('.').pop().toUpperCase(); return e.length<=4?e:'FILE'; }
-
-// ── Documents ─────────────────────────────────────────────────────────
-let _docUid = null;
-
-async function loadDocuments(uid) {
-  _docUid = uid;
-  const { data, error } = await _sb.from('documents').select('*').eq('user_id', uid).order('created_at', { ascending: false });
-  if (error) showErrToast();
-  renderDocuments(data || []);
-}
-
-function renderDocuments(docs) {
-  const badge = document.getElementById('doc-count-badge');
-  const list  = document.getElementById('doc-list');
-  const stat  = document.getElementById('stat-docs');
-  if (badge) badge.textContent = docs.length + (docs.length === 1 ? ' archivo' : ' archivos');
-  if (stat)  stat.textContent  = docs.length + (docs.length === 1 ? ' documento subido' : ' documentos subidos');
-  if (!list) return;
-  if (docs.length === 0) { list.innerHTML = ''; return; }
-  list.innerHTML = docs.map(d => `
-    <div class="flex items-center gap-3 px-3 py-2.5 rounded-xl" style="background:#f4ede5">
-      <div class="w-8 h-8 rounded-lg flex-shrink-0 flex items-center justify-center text-[9px] font-black"
-           style="background:rgba(164,55,0,.12);color:#a43700">${_fileExt(d.name)}</div>
-      <div class="flex-1 min-w-0">
-        <p class="text-sm font-semibold truncate" style="color:#1e1b17">${_esc(d.name)}</p>
-        <p class="text-xs" style="color:#594139">${_fmtBytes(d.size_bytes)} · ${_fmtDate(d.created_at)}</p>
-      </div>
-      <button onclick="downloadDoc('${_esc(d.storage_path)}','${_esc(d.name)}')"
-              class="w-8 h-8 rounded-lg flex-shrink-0 flex items-center justify-center transition-all hover:opacity-70"
-              style="background:rgba(164,55,0,.1)" title="Descargar">
-        <svg class="w-4 h-4" style="color:#a43700" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-          <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
-        </svg>
-      </button>
-      <button onclick="deleteDoc('${d.id}','${_esc(d.storage_path)}')"
-              class="w-8 h-8 rounded-lg flex-shrink-0 flex items-center justify-center transition-all hover:opacity-70"
-              style="background:rgba(220,38,38,.08)" title="Eliminar">
-        <svg class="w-4 h-4" style="color:#dc2626" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-          <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/>
-        </svg>
-      </button>
-    </div>
-  `).join('');
-}
-
-async function uploadFile(file) {
-  if (!_docUid) return;
-  if (file.size > 10 * 1024 * 1024) { alert('El archivo supera el límite de 10 MB.'); return; }
-  const zone = document.getElementById('upload-zone');
-  const prog = document.getElementById('upload-progress');
-  const bar  = document.getElementById('upload-bar');
-  zone.style.pointerEvents = 'none';
-  if (prog) { prog.classList.remove('hidden'); bar.style.width = '30%'; }
-  const path = `${_docUid}/${Date.now()}-${file.name}`;
-  const { error } = await _sb.storage.from('documents').upload(path, file, { upsert: false });
-  if (error) {
-    alert('Error al subir: ' + error.message);
-    zone.style.pointerEvents = '';
-    if (prog) { prog.classList.add('hidden'); bar.style.width = '0%'; }
-    return;
-  }
-  if (prog) bar.style.width = '70%';
-  await _sb.from('documents').insert({
-    user_id: _docUid, name: file.name, type: file.type,
-    storage_path: path, year: new Date().getFullYear(), size_bytes: file.size,
-  });
-  if (prog) bar.style.width = '100%';
-  setTimeout(async () => {
-    zone.style.pointerEvents = '';
-    if (prog) { prog.classList.add('hidden'); bar.style.width = '0%'; }
-    await loadDocuments(_docUid);
-  }, 400);
-}
-
-function handleFileSelect(e) { const f = e.target.files[0]; if (f) uploadFile(f); e.target.value = ''; }
-
-function handleDrop(e) {
-  e.preventDefault();
-  const zone = document.getElementById('upload-zone');
-  zone.style.borderColor = 'rgba(164,55,0,.2)';
-  zone.style.background  = 'rgba(164,55,0,.02)';
-  const f = e.dataTransfer.files[0];
-  if (f) uploadFile(f);
-}
-
-async function downloadDoc(path, name) {
-  const { data, error } = await _sb.storage.from('documents').createSignedUrl(path, 3600);
-  if (error) { alert('Error al descargar: ' + error.message); return; }
-  const a = document.createElement('a'); a.href = data.signedUrl; a.download = name; a.click();
-}
-
-async function deleteDoc(id, path) {
-  if (!confirm('¿Eliminar este documento?')) return;
-  await _sb.storage.from('documents').remove([path]);
-  await _sb.from('documents').delete().eq('id', id);
-  await loadDocuments(_docUid);
-}
 
 // -- Recent Invoices --------------------------------------------------
 function loadRecentInvoices(invoices) {
@@ -921,13 +798,14 @@ function loadRecentInvoices(invoices) {
     return;
   }
 
-  const statusLabel = { paid: 'Cobrada', sent: 'Enviada', pending: 'Pendiente', draft: 'Borrador', overdue: 'Vencida' };
+  const statusLabel = { paid: 'Cobrada', sent: 'Enviada', pending: 'Pendiente', draft: 'Borrador', overdue: 'Vencida', cancelled: 'Cancelada' };
   const statusColor = {
-    paid:    'background:rgba(34,197,94,.1);color:#15803d',
-    sent:    'background:rgba(59,130,246,.1);color:#1d4ed8',
-    pending: 'background:rgba(234,179,8,.1);color:#a16207',
-    overdue: 'background:rgba(220,38,38,.1);color:#dc2626',
-    draft:   'background:rgba(164,55,0,.08);color:#a43700',
+    paid:      'background:rgba(34,197,94,.1);color:#15803d',
+    sent:      'background:rgba(59,130,246,.1);color:#1d4ed8',
+    pending:   'background:rgba(234,179,8,.1);color:#a16207',
+    overdue:   'background:rgba(220,38,38,.1);color:#dc2626',
+    draft:     'background:rgba(164,55,0,.08);color:#a43700',
+    cancelled: 'background:rgba(107,114,128,.1);color:#6b7280',
   };
 
   container.innerHTML = recent.map(inv => {
@@ -1102,9 +980,17 @@ function _renderChart(invoices, expenses) {
 
   const fmt = n => '€' + Math.round(n).toLocaleString('de-DE');
 
+  // Auto-mark overdue invoices (sent/pending with due_date in the past)
+  _sb.from('invoices')
+    .update({ status: 'overdue' })
+    .eq('user_id', uid)
+    .in('status', ['sent', 'pending'])
+    .lt('due_date', new Date().toISOString().slice(0, 10))
+    .then(({ error }) => { if (error) console.warn('overdue update:', error.message); });
+
   // Fetch invoices and expenses in parallel (client_name needed for invoice list)
   const [{ data: invoices, error: invErr }, { data: expenses, error: expErr }] = await Promise.all([
-    _sb.from('invoices').select('amount, status, date, client_name').eq('user_id', uid),
+    _sb.from('invoices').select('amount, status, date, client_name, due_date').eq('user_id', uid),
     _sb.from('expenses').select('amount, date').eq('user_id', uid),
   ]);
   if (invErr || expErr) showErrToast();
@@ -1113,11 +999,12 @@ function _renderChart(invoices, expenses) {
   const exp = expenses || [];
 
   // Stat cards
-  const totalIngresos = inv.filter(i => i.status === 'paid').reduce((s,i) => s + (parseFloat(i.amount)||0), 0);
-  const totalGastos   = exp.reduce((s,e) => s + (parseFloat(e.amount)||0), 0);
-  const beneficio     = totalIngresos - totalGastos;
+  const totalIngresos  = inv.filter(i => i.status === 'paid').reduce((s,i) => s + (parseFloat(i.amount)||0), 0);
+  const totalPendiente = inv.filter(i => ['sent','pending'].includes(i.status)).reduce((s,i) => s + (parseFloat(i.amount)||0), 0);
+  const totalGastos    = exp.reduce((s,e) => s + (parseFloat(e.amount)||0), 0);
+  const beneficio      = totalIngresos - totalGastos;
   // IVA: facturado − Vorsteuer (IVA deducible de gastos)
-  const ivaPendiente  = Math.max(0, totalIngresos * 0.19 - totalGastos * 0.19);
+  const ivaPendiente   = Math.max(0, totalIngresos * 0.19 - totalGastos * 0.19);
 
   const elIngresos  = document.getElementById('stat-ingresos');
   const elGastos    = document.getElementById('stat-gastos');
@@ -1128,8 +1015,15 @@ function _renderChart(invoices, expenses) {
   if (elBeneficio) elBeneficio.textContent = fmt(beneficio);
   if (elIva)       elIva.textContent       = fmt(ivaPendiente);
 
-  // Empty state
-  if (!inv.length && !exp.length) {
+  // Pending income line below ingresos stat
+  const elPending = document.getElementById('stat-ingresos-pending');
+  if (elPending && totalPendiente > 0) {
+    elPending.textContent = '+ ' + fmt(totalPendiente) + ' pendiente de cobro';
+    elPending.classList.remove('hidden');
+  }
+
+  // Empty state (skip if user already dismissed)
+  if (!inv.length && !exp.length && !localStorage.getItem('klaro_welcome_dismissed')) {
     const b = document.getElementById('empty-state-banner');
     if (b) b.classList.remove('hidden');
   }
@@ -1137,9 +1031,8 @@ function _renderChart(invoices, expenses) {
   // Bar chart
   _renderChart(inv, exp);
 
-  // Invoice list & documents
+  // Invoice list
   loadRecentInvoices(inv);
-  await loadDocuments(uid);
 
   // Action Center + Clara recommendations
   loadActionCenter(uid, inv, exp);
@@ -1316,27 +1209,25 @@ async function loadActionCenter(uid, inv, exp) {
     });
   }
 
-  // Expenses: if very few
+  // Expenses: if none, show deductible examples card
   if ((exp || []).length === 0) {
     actions.push({
       priority: 'green',
       icon: '<path d="M20 12V22H4V12"/><path d="M22 7H2v5h20V7z"/>',
-      title: 'Sin gastos registrados',
-      desc: 'Los gastos deducibles reducen tu IVA y tu base imponible.',
+      title: 'Gastos que podés deducir',
+      desc: 'Como freelancer en Alemania, estos gastos reducen tu base imponible:',
+      list: [
+        'Homeoffice-Pauschale — 6 €/día (máx. 1.260 €/año)',
+        'Software profesional — Figma, Adobe CC, Notion',
+        'BVG Monatskarte (uso profesional)',
+        'Formación — cursos, libros técnicos, conferencias',
+        'Equipos de trabajo — laptop, periféricos, cámara',
+      ],
       cta: 'Añadir gasto',
       href: 'klaro-gastos.html',
     });
   }
 
-  // Clara recommendation: docs page
-  actions.push({
-    priority: 'blue',
-    icon: '<path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>',
-    title: 'Subí tus recibos del trimestre',
-    desc: 'Documentá tus gastos para maximizar la deducción de Vorsteuer.',
-    cta: 'Ir a Documentos',
-    href: 'klaro-documentos.html',
-  });
 
   const COLORS = {
     red:   { bg: 'rgba(239,68,68,.06)',  border: 'rgba(239,68,68,.15)',  dot: '#DC2626', cta: '#DC2626', ctaBg: 'rgba(239,68,68,.08)' },
@@ -1351,6 +1242,11 @@ async function loadActionCenter(uid, inv, exp) {
 
   container.innerHTML = actions.slice(0, 4).map(a => {
     const c = COLORS[a.priority];
+    const listHtml = a.list && a.list.length
+      ? `<ul class="mt-1.5 flex flex-col gap-0.5">${a.list.map(item =>
+          `<li class="text-xs flex items-start gap-1.5" style="color:#594139"><span style="color:${c.dot};margin-top:2px">•</span><span>${item}</span></li>`
+        ).join('')}</ul>`
+      : '';
     return `<div class="rounded-2xl p-4 flex flex-col gap-2" style="background:${c.bg};border:1px solid ${c.border}">
       <div class="flex items-start gap-3">
         <div class="w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0" style="background:${c.ctaBg}">
@@ -1359,6 +1255,7 @@ async function loadActionCenter(uid, inv, exp) {
         <div class="flex-1 min-w-0">
           <p class="text-sm font-bold text-[#1e1b17] leading-tight">${a.title}</p>
           <p class="text-xs mt-0.5" style="color:#594139">${a.desc}</p>
+          ${listHtml}
         </div>
       </div>
       <a href="${a.href}" class="text-xs font-bold px-3 py-1.5 rounded-lg text-center transition-all hover:opacity-80" style="background:${c.ctaBg};color:${c.cta}">${a.cta} →</a>

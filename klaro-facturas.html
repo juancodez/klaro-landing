@@ -787,13 +787,14 @@
     const gross   = net * (1 + taxRate / 100);
 
     const STATUS_STYLES = {
-      draft:   'background:rgba(89,65,57,.08);color:#594139',
-      sent:    'background:rgba(59,130,246,.1);color:#1d4ed8',
-      paid:    'background:rgba(5,150,105,.1);color:#059669',
-      overdue: 'background:rgba(220,38,38,.1);color:#dc2626',
+      draft:     'background:rgba(89,65,57,.08);color:#594139',
+      sent:      'background:rgba(59,130,246,.1);color:#1d4ed8',
+      paid:      'background:rgba(5,150,105,.1);color:#059669',
+      overdue:   'background:rgba(220,38,38,.1);color:#dc2626',
+      cancelled: 'background:rgba(107,114,128,.1);color:#6b7280',
     };
-    const STATUS_LABELS = { draft:'Borrador', sent:'Enviada', paid:'Pagada', overdue:'Vencida' };
-    const NEXT_STATUS   = { draft:'sent', sent:'paid', paid:'draft', overdue:'draft' };
+    const STATUS_LABELS = { draft:'Borrador', sent:'Enviada', paid:'Pagada ✓', overdue:'Vencida', cancelled:'Cancelada' };
+    const NEXT_STATUS   = { draft:'sent', sent:'paid', paid:'draft', overdue:'cancelled', cancelled:'draft' };
 
     const status  = inv.status || 'draft';
     const style   = STATUS_STYLES[status] || STATUS_STYLES.draft;
@@ -943,7 +944,7 @@
     const inv = allInvoices.find(i => i.id === id);
     if (inv) {
       inv.status = newStatus;
-      const STATUS_LABELS = { draft:'Borrador', sent:'Enviada', paid:'Pagada', overdue:'Vencida' };
+      const STATUS_LABELS = { draft:'Borrador', sent:'Enviada', paid:'Pagada ✓', overdue:'Vencida', cancelled:'Cancelada' };
       showToast('Estado actualizado a ' + (STATUS_LABELS[newStatus] || newStatus));
       renderInvoiceList();
       updateRevenueTotal();
