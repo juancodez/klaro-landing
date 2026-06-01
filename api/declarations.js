@@ -1,18 +1,19 @@
 const { createClient } = require('@supabase/supabase-js');
 
-const sb = createClient(
-  process.env.SUPABASE_URL,
-  process.env.SUPABASE_SERVICE_ROLE_KEY
-);
-
 module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PATCH, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
   if (req.method === 'OPTIONS') return res.status(200).end();
 
+  if (!process.env.SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
+    return res.status(503).json({ error: 'Service not configured' });
+  }
+
   const token = (req.headers.authorization || '').replace('Bearer ', '');
   if (!token) return res.status(401).json({ error: 'No token' });
+
+  const sb = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY);
 
   const { data: { user }, error: authErr } = await sb.auth.getUser(token);
   if (authErr || !user) return res.status(401).json({ error: 'Invalid token' });
