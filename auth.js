@@ -42,19 +42,20 @@ _sb.auth.onAuthStateChange((event, session) => {
   document.querySelectorAll('[data-user-initials]').forEach(el => { el.textContent = initials0; });
   document.querySelectorAll('[data-user-name]').forEach(el => { el.textContent = displayName0; });
 
-  // Fetch profile and upgrade to real name + city
+  // Fetch profile for city (and name only if metadata has none)
   _sb.from('profiles')
     .select('full_name, city')
     .eq('id', session.user.id)
     .single()
     .then(({ data: profile }) => {
       if (!profile) return;
-      const displayName = profile.full_name || email;
-      const profileInitials = profile.full_name
-        ? profile.full_name.split(' ').filter(Boolean).map(w => w[0].toUpperCase()).join('').slice(0, 2)
-        : email.slice(0, 2).toUpperCase();
-      document.querySelectorAll('[data-user-initials]').forEach(el => { el.textContent = profileInitials; });
-      document.querySelectorAll('[data-user-name]').forEach(el => { el.textContent = displayName; });
+      if (!metaName && profile.full_name) {
+        const displayName = profile.full_name;
+        const profileInitials = profile.full_name
+          .split(' ').filter(Boolean).map(w => w[0].toUpperCase()).join('').slice(0, 2);
+        document.querySelectorAll('[data-user-initials]').forEach(el => { el.textContent = profileInitials; });
+        document.querySelectorAll('[data-user-name]').forEach(el => { el.textContent = displayName; });
+      }
       if (profile.city) {
         document.querySelectorAll('[data-user-city]').forEach(el => {
           el.textContent = `Freiberufler/a · ${profile.city}`;

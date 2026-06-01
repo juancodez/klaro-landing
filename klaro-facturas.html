@@ -86,6 +86,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="auth.js"></script>
+  <script src="notifications.js"></script>
 </head>
 <body class="bg-cream text-navy overflow-hidden h-screen flex">
 
@@ -104,7 +105,7 @@
 
   <!-- User chip -->
   <div class="mx-4 mb-5 px-3.5 py-3 rounded-2xl flex items-center gap-3 flex-shrink-0" style="background:rgba(164,55,0,0.06);border:1px solid rgba(164,55,0,0.08)">
-    <div class="w-9 h-9 rounded-full flex-shrink-0 flex items-center justify-center font-bold text-xs text-white" style="background:linear-gradient(135deg,#a43700,#FFB830)" data-user-initials="">AG</div>
+    <div class="w-9 h-9 rounded-full flex-shrink-0 flex items-center justify-center font-bold text-xs text-white" style="background:linear-gradient(135deg,#a43700,#FFB830)" data-user-initials=""></div>
     <div class="min-w-0">
       <p class="text-[#1e1b17] text-sm font-semibold truncate leading-tight" data-user-name>…</p>
       <p class="text-[11px] truncate leading-tight" data-user-city style="color:#594139">Freiberufler/a</p>
@@ -119,12 +120,6 @@
         <rect x="3" y="14" width="7" height="7" rx="1"></rect><rect x="14" y="14" width="7" height="7" rx="1"></rect>
       </svg>
       Dashboard
-    </a>
-    <a href="klaro-documentos.html" class="flex items-center gap-3 px-4 py-3 rounded-xl text-[#594139] font-medium hover:bg-[#a43700]/5 transition-all text-sm">
-      <svg class="w-[18px] h-[18px] flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-        <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
-      </svg>
-      Documentos
     </a>
     <a href="klaro-facturas.html" class="nav-active flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm transition-all">
       <svg class="w-[18px] h-[18px] flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -193,14 +188,9 @@
     </div>
     <div class="flex items-center gap-2.5">
       <!-- Bell -->
-      <button class="relative w-9 h-9 rounded-xl flex items-center justify-center text-muted hover:bg-cream transition-colors">
+      <button id="bell-btn" class="relative w-9 h-9 rounded-xl flex items-center justify-center text-muted hover:bg-cream transition-colors">
         <svg class="w-[17px] h-[17px]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-        <span class="absolute top-1.5 right-1.5 w-1.5 h-1.5 rounded-full bg-orange"></span>
-      </button>
-      <!-- Guardar borrador -->
-      <button id="btn-draft" onclick="saveDraft()" class="hidden sm:flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-medium text-[#594139] transition-all hover:bg-[#a43700]/5" style="border:1.5px solid rgba(164,55,0,0.2)">
-        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
-        Guardar borrador
+        <span id="bell-dot" class="absolute top-1.5 right-1.5 w-1.5 h-1.5 rounded-full" style="background:#a43700;display:none"></span>
       </button>
       <!-- Enviar Factura -->
       <button id="btn-send" onclick="sendInvoice()" class="flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-semibold text-white transition-all hover:opacity-90 active:scale-95" style="background:#a43700">
@@ -209,7 +199,7 @@
       </button>
       <!-- Avatar -->
       <div class="w-8 h-8 rounded-full flex items-center justify-center text-white font-semibold text-xs cursor-pointer"
-           style="background:linear-gradient(135deg,#a43700,#FFB830)" data-user-initials>AG</div>
+           style="background:linear-gradient(135deg,#a43700,#FFB830)" data-user-initials></div>
     </div>
   </header>
 
@@ -223,82 +213,79 @@
         <!-- Section title -->
         <div class="fade-in">
           <h2 class="font-serif text-2xl text-navy leading-tight">Nueva Factura</h2>
-          <p class="text-sm text-muted mt-0.5">Rellena los datos y genera tu Rechnung al instante.</p>
+          <p class="text-sm text-muted mt-0.5">Rellena los datos de tu cliente. Genera y personaliza tu "Rechnung" al instante.</p>
         </div>
 
-        <!-- ── Card 1: Basic info ── -->
+        <!-- ── Card: Datos del cliente ── -->
         <div class="bg-[#fff8f1] rounded-2xl p-5 fade-in" style="border:1px solid rgba(164,55,0,0.08);box-shadow:0 0 0 3px rgba(164,55,0,.04);animation-delay:.05s">
-          <h3 class="text-xs font-semibold uppercase tracking-widest text-muted mb-4">Datos principales</h3>
-
+          <h3 class="text-xs font-semibold uppercase tracking-widest text-muted mb-4">Datos del cliente</h3>
           <div class="space-y-4">
-            <!-- Invoice number + Date row -->
+            <!-- Client name -->
+            <div>
+              <label class="block text-xs font-medium text-navy mb-1.5">Nombre del cliente</label>
+              <input id="inv-client" type="text" placeholder="ej. Maria Schmidt"
+                class="klaro-input w-full px-3.5 py-2.5 rounded-xl text-sm text-navy"
+                style="background:#fff8f1;border:1.5px solid rgba(164,55,0,0.12)" oninput="updatePreview()" />
+            </div>
+            <!-- Client company -->
+            <div>
+              <label class="block text-xs font-medium text-navy mb-1.5">Empresa del cliente <span class="text-muted font-normal">(opcional)</span></label>
+              <input id="inv-client-company" type="text" placeholder="ej. Acme GmbH"
+                class="klaro-input w-full px-3.5 py-2.5 rounded-xl text-sm text-navy"
+                style="background:#fff8f1;border:1.5px solid rgba(164,55,0,0.12)" oninput="updatePreview()" />
+            </div>
+            <!-- Client address -->
+            <div>
+              <label class="block text-xs font-medium text-navy mb-1.5">Dirección del cliente</label>
+              <input id="inv-client-address" type="text" placeholder="ej. Musterstraße 1, 10115 Berlín"
+                class="klaro-input w-full px-3.5 py-2.5 rounded-xl text-sm text-navy"
+                style="background:#fff8f1;border:1.5px solid rgba(164,55,0,0.12)" oninput="updatePreview()" />
+            </div>
+            <!-- Client email -->
+            <div>
+              <label class="block text-xs font-medium text-navy mb-1.5">Email del cliente <span class="text-muted font-normal">(para envío)</span></label>
+              <input id="inv-client-email" type="email" placeholder="ej. cliente@empresa.com"
+                class="klaro-input w-full px-3.5 py-2.5 rounded-xl text-sm text-navy"
+                style="background:#fff8f1;border:1.5px solid rgba(164,55,0,0.12)" />
+            </div>
+          </div>
+        </div>
+
+        <!-- ── Card: Datos de la factura ── -->
+        <div class="bg-[#fff8f1] rounded-2xl p-5 fade-in" style="border:1px solid rgba(164,55,0,0.08);box-shadow:0 0 0 3px rgba(164,55,0,.04);animation-delay:.08s">
+          <h3 class="text-xs font-semibold uppercase tracking-widest text-muted mb-4">Datos de la factura</h3>
+          <div class="space-y-4">
+            <!-- Invoice number + Date -->
             <div class="grid grid-cols-2 gap-3">
               <div>
                 <label class="block text-xs font-medium text-navy mb-1.5">Nº Factura</label>
-                <input
-                  id="inv-number"
-                  type="text"
-                  value="KL-2026-001"
+                <input id="inv-number" type="text" value="KL-2026-001"
                   class="klaro-input w-full px-3.5 py-2.5 rounded-xl text-sm text-navy font-medium"
-                  style="background:#fff8f1;border:1.5px solid rgba(164,55,0,0.12)"
-                  oninput="updatePreview()"
-                />
+                  style="background:#fff8f1;border:1.5px solid rgba(164,55,0,0.12)" oninput="updatePreview()" />
               </div>
               <div>
                 <label class="block text-xs font-medium text-navy mb-1.5">Fecha</label>
-                <input
-                  id="inv-date"
-                  type="date"
-                  value="2026-04-16"
+                <input id="inv-date" type="date" value="2026-04-16"
                   class="klaro-input w-full px-3.5 py-2.5 rounded-xl text-sm text-navy"
-                  style="background:#fff8f1;border:1.5px solid rgba(164,55,0,0.12)"
-                  oninput="updatePreview()"
-                />
+                  style="background:#fff8f1;border:1.5px solid rgba(164,55,0,0.12)" oninput="updatePreview()" />
               </div>
             </div>
-
-            <!-- Client name -->
+            <!-- Amount -->
             <div>
-              <label class="block text-xs font-medium text-navy mb-1.5">Cliente</label>
-              <input
-                id="inv-client"
-                type="text"
-                placeholder="ej. Acme GmbH, Berlín"
-                class="klaro-input w-full px-3.5 py-2.5 rounded-xl text-sm text-navy"
-                style="background:#fff8f1;border:1.5px solid rgba(164,55,0,0.12)"
-                oninput="updatePreview()"
-              />
-            </div>
-
-            <!-- Amount + Currency row -->
-            <div>
-              <label class="block text-xs font-medium text-navy mb-1.5">Importe neto (€)</label>
+              <label class="block text-xs font-medium text-navy mb-1.5">Importe bruto (€)</label>
               <div class="relative">
                 <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-sm font-semibold text-muted">€</span>
-                <input
-                  id="inv-amount"
-                  type="number"
-                  min="0"
-                  step="0.01"
-                  placeholder="0,00"
+                <input id="inv-amount" type="number" min="0" step="0.01" placeholder="0,00"
                   class="klaro-input w-full pl-8 pr-3.5 py-2.5 rounded-xl text-sm text-navy font-semibold"
-                  style="background:#fff8f1;border:1.5px solid rgba(164,55,0,0.12)"
-                  oninput="updatePreview()"
-                />
+                  style="background:#fff8f1;border:1.5px solid rgba(164,55,0,0.12)" oninput="updatePreview()" />
               </div>
             </div>
-
             <!-- Description -->
             <div>
               <label class="block text-xs font-medium text-navy mb-1.5">Descripción del servicio</label>
-              <textarea
-                id="inv-desc"
-                rows="2"
-                placeholder="ej. Diseño UX — sprint Q1 2026"
+              <textarea id="inv-desc" rows="2" placeholder="ej. Diseño UX — sprint Q1 2026"
                 class="klaro-input w-full px-3.5 py-2.5 rounded-xl text-sm text-navy resize-none"
-                style="background:#fff8f1;border:1.5px solid rgba(164,55,0,0.12)"
-                oninput="updatePreview()"
-              ></textarea>
+                style="background:#fff8f1;border:1.5px solid rgba(164,55,0,0.12)" oninput="updatePreview()"></textarea>
             </div>
           </div>
         </div>
@@ -390,12 +377,13 @@
               <svg class="w-3.5 h-3.5 text-orange" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
               <h3 class="text-xs font-semibold uppercase tracking-widest text-muted">Adjuntos</h3>
             </div>
-            <label class="flex flex-col items-center justify-center gap-1.5 w-full py-4 rounded-xl cursor-pointer transition-colors hover:bg-orange/5"
+            <label id="adjunto-label" class="flex flex-col items-center justify-center gap-1.5 w-full py-4 rounded-xl cursor-pointer transition-colors hover:bg-orange/5"
                    style="background:rgba(164,55,0,0.04);border:1.5px dashed rgba(164,55,0,0.18)">
-              <svg class="w-5 h-5 text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-              <span class="text-[10px] font-medium text-muted">Subir archivo</span>
-              <input type="file" class="hidden" accept=".pdf,.jpg,.png" />
+              <svg id="adjunto-icon" class="w-5 h-5 text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+              <span id="adjunto-label-text" class="text-[10px] font-medium text-muted">Subir recibo existente</span>
+              <input id="adjunto-file" type="file" class="hidden" accept=".pdf,.jpg,.png,.jpeg" onchange="handleAdjuntoUpload(this)" />
             </label>
+            <p id="adjunto-status" class="hidden mt-1.5 text-[10px] text-center text-muted"></p>
           </div>
 
           <!-- Notes card — full width -->
@@ -412,6 +400,63 @@
               style="background:#fff8f1;border:1.5px solid rgba(164,55,0,0.12)"
               oninput="updatePreview()"
             ></textarea>
+          </div>
+        </div>
+
+        <!-- ── Logo upload card ── -->
+        <div class="bg-[#fff8f1] rounded-2xl p-4 fade-in bento-card" style="border:1px solid rgba(164,55,0,0.08);box-shadow:0 0 0 3px rgba(164,55,0,.04);animation-delay:.18s">
+          <div class="flex items-center gap-1.5 mb-3">
+            <svg class="w-3.5 h-3.5 text-orange" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+            <h3 class="text-xs font-semibold uppercase tracking-widest text-muted">Tu logo en el PDF</h3>
+          </div>
+          <div class="flex items-center gap-3">
+            <div id="logo-preview-wrap" class="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 overflow-hidden" style="background:rgba(164,55,0,0.06);border:1.5px dashed rgba(164,55,0,0.18)">
+              <img id="logo-preview-img" class="hidden w-full h-full object-contain rounded-xl" alt="logo" />
+              <svg id="logo-preview-icon" class="w-5 h-5 text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+            </div>
+            <div class="flex-1 min-w-0">
+              <p id="logo-filename" class="text-xs text-navy font-medium truncate">Sin logo</p>
+              <p class="text-[10px] text-muted mt-0.5">PNG o JPG · máx 2MB · aparece en el PDF</p>
+              <label for="logo-file-input" class="mt-1.5 inline-flex items-center gap-1 text-[10px] font-semibold cursor-pointer px-2.5 py-1 rounded-lg transition-all hover:opacity-80" style="background:rgba(164,55,0,0.1);color:#a43700">
+                <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                Subir logo
+              </label>
+            </div>
+          </div>
+          <input id="logo-file-input" type="file" class="hidden" accept=".png,.jpg,.jpeg" onchange="handleLogoUpload(this)" />
+        </div>
+
+        <!-- ── Company info card ── -->
+        <div class="bg-[#fff8f1] rounded-2xl p-4 fade-in bento-card" style="border:1px solid rgba(164,55,0,0.08);box-shadow:0 0 0 3px rgba(164,55,0,.04);animation-delay:.19s">
+          <div class="flex items-center gap-1.5 mb-3">
+            <svg class="w-3.5 h-3.5 text-orange" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            <h3 class="text-xs font-semibold uppercase tracking-widest text-muted">Datos de tu empresa</h3>
+          </div>
+          <div class="space-y-2.5">
+            <div>
+              <label class="block text-[10px] font-medium text-muted mb-1">Nombre de empresa o profesional</label>
+              <input
+                id="company-name-input"
+                type="text"
+                placeholder="ej. Juan Gómez Vara"
+                maxlength="60"
+                class="klaro-input w-full px-3 py-2 rounded-xl text-sm text-navy font-semibold"
+                style="background:#fff8f1;border:1.5px solid rgba(164,55,0,0.12)"
+                oninput="updateCompanyPreview()"
+              />
+            </div>
+            <div>
+              <label class="block text-[10px] font-medium text-muted mb-1">Servicio / subtítulo del recibo</label>
+              <input
+                id="company-service-input"
+                type="text"
+                placeholder="ej. Diseño UX · Freelancer"
+                maxlength="50"
+                class="klaro-input w-full px-3 py-2 rounded-xl text-sm text-navy"
+                style="background:#fff8f1;border:1.5px solid rgba(164,55,0,0.12)"
+                oninput="updateCompanyPreview()"
+              />
+            </div>
           </div>
         </div>
 
@@ -443,7 +488,16 @@
               <p class="text-xl font-bold text-navy mt-0.5" id="revenue-total">€ 0,00</p>
               <p class="text-[10px] text-muted">ingresos totales (bruto)</p>
             </div>
-            <span id="invoice-count-badge" class="text-xs font-medium px-2.5 py-1 rounded-xl" style="background:rgba(164,55,0,.08);color:#a43700">0 facturas</span>
+            <div class="flex items-center gap-2">
+              <button onclick="document.getElementById('receipt-upload-input').click()"
+                      class="flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-xl transition-all hover:opacity-80"
+                      style="background:rgba(164,55,0,0.1);color:#a43700">
+                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                Subir recibo
+              </button>
+              <input id="receipt-upload-input" type="file" class="hidden" accept=".pdf,.jpg,.png,.jpeg" onchange="handleReceiptUpload(this)" />
+              <span id="invoice-count-badge" class="text-xs font-medium px-2.5 py-1 rounded-xl" style="background:rgba(164,55,0,.08);color:#a43700">0 facturas</span>
+            </div>
           </div>
 
           <!-- Loading skeleton -->
@@ -456,11 +510,14 @@
           <!-- Invoice list -->
           <div id="inv-list" class="hidden space-y-2"></div>
 
+          <!-- Document list (uploaded receipts) -->
+          <div id="doc-list" class="space-y-2 mt-2"></div>
+
           <!-- Empty state -->
           <div id="inv-empty" class="hidden text-center py-8">
             <div class="text-3xl mb-2">📄</div>
             <p class="text-sm font-semibold text-navy">Sin facturas todavía</p>
-            <p class="text-xs text-muted mt-1">Guarda tu primera factura con los botones de arriba.</p>
+            <p class="text-xs text-muted mt-1">Guarda tu primera factura o sube un recibo existente.</p>
           </div>
         </div>
 
@@ -468,12 +525,22 @@
 
       <!-- ── RIGHT: A4 PREVIEW ─────────────────────────────────────────── -->
       <div class="hidden lg:flex flex-col flex-1 min-w-0 fade-in" style="animation-delay:.2s">
-        <div class="flex items-center justify-between mb-4">
+        <div class="flex items-center justify-between mb-3">
           <p class="text-xs font-semibold uppercase tracking-widest text-muted">Vista previa · Rechnung</p>
           <button onclick="window.print()" class="flex items-center gap-1.5 text-xs font-medium text-muted hover:text-navy transition-colors">
             <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
             Imprimir / PDF
           </button>
+        </div>
+
+        <!-- PDF language toggle -->
+        <div class="flex items-center gap-2 mb-4">
+          <span class="text-[10px] font-semibold uppercase tracking-wider" style="color:#594139">PDF:</span>
+          <div class="flex items-center gap-1 p-1 rounded-xl" style="background:rgba(164,55,0,0.06)">
+            <button onclick="setPdfLang('bilingual',this)" class="pdf-lang-btn text-xs font-semibold px-3 py-1.5 rounded-lg transition-all" style="background:#a43700;color:white">ES / DE</button>
+            <button onclick="setPdfLang('es',this)" class="pdf-lang-btn text-xs font-semibold px-3 py-1.5 rounded-lg transition-all" style="color:#594139">Solo ES</button>
+            <button onclick="setPdfLang('de',this)" class="pdf-lang-btn text-xs font-semibold px-3 py-1.5 rounded-lg transition-all" style="color:#594139">Solo DE</button>
+          </div>
         </div>
 
         <!-- A4 card -->
@@ -485,12 +552,13 @@
             <div class="flex items-start justify-between">
               <!-- Brand -->
               <div class="flex items-center gap-2.5">
-                <div class="w-9 h-9 rounded-lg bg-orange flex items-center justify-center flex-shrink-0">
+                <div id="prev-logo-k" class="w-9 h-9 rounded-lg bg-orange flex items-center justify-center flex-shrink-0">
                   <span class="text-white font-bold text-lg font-serif leading-none">K</span>
                 </div>
+                <img id="prev-user-logo" class="hidden w-9 h-9 rounded-lg object-contain flex-shrink-0" style="background:white;padding:2px" alt="logo" />
                 <div>
-                  <p class="text-white font-serif text-xl leading-tight">Klaro</p>
-                  <p style="color:rgba(255,255,255,.45);font-size:10px">Fiscal · Facturas</p>
+                  <p id="prev-company-name" class="text-white font-serif text-xl leading-tight">Mi empresa</p>
+                  <p id="prev-company-service" style="color:rgba(255,255,255,.45);font-size:10px">Servicio · Freelancer</p>
                 </div>
               </div>
               <!-- Invoice badge -->
@@ -509,13 +577,13 @@
             <div class="grid grid-cols-2 gap-8 mb-7">
               <div>
                 <p class="text-[10px] font-bold uppercase tracking-widest mb-2" style="color:#594139">DE</p>
-                <p class="font-semibold text-navy text-sm">Ana García</p>
+                <p class="font-semibold text-navy text-sm" data-user-name>—</p>
                 <p class="text-xs text-muted leading-relaxed mt-0.5">Freiberuflerin<br/>Musterstraße 12, 10115 Berlín<br/>Steuernummer: 12/345/67890<br/>ana@anagarcia.design</p>
               </div>
               <div>
                 <p class="text-[10px] font-bold uppercase tracking-widest mb-2" style="color:#594139">PARA</p>
                 <p class="font-semibold text-navy text-sm" id="prev-client">— Cliente —</p>
-                <p class="text-xs text-muted mt-0.5">Cliente · Alemania</p>
+                <p class="text-xs text-muted leading-relaxed mt-0.5" id="prev-client-details"></p>
               </div>
             </div>
 
@@ -601,6 +669,31 @@
   </svg>
 </a>
 
+<!-- ─── EMAIL GATE MODAL ─────────────────────────────────────────── -->
+<div id="email-gate-overlay" class="hidden fixed inset-0 z-[200] flex items-center justify-center" style="background:rgba(30,27,23,.55)">
+  <div class="bg-[#fff8f1] rounded-2xl p-6 w-full max-w-sm mx-4 fade-in" style="box-shadow:0 24px 64px rgba(0,0,0,.2);border:1px solid rgba(164,55,0,0.12)">
+    <div class="flex items-center gap-2.5 mb-1">
+      <div class="w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0" style="background:rgba(164,55,0,.1)">
+        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="#a43700" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+      </div>
+      <h3 class="text-sm font-bold text-navy">Email del cliente requerido</h3>
+    </div>
+    <p class="text-xs text-muted mb-4 ml-[42px]">Añade el email del cliente para enviarle la factura.</p>
+    <input id="gate-email-input" type="email" placeholder="cliente@empresa.com"
+           class="klaro-input w-full px-3.5 py-2.5 rounded-xl text-sm text-navy mb-4"
+           style="background:#fff8f1;border:1.5px solid rgba(164,55,0,0.2)"
+           onkeydown="if(event.key==='Enter') submitEmailGate()" />
+    <div class="flex gap-2">
+      <button onclick="closeEmailGate()" class="flex-1 py-2.5 rounded-xl text-sm font-medium text-muted hover:bg-orange/5 transition-all" style="border:1.5px solid rgba(164,55,0,0.15)">
+        Cancelar
+      </button>
+      <button onclick="submitEmailGate()" class="flex-1 py-2.5 rounded-xl text-sm font-semibold text-white transition-all hover:opacity-90" style="background:#a43700">
+        Enviar factura →
+      </button>
+    </div>
+  </div>
+</div>
+
 <!-- ─── TOAST ─────────────────────────────────────────────────────── -->
 <div id="save-toast" class="fixed bottom-24 right-6 z-50 px-4 py-3 rounded-2xl text-sm font-semibold text-white flex items-center gap-2 pointer-events-none opacity-0 transition-opacity duration-300"
      style="background:#1e1b17;box-shadow:0 8px 24px rgba(0,0,0,.25)">
@@ -613,17 +706,24 @@
 
   let allInvoices = [];
   let userProfile = null;
+  let userLogoBase64 = null;
+  let pendingSendCallback = null;
+  let pdfLangMode = 'bilingual';
 
   async function loadProfile() {
     try {
       const { data: { user } } = await _sb.auth.getUser();
       if (!user) return;
       const [{ data: prof }, { data: fp }] = await Promise.all([
-        _sb.from('profiles').select('tax_number').eq('id', user.id).maybeSingle(),
+        _sb.from('profiles').select('tax_number, full_name, address, city, postal_code, company_name, company_service').eq('id', user.id).maybeSingle(),
         _sb.from('fiscal_profiles').select('is_kleinunternehmer').eq('user_id', user.id).maybeSingle(),
       ]);
       userProfile = {
-        tax_number: prof?.tax_number || '',
+        tax_number:          prof?.tax_number    || '',
+        full_name:           prof?.full_name     || '',
+        address:             prof?.address       || '',
+        city:                prof?.city          || '',
+        postal_code:         prof?.postal_code   || '',
         is_kleinunternehmer: fp?.is_kleinunternehmer || false,
       };
     } catch (e) {
@@ -812,7 +912,9 @@
     const payload = {
       user_id:        user.id,
       client_name:    client,
-      client_email:   '',
+      client_company: (document.getElementById('inv-client-company')?.value || '').trim() || null,
+      client_address: (document.getElementById('inv-client-address')?.value || '').trim() || null,
+      client_email:   (document.getElementById('inv-client-email').value || '').trim(),
       description:    document.getElementById('inv-desc').value.trim(),
       amount:         amount,
       tax_rate:       taxRate,
@@ -992,10 +1094,18 @@
     const due     = document.getElementById('inv-due').value;
     const notes   = document.getElementById('inv-notes').value.trim();
 
+    const company = (document.getElementById('inv-client-company')?.value || '').trim();
+    const address = (document.getElementById('inv-client-address')?.value || '').trim();
+
     document.getElementById('prev-number').textContent = number;
     document.getElementById('prev-date').textContent   = fmtDate(date);
     document.getElementById('prev-client').textContent = client || '— Cliente —';
     document.getElementById('prev-desc').textContent   = desc || '—';
+
+    const detailParts = [company, address].filter(Boolean);
+    const detailEl = document.getElementById('prev-client-details');
+    detailEl.innerHTML = detailParts.map(p => escHtml(p)).join('<br>');
+    detailEl.style.display = detailParts.length ? '' : 'none';
 
     const net  = amtRaw;
     let ivaAmt = 0;
@@ -1031,169 +1141,537 @@
   }
 
   /* ─ Actions — now wired to Supabase ─ */
-  async function saveDraft() {
-    const btn = document.getElementById('btn-draft');
-    btn.disabled = true;
-    btn.style.opacity = '.6';
-
-    const ok = await saveToSupabase('draft');
-
-    btn.disabled = false;
-    btn.style.opacity = '';
-
-    if (ok) {
-      showToast('Borrador guardado', 'success');
-      document.getElementById('prev-status').textContent = 'BORRADOR';
-      document.getElementById('prev-status').style.background = 'rgba(255,184,48,.2)';
-      document.getElementById('prev-status').style.color = '#FFB830';
-    }
-  }
 
   async function sendInvoice() {
+    const emailVal = (document.getElementById('inv-client-email').value || '').trim();
+    if (!emailVal || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailVal)) {
+      pendingSendCallback = doSendInvoice;
+      document.getElementById('gate-email-input').value = emailVal;
+      document.getElementById('email-gate-overlay').classList.remove('hidden');
+      document.getElementById('gate-email-input').focus();
+      return;
+    }
+    await doSendInvoice();
+  }
+
+  async function doSendInvoice() {
     const btn = document.getElementById('btn-send');
     btn.disabled = true;
     btn.style.opacity = '.6';
+    btn.innerHTML = '<svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0"/></svg> Enviando…';
 
-    const ok = await saveToSupabase('sent');
+    const saved = await saveToSupabase('sent');
+
+    if (!saved) {
+      btn.disabled = false;
+      btn.style.opacity = '';
+      btn.innerHTML = '<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg> Enviar Factura';
+      return;
+    }
+
+    /* ── Call email API ── */
+    try {
+      const payload = {
+        clientEmail:   (document.getElementById('inv-client-email')?.value   || '').trim(),
+        clientName:    (document.getElementById('inv-client')?.value          || '').trim(),
+        clientCompany: (document.getElementById('inv-client-company')?.value  || '').trim(),
+        clientAddress: (document.getElementById('inv-client-address')?.value  || '').trim(),
+        invoiceNumber: (document.getElementById('inv-number')?.value          || '').trim(),
+        description:   (document.getElementById('inv-desc')?.value            || '').trim(),
+        amount:        parseFloat(document.getElementById('inv-amount')?.value) || 0,
+        taxRate:       ivaRate === 'rc' ? 0 : Math.round((ivaRate || 0) * 100),
+        dueDate:       document.getElementById('inv-due')?.value  || '',
+        date:          document.getElementById('inv-date')?.value || '',
+        companyName:   (document.getElementById('company-name-input')?.value    || '').trim(),
+        companyService:(document.getElementById('company-service-input')?.value || '').trim(),
+        stNr:          userProfile?.tax_number || '',
+      };
+
+      const res = await fetch('/api/send-invoice', {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify(payload),
+      });
+
+      if (res.ok) {
+        showToast('Factura enviada a ' + payload.clientEmail, 'success');
+      } else {
+        const err = await res.json().catch(() => ({}));
+        showToast('Guardada, pero no se pudo enviar el email: ' + (err.error || 'error desconocido'), 'error');
+      }
+    } catch (e) {
+      showToast('Guardada, pero fallo de conexión al enviar email', 'error');
+    }
+
+    document.getElementById('prev-status').textContent = 'ENVIADA';
+    document.getElementById('prev-status').style.background = 'rgba(5,150,105,.15)';
+    document.getElementById('prev-status').style.color = '#059669';
 
     btn.disabled = false;
     btn.style.opacity = '';
+    btn.innerHTML = '<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg> Enviar Factura';
+  }
 
-    if (ok) {
-      showToast('Factura enviada', 'success');
-      document.getElementById('prev-status').textContent = 'ENVIADA';
-      document.getElementById('prev-status').style.background = 'rgba(5,150,105,.15)';
-      document.getElementById('prev-status').style.color = '#059669';
+  function closeEmailGate() {
+    document.getElementById('email-gate-overlay').classList.add('hidden');
+    pendingSendCallback = null;
+  }
+
+  async function submitEmailGate() {
+    const email = document.getElementById('gate-email-input').value.trim();
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      document.getElementById('gate-email-input').style.borderColor = '#dc2626';
+      return;
+    }
+    document.getElementById('inv-client-email').value = email;
+    document.getElementById('email-gate-overlay').classList.add('hidden');
+    if (pendingSendCallback) {
+      const cb = pendingSendCallback;
+      pendingSendCallback = null;
+      await cb();
     }
   }
 
-  /* ─ PDF download via jsPDF ─ */
+  /* ─ PDF language helpers ─ */
+  function setPdfLang(mode, btn) {
+    pdfLangMode = mode;
+    document.querySelectorAll('.pdf-lang-btn').forEach(b => {
+      b.style.background = '';
+      b.style.color = '#594139';
+    });
+    btn.style.background = '#a43700';
+    btn.style.color = 'white';
+  }
+
+  function bilabel(es, de) {
+    if (pdfLangMode === 'es') return es;
+    if (pdfLangMode === 'de') return de;
+    return es + ' / ' + de;
+  }
+
+  /* ─ PDF download via jsPDF (bilingual §14 UStG) ─ */
   function printInvoice(inv) {
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
 
     const net      = parseFloat(inv.amount || 0);
     const taxRate  = parseFloat(inv.vat_rate || inv.tax_rate || 19);
-    const isKlein  = taxRate === 0 || (userProfile?.is_kleinunternehmer || false);
+    const isKlein  = userProfile?.is_kleinunternehmer || false;
     const vat      = isKlein ? 0 : net * (taxRate / 100);
     const gross    = net + vat;
-    const userName = document.querySelector('[data-user-name]')?.textContent?.trim() || '';
-    const stNr     = userProfile?.tax_number || '';
-    const invDate  = new Date(inv.date || inv.created_at || new Date());
-    const fmtDate  = d => d.toLocaleDateString('de-DE', {day:'2-digit', month:'2-digit', year:'numeric'});
-    const fmtEurPdf = n => '€ ' + n.toLocaleString('de-DE', {minimumFractionDigits:2, maximumFractionDigits:2});
+
+    // Issuer — always from Supabase, never hardcoded
+    const userName       = document.getElementById('company-name-input')?.value.trim()
+                         || userProfile?.full_name || '';
+    const companyService = document.getElementById('company-service-input')?.value.trim() || '';
+    const stNr           = userProfile?.tax_number || '';
+    const issuerAddr     = [
+      userProfile?.address,
+      (userProfile?.postal_code && userProfile?.city)
+        ? (userProfile.postal_code + ' ' + userProfile.city)
+        : (userProfile?.city || ''),
+    ].filter(Boolean).join(', ');
+
+    const invDate   = new Date(inv.date || inv.created_at || new Date());
+    const fmtDE     = d => d.toLocaleDateString('de-DE', { day:'2-digit', month:'2-digit', year:'numeric' });
+    const fmtEurPdf = n => '€ ' + n.toLocaleString('de-DE', { minimumFractionDigits:2, maximumFractionDigits:2 });
+    const invNum    = inv.invoice_number || (inv.id ? inv.id.slice(0,8).toUpperCase() : '0001');
 
     const ORANGE = [164, 55, 0];
     const DARK   = [30, 27, 23];
     const MUTED  = [89, 65, 57];
+    const WHITE  = [255, 255, 255];
+    const W = 210, ML = 20, MR = 190;
 
-    // ── Header ──
+    // ── Dark header bar ──
+    doc.setFillColor(...DARK);
+    doc.rect(0, 0, W, 40, 'F');
+
+    let logoX = ML;
+    if (userLogoBase64) {
+      try {
+        const ext = userLogoBase64.split(';')[0].split('/')[1].toUpperCase();
+        doc.addImage(userLogoBase64, ext === 'JPG' ? 'JPEG' : ext, ML, 10, 15, 15);
+        logoX = ML + 19;
+      } catch(e) {}
+    }
     doc.setFont('helvetica', 'bold');
-    doc.setFontSize(22);
-    doc.setTextColor(...ORANGE);
-    doc.text('Klaro', 20, 24);
-
+    doc.setFontSize(15);
+    doc.setTextColor(...WHITE);
+    doc.text(userName || 'Klaro', logoX, 21);
     doc.setFont('helvetica', 'normal');
-    doc.setFontSize(10);
-    doc.setTextColor(...MUTED);
-    if (userName) doc.text(userName, 20, 31);
-    if (stNr)     doc.text('St.-Nr.: ' + stNr, 20, 36);
+    doc.setFontSize(8);
+    doc.setTextColor(220, 200, 190);
+    if (companyService) doc.text(companyService, logoX, 28);
 
-    // RECHNUNG label (right)
+    // Title right
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(18);
-    doc.setTextColor(...DARK);
-    doc.text('RECHNUNG', 190, 24, { align: 'right' });
-
+    doc.setTextColor(...WHITE);
+    doc.text(bilabel('FACTURA', 'RECHNUNG'), MR, 19, { align: 'right' });
     doc.setFont('helvetica', 'normal');
-    doc.setFontSize(10);
-    doc.setTextColor(...MUTED);
-    const invNum = inv.invoice_number || (inv.id ? inv.id.slice(0,8).toUpperCase() : '0001');
-    doc.text('Nr. ' + invNum, 190, 31, { align: 'right' });
-    doc.text('Datum: ' + fmtDate(invDate), 190, 36, { align: 'right' });
+    doc.setFontSize(8.5);
+    doc.setTextColor(220, 200, 190);
+    doc.text(bilabel('Nº', 'Nr.') + ' ' + invNum, MR, 27, { align: 'right' });
+    doc.text(bilabel('Fecha', 'Datum') + ': ' + fmtDE(invDate), MR, 33, { align: 'right' });
 
-    // Divider
+    // ── Orange divider ──
     doc.setDrawColor(...ORANGE);
-    doc.setLineWidth(0.4);
-    doc.line(20, 42, 190, 42);
+    doc.setLineWidth(0.5);
+    doc.line(ML, 44, MR, 44);
 
-    // ── Bill-to ──
+    // ── Issuer / Client columns ──
+    let y = 54;
     doc.setFont('helvetica', 'bold');
-    doc.setFontSize(9);
-    doc.setTextColor(...MUTED);
-    doc.text('RECHNUNGSEMPFÄNGER', 20, 52);
-    doc.setFont('helvetica', 'normal');
-    doc.setFontSize(11);
-    doc.setTextColor(...DARK);
-    doc.text(inv.client_name || '—', 20, 58);
-    if (inv.client_email) { doc.setFontSize(9); doc.setTextColor(...MUTED); doc.text(inv.client_email, 20, 63); }
+    doc.setFontSize(7.5);
+    doc.setTextColor(...ORANGE);
+    doc.text(bilabel('EMISOR', 'AUSSTELLER'), ML, y);
+    doc.text(bilabel('CLIENTE', 'KUNDE'), 115, y);
 
-    // ── Items table ──
+    y += 5;
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(10);
+    doc.setTextColor(...DARK);
+    doc.text(userName || '—', ML, y);
+    doc.text(inv.client_name || '—', 115, y);
+
+    y += 5;
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(8.5);
+    doc.setTextColor(...MUTED);
+
+    const issuerLines = [
+      companyService || null,
+      issuerAddr     || null,
+      stNr ? (bilabel('N.º fiscal', 'St.-Nr.') + ': ' + stNr) : null,
+    ].filter(Boolean);
+    issuerLines.forEach((line, i) => doc.text(line, ML, y + i * 4.5));
+
+    const clientLines = [inv.client_company, inv.client_address, inv.client_email].filter(Boolean);
+    clientLines.forEach((line, i) => doc.text(String(line), 115, y + i * 4.5));
+
+    const maxLines = Math.max(issuerLines.length, clientLines.length, 1);
+    y += maxLines * 4.5 + 8;
+
+    // ── §14 UStG mandatory fields ──
+    doc.setDrawColor(224, 191, 180);
+    doc.setLineWidth(0.2);
+    doc.line(ML, y, MR, y);
+    y += 6;
+
+    const metaRows = [
+      [bilabel('Nº Factura', 'Rechnungsnummer'),        invNum],
+      [bilabel('Fecha de emisión', 'Ausstellungsdatum'), fmtDE(invDate)],
+    ];
+    if (inv.due_date) {
+      metaRows.push([bilabel('Vencimiento', 'Fälligkeitsdatum'), fmtDE(new Date(inv.due_date))]);
+    }
+    metaRows.forEach(([lbl, val]) => {
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(8.5);
+      doc.setTextColor(...MUTED);
+      doc.text(lbl + ':', ML, y);
+      doc.setFont('helvetica', 'normal');
+      doc.setTextColor(...DARK);
+      doc.text(val, 90, y);
+      y += 5.5;
+    });
+    y += 3;
+
+    // ── Line items table (Leistungsbeschreibung §14 UStG) ──
     doc.autoTable({
-      startY: 75,
-      head: [['Beschreibung', 'Betrag']],
-      body: [[inv.description || 'Servicios profesionales', fmtEurPdf(net)]],
-      styles: { font: 'helvetica', fontSize: 10, textColor: DARK },
-      headStyles: { fillColor: ORANGE, textColor: [255,255,255], fontStyle: 'bold', fontSize: 9 },
-      columnStyles: { 1: { halign: 'right', cellWidth: 40 } },
-      margin: { left: 20, right: 20 },
+      startY: y,
+      head: [[
+        bilabel('Descripción', 'Leistungsbeschreibung'),
+        bilabel('Importe neto', 'Nettobetrag'),
+      ]],
+      body: [[
+        inv.description || bilabel('Servicios profesionales', 'Professionelle Dienstleistungen'),
+        fmtEurPdf(net),
+      ]],
+      styles:      { font: 'helvetica', fontSize: 10, textColor: DARK },
+      headStyles:  { fillColor: ORANGE, textColor: WHITE, fontStyle: 'bold', fontSize: 8.5 },
+      columnStyles: { 1: { halign: 'right', cellWidth: 44 } },
+      margin: { left: ML, right: 20 },
     });
 
     // ── Totals ──
-    const afterTable = doc.lastAutoTable.finalY + 6;
-    const col1 = 140, col2 = 190;
+    let tY = doc.lastAutoTable.finalY + 8;
+    const tC1 = 128, tC2 = MR;
 
+    doc.setDrawColor(224, 191, 180);
+    doc.setLineWidth(0.15);
+    doc.line(tC1, tY - 3, tC2, tY - 3);
+
+    // Neto
     doc.setFont('helvetica', 'normal');
-    doc.setFontSize(10);
+    doc.setFontSize(9);
     doc.setTextColor(...MUTED);
-    doc.text('Nettobetrag', col1, afterTable);
+    doc.text(bilabel('Neto', 'Nettobetrag'), tC1, tY);
     doc.setTextColor(...DARK);
-    doc.text(fmtEurPdf(net), col2, afterTable, { align: 'right' });
+    doc.text(fmtEurPdf(net), tC2, tY, { align: 'right' });
+    tY += 5.5;
 
+    // IVA / MwSt.
     if (isKlein) {
-      doc.setFontSize(8);
+      doc.setFontSize(8.5);
       doc.setTextColor(...MUTED);
-      doc.text('Gemäß §19 UStG wird keine Umsatzsteuer berechnet.', 20, afterTable + 8);
-      doc.setDrawColor(...DARK);
-      doc.setLineWidth(0.3);
-      doc.line(col1, afterTable + 13, 190, afterTable + 13);
-      doc.setFont('helvetica', 'bold');
-      doc.setFontSize(12);
-      doc.setTextColor(...DARK);
-      doc.text('Gesamtbetrag', col1, afterTable + 19);
-      doc.text(fmtEurPdf(gross), col2, afterTable + 19, { align: 'right' });
+      doc.text(bilabel('IVA', 'MwSt.'), tC1, tY);
+      doc.setTextColor(89, 150, 89);
+      doc.text(bilabel('Exento §19', 'Befreit §19'), tC2, tY, { align: 'right' });
     } else {
+      doc.setFontSize(9);
       doc.setTextColor(...MUTED);
-      doc.text('MwSt. ' + Math.round(taxRate) + '%', col1, afterTable + 7);
+      doc.text(bilabel('IVA', 'MwSt.') + ' ' + Math.round(taxRate) + '%', tC1, tY);
       doc.setTextColor(...DARK);
-      doc.text(fmtEurPdf(vat), col2, afterTable + 7, { align: 'right' });
-      doc.setDrawColor(...DARK);
-      doc.setLineWidth(0.3);
-      doc.line(col1, afterTable + 12, 190, afterTable + 12);
-      doc.setFont('helvetica', 'bold');
-      doc.setFontSize(12);
-      doc.setTextColor(...DARK);
-      doc.text('Gesamtbetrag', col1, afterTable + 18);
-      doc.text(fmtEurPdf(gross), col2, afterTable + 18, { align: 'right' });
+      doc.text(fmtEurPdf(vat), tC2, tY, { align: 'right' });
+    }
+    tY += 6;
+
+    // Total line
+    doc.setDrawColor(...DARK);
+    doc.setLineWidth(0.3);
+    doc.line(tC1, tY - 2, tC2, tY - 2);
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(11);
+    doc.setTextColor(...DARK);
+    doc.text(bilabel('TOTAL', 'GESAMT'), tC1, tY + 4);
+    doc.setTextColor(...ORANGE);
+    doc.text(fmtEurPdf(gross), tC2, tY + 4, { align: 'right' });
+    tY += 14;
+
+    // ── §19 UStG Kleinunternehmer notice (bilingual) ──
+    if (isKlein) {
+      const boxH = pdfLangMode === 'bilingual' ? 19 : 12;
+      doc.setFillColor(255, 248, 240);
+      doc.setDrawColor(224, 191, 180);
+      doc.setLineWidth(0.2);
+      doc.roundedRect(ML, tY, MR - ML, boxH, 2, 2, 'FD');
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(7.5);
+      doc.setTextColor(...MUTED);
+      let bY = tY + 5.5;
+      if (pdfLangMode !== 'de') {
+        doc.text('Este profesional está acogido al régimen de pequeños empresarios según §19 UStG. No se aplica IVA.', ML + 3, bY);
+        bY += 6;
+      }
+      if (pdfLangMode !== 'es') {
+        doc.text('Gemäß §19 UStG wird keine Umsatzsteuer berechnet.', ML + 3, bY);
+      }
+      tY += boxH + 6;
     }
 
-    // ── Footer ──
-    doc.setFont('helvetica', 'normal');
-    doc.setFontSize(8);
-    doc.setTextColor(...MUTED);
+    // ── §14 UStG compliance note ──
+    doc.setFont('helvetica', 'italic');
+    doc.setFontSize(6.5);
+    doc.setTextColor(180, 160, 150);
+    doc.text(bilabel('Documento fiscal conforme a §14 UStG', 'Steuerrechnung gemäß §14 UStG'), ML, tY + 5);
+
+    // ── Cream footer ──
+    doc.setFillColor(250, 245, 240);
+    doc.rect(0, 274, W, 23, 'F');
     doc.setDrawColor(224, 191, 180);
-    doc.setLineWidth(0.2);
-    doc.line(20, 272, 190, 272);
-    doc.text('Zahlbar innerhalb von 14 Tagen nach Rechnungsdatum.', 20, 277);
-    doc.text('Generado con Klaro · ' + new Date().getFullYear(), 190, 277, { align: 'right' });
+    doc.setLineWidth(0.15);
+    doc.line(ML, 274, MR, 274);
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(7.5);
+    doc.setTextColor(...MUTED);
+    doc.text(bilabel('Generado con Klaro', 'Erstellt mit Klaro') + ' · ' + new Date().getFullYear(), ML, 281);
+    doc.text(bilabel('Pág.', 'Seite') + ' 1 / 1', MR, 281, { align: 'right' });
 
     doc.save('Rechnung-' + invNum + '.pdf');
   }
 
+  /* ─── Company info ─── */
+  let _companySaveTimer = null;
+
+  function updateCompanyPreview() {
+    const name    = document.getElementById('company-name-input').value.trim();
+    const service = document.getElementById('company-service-input').value.trim();
+    document.getElementById('prev-company-name').textContent    = name    || 'Mi empresa';
+    document.getElementById('prev-company-service').textContent = service || 'Servicio · Freelancer';
+    // Debounce save — 800 ms after last keystroke
+    clearTimeout(_companySaveTimer);
+    _companySaveTimer = setTimeout(() => saveCompanyInfo(name, service), 800);
+  }
+
+  async function saveCompanyInfo(name, service) {
+    try {
+      const { data: { user } } = await _sb.auth.getUser();
+      if (!user) return;
+      const { error } = await _sb.from('profiles')
+        .update({ company_name: name || null, company_service: service || null })
+        .eq('id', user.id);
+      if (error) console.error('saveCompanyInfo:', error.message);
+    } catch(e) { console.error('saveCompanyInfo:', e); }
+  }
+
+  async function loadCompanyInfo() {
+    try {
+      const { data: { user } } = await _sb.auth.getUser();
+      if (!user) return;
+      const { data: profile } = await _sb.from('profiles')
+        .select('company_name, company_service')
+        .eq('id', user.id)
+        .single();
+      const name    = profile?.company_name    || '';
+      const service = profile?.company_service || '';
+      document.getElementById('company-name-input').value    = name;
+      document.getElementById('company-service-input').value = service;
+      document.getElementById('prev-company-name').textContent    = name    || 'Mi empresa';
+      document.getElementById('prev-company-service').textContent = service || 'Servicio · Freelancer';
+    } catch(e) { /* non-critical */ }
+  }
+
+  /* ─── Logo ─── */
+  async function loadUserLogo() {
+    try {
+      const { data: { user } } = await _sb.auth.getUser();
+      if (!user) return;
+      const { data, error } = await _sb.storage.from('user-assets').download(`${user.id}/logo`);
+      if (error || !data) return;
+      const reader = new FileReader();
+      reader.onload = e => { setLogoUI(e.target.result, 'logo'); };
+      reader.readAsDataURL(data);
+    } catch(e) { /* non-critical */ }
+  }
+
+  function setLogoUI(base64, filename) {
+    userLogoBase64 = base64;
+    const img = document.getElementById('logo-preview-img');
+    const icon = document.getElementById('logo-preview-icon');
+    const name = document.getElementById('logo-filename');
+    const prevLogo = document.getElementById('prev-user-logo');
+    const prevK = document.getElementById('prev-logo-k');
+    img.src = base64;
+    img.classList.remove('hidden');
+    icon.classList.add('hidden');
+    name.textContent = filename;
+    prevLogo.src = base64;
+    prevLogo.classList.remove('hidden');
+    prevK.classList.add('hidden');
+  }
+
+  async function handleLogoUpload(input) {
+    const file = input.files[0];
+    if (!file) return;
+    if (file.size > 2 * 1024 * 1024) { showToast('Logo debe ser menor a 2MB', 'error'); input.value = ''; return; }
+    try {
+      const { data: { user } } = await _sb.auth.getUser();
+      if (!user) { showToast('Sesión expirada', 'error'); return; }
+      const ext = file.name.split('.').pop().toLowerCase();
+      const path = `${user.id}/logo.${ext}`;
+      const { error } = await _sb.storage.from('user-assets').upload(path, file, { upsert: true, contentType: file.type });
+      if (error) { showToast('Error al subir logo: ' + error.message, 'error'); return; }
+      const reader = new FileReader();
+      reader.onload = e => { setLogoUI(e.target.result, file.name); };
+      reader.readAsDataURL(file);
+      showToast('Logo actualizado');
+    } catch(e) { showToast('Error al subir logo', 'error'); }
+    input.value = '';
+  }
+
+  /* ─── Adjunto (broken button fix — wired to receipt upload) ─── */
+  async function handleAdjuntoUpload(input) {
+    const file = input.files[0];
+    if (!file) return;
+    const statusEl = document.getElementById('adjunto-status');
+    const labelText = document.getElementById('adjunto-label-text');
+    statusEl.textContent = 'Subiendo…';
+    statusEl.classList.remove('hidden');
+    labelText.textContent = file.name.length > 22 ? file.name.slice(0, 20) + '…' : file.name;
+    await handleReceiptUpload(input, true);
+    labelText.textContent = 'Subir recibo existente';
+    statusEl.classList.add('hidden');
+    input.value = '';
+  }
+
+  /* ─── Receipt upload ─── */
+  async function handleReceiptUpload(input, fromAdjunto) {
+    const file = input.files[0];
+    if (!file) return;
+    if (file.size > 5 * 1024 * 1024) { showToast('El archivo debe ser menor a 5MB', 'error'); input.value = ''; return; }
+    const allowed = ['application/pdf','image/jpeg','image/jpg','image/png'];
+    if (!allowed.includes(file.type) && !file.name.match(/\.(pdf|jpg|jpeg|png)$/i)) {
+      showToast('Formato no permitido. Usa PDF, JPG o PNG.', 'error'); input.value = ''; return;
+    }
+    try {
+      const { data: { user } } = await _sb.auth.getUser();
+      if (!user) { showToast('Sesión expirada', 'error'); return; }
+      const ts = Date.now();
+      const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
+      const path = `${user.id}/receipts/${ts}_${safeName}`;
+      const { error: upErr } = await _sb.storage.from('documents').upload(path, file, { contentType: file.type });
+      if (upErr) { showToast('Error al subir: ' + upErr.message, 'error'); return; }
+      const { data: doc, error: dbErr } = await _sb.from('documents').insert({
+        user_id:      user.id,
+        name:         file.name,
+        type:         'receipt',
+        storage_path: path,
+        year:         new Date().getFullYear(),
+        size_bytes:   file.size,
+      }).select().single();
+      if (dbErr) { showToast('Archivo subido pero no se pudo registrar: ' + dbErr.message, 'error'); return; }
+      prependDocumentRow(doc);
+      updateEmptyState();
+      showToast('Recibo subido correctamente');
+    } catch(e) { showToast('Error inesperado al subir recibo', 'error'); }
+    if (!fromAdjunto) input.value = '';
+  }
+
+  /* ─── Documents list ─── */
+  async function loadDocuments() {
+    try {
+      const { data: { user } } = await _sb.auth.getUser();
+      if (!user) return;
+      const { data, error } = await _sb.from('documents')
+        .select('*')
+        .eq('user_id', user.id)
+        .eq('type', 'receipt')
+        .order('created_at', { ascending: false });
+      if (error || !data) return;
+      data.forEach(doc => prependDocumentRow(doc, true));
+      updateEmptyState();
+    } catch(e) { /* non-critical */ }
+  }
+
+  function prependDocumentRow(doc, append) {
+    const list = document.getElementById('doc-list');
+    const sizeKb = doc.size_bytes ? Math.round(doc.size_bytes / 1024) + ' KB' : '';
+    const dateStr = doc.created_at ? fmtDateShort(doc.created_at.slice(0, 10)) : '—';
+    const isImg = /\.(jpg|jpeg|png)$/i.test(doc.name);
+    const row = document.createElement('div');
+    row.className = 'flex items-center gap-3 px-3.5 py-3 rounded-xl transition-all hover:shadow-sm';
+    row.style.cssText = 'background:#fff;border:1px solid rgba(164,55,0,0.08)';
+    row.innerHTML =
+      '<div class="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0" style="background:rgba(164,55,0,0.08);color:#a43700">' +
+        (isImg
+          ? '<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>'
+          : '<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>') +
+      '</div>' +
+      '<div class="flex-1 min-w-0">' +
+        '<p class="text-xs font-semibold text-navy truncate">' + escHtml(doc.name) + '</p>' +
+        '<p class="text-[10px]" style="color:#594139">Recibo · ' + dateStr + (sizeKb ? ' · ' + sizeKb : '') + '</p>' +
+      '</div>' +
+      '<span class="text-[10px] font-semibold px-1.5 py-0.5 rounded-lg flex-shrink-0" style="background:rgba(89,65,57,.08);color:#594139">Subido</span>';
+    if (append) { list.appendChild(row); } else { list.prepend(row); }
+  }
+
+  function updateEmptyState() {
+    const hasInvoices = allInvoices.length > 0;
+    const hasDocs = document.getElementById('doc-list').children.length > 0;
+    if (hasInvoices || hasDocs) {
+      document.getElementById('inv-empty').classList.add('hidden');
+    }
+  }
+
   /* ─ Init ─ */
   updatePreview();
+  loadCompanyInfo();
   loadInvoices();
   loadProfile();
+  loadDocuments();
+  loadUserLogo();
   initInvoiceNumber();
 </script>
 
