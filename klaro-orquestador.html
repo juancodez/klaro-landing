@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Klaro — Orquestador</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --naranja: #E8622A; --naranja-light: #FFF2EC; --naranja-dark: #D05520;
+    --crema: #FFF8F0; --navy: #1A1A2E; --gris: #888780; --gris-light: #F0EDE8;
+    --verde: #2ECC71; --verde-light: #E8F5EE;
+    --amarillo: #FFB830; --amarillo-light: #FFF8E6;
+    --rojo: #E24B4A; --rojo-light: #FCEBEB;
+    --superficie: #fff; --borde: rgba(0,0,0,0.07);
+  }
+  body {
+    font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
+    background: var(--crema); color: var(--navy);
+    min-height: 100vh; display: flex; flex-direction: column;
+    align-items: center; padding: 24px; gap: 16px;
+  }
+
+  .header {
+    width: 100%; max-width: 600px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .logo { font-size: 24px; font-weight: 700; color: var(--naranja); letter-spacing: -0.5px; }
+  .badge { font-size: 12px; color: var(--gris); background: var(--superficie); border: 1px solid var(--borde); padding: 5px 12px; border-radius: 20px; }
+
+  .layout { width: 100%; max-width: 600px; display: flex; flex-direction: column; gap: 12px; }
+
+  /* ===== PIPELINE ===== */
+  .pipeline-card {
+    background: var(--superficie); border-radius: 20px; border: 1px solid var(--borde);
+    padding: 20px 24px;
+  }
+  .pipeline-title { font-size: 12px; font-weight: 600; color: var(--gris); text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 16px; }
+  .pipeline {
+    display: flex; align-items: center; gap: 0;
+  }
+  .p-step { display: flex; flex-direction: column; align-items: center; gap: 6px; flex-shrink: 0; }
+  .p-dot {
+    width: 44px; height: 44px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px; border: 2px solid var(--gris-light);
+    background: var(--superficie); transition: all 0.4s;
+    font-weight: 600;
+  }
+  .p-dot.waiting { border-color: var(--gris-light); color: var(--gris); }
+  .p-dot.running { border-color: var(--naranja); background: var(--naranja-light); animation: pulse 1s infinite; }
+  .p-dot.done { border-color: var(--verde); background: var(--verde-light); color: #0F6E56; }
+  .p-dot.error { border-color: var(--rojo); background: var(--rojo-light); }
+  @keyframes pulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.05)} }
+  .p-label { font-size: 11px; color: var(--gris); font-weight: 500; text-align: center; }
+  .p-sublabel { font-size: 10px; color: var(--gris-light); }
+  .p-arrow { flex: 1; height: 2px; background: var(--gris-light); min-width: 20px; transition: background 0.4s; margin-bottom: 20px; }
+  .p-arrow.active { background: var(--naranja); }
+  .p-arrow.done { background: var(--verde); }
+
+  /* ===== LOG DE EJECUCIÓN ===== */
+  .log-card {
+    background: var(--superficie); border-radius: 20px; border: 1px solid var(--borde);
+    overflow: hidden;
+  }
+  .log-header {
+    padding: 14px 20px; border-bottom: 1px solid var(--gris-light);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .log-title { font-size: 13px; font-weight: 600; }
+  .log-badge { font-size: 11px; color: var(--gris); background: var(--crema); padding: 3px 8px; border-radius: 20px; }
+  .log-body { padding: 16px 20px; min-height: 120px; }
+  .log-entry {
+    display: flex; gap: 10px; align-items: flex-start;
+    padding: 8px 0; border-bottom: 1px solid var(--gris-light);
+    font-size: 13px; line-height: 1.4;
+    animation: fadeIn 0.3s ease;
+  }
+  .log-entry:last-child { border-bottom: none; }
+  @keyframes fadeIn { from{opacity:0;transform:translateY(4px)} to{opacity:1;transform:translateY(0)} }
+  .log-dot { width: 6px; height: 6px; border-radius: 50%; margin-top: 5px; flex-shrink: 0; }
+  .log-dot.info { background: var(--naranja); }
+  .log-dot.ok { background: var(--verde); }
+  .log-dot.warn { background: var(--amarillo); }
+  .log-dot.error { background: var(--rojo); }
+  .log-time { font-size: 11px; color: var(--gris); min-width: 42px; margin-top: 1px; font-family: 'SF Mono', monospace; }
+
+  /* ===== RESULTADO FINAL ===== */
+  .result-card {
+    background: var(--superficie); border-radius: 20px; border: 1px solid var(--borde);
+    overflow: hidden; display: none;
+  }
+  .result-card.visible { display: block; }
+  .result-header { padding: 16px 20px; border-bottom: 1px solid var(--gris-light); display: flex; align-items: center; gap: 12px; }
+  .result-icon { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; }
+  .result-icon.ok { background: var(--verde-light); }
+  .result-icon.warn { background: var(--amarillo-light); }
+  .result-icon.error { background: var(--rojo-light); }
+  .result-title { font-size: 15px; font-weight: 600; }
+  .result-desc { font-size: 12px; color: var(--gris); margin-top: 2px; }
+  .result-body { padding: 16px 20px; }
+
+  .context-box {
+    background: var(--crema); border-radius: 12px; padding: 14px 16px;
+    font-size: 12px; font-family: 'SF Mono', monospace; line-height: 1.7;
+    color: var(--navy); white-space: pre-wrap; margin-bottom: 14px;
+    border: 1px solid var(--gris-light);
+  }
+  .context-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.6px; color: var(--gris); margin-bottom: 8px; font-family: 'Plus Jakarta Sans', sans-serif; }
+
+  .btn-lanzar-clara {
+    width: 100%; padding: 14px; background: var(--naranja); color: #fff;
+    border: none; border-radius: 12px; font-size: 14px; font-weight: 600;
+    cursor: pointer; font-family: inherit; transition: background 0.15s;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+  }
+  .btn-lanzar-clara:hover { background: var(--naranja-dark); }
+
+  /* ===== CTA PRINCIPAL ===== */
+  .cta-card {
+    background: var(--superficie); border-radius: 20px; border: 1px solid var(--borde); padding: 20px 24px;
+  }
+  .cta-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.6px; color: var(--gris); margin-bottom: 12px; }
+
+  .escenarios { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
+  .btn-escenario {
+    font-size: 12px; padding: 7px 12px; border: 1.5px solid var(--gris-light);
+    border-radius: 20px; background: var(--crema); cursor: pointer;
+    font-family: inherit; color: var(--navy); transition: all 0.15s;
+  }
+  .btn-escenario:hover { border-color: var(--naranja); background: var(--naranja-light); color: var(--naranja); }
+  .btn-escenario.active { border-color: var(--naranja); background: var(--naranja-light); color: var(--naranja); font-weight: 600; }
+
+  .btn-run {
+    width: 100%; padding: 15px; background: var(--naranja); color: #fff;
+    border: none; border-radius: 12px; font-size: 15px; font-weight: 600;
+    cursor: pointer; font-family: inherit; transition: all 0.15s;
+  }
+  .btn-run:hover { background: var(--naranja-dark); }
+  .btn-run:disabled { background: var(--gris-light); cursor: not-allowed; }
+
+  .btn-reset {
+    width: 100%; padding: 12px; background: transparent; color: var(--naranja);
+    border: 1.5px solid var(--naranja); border-radius: 12px; font-size: 13px;
+    font-weight: 500; cursor: pointer; font-family: inherit; margin-top: 10px; transition: background 0.15s;
+  }
+  .btn-reset:hover { background: var(--naranja-light); }
+
+  /* ===== DEV PANEL ===== */
+  .dev-panel { width: 100%; max-width: 600px; border-radius: 12px; border: 1px solid var(--gris-light); overflow: hidden; }
+  .dev-header { padding: 10px 14px; background: #F5F3EE; cursor: pointer; font-size: 12px; color: var(--gris); font-weight: 500; display: flex; justify-content: space-between; }
+  .dev-body { padding: 14px; background: #1A1A2E; display: none; }
+  .dev-body.open { display: block; }
+  .dev-code { font-family: 'SF Mono', monospace; font-size: 11px; color: #9FE1CB; white-space: pre-wrap; word-break: break-all; line-height: 1.6; max-height: 320px; overflow-y: auto; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="logo">klaro</div>
+  <div class="badge">Orquestador — Sistema completo</div>
+</div>
+
+<div class="layout">
+
+  <!-- PIPELINE VISUAL -->
+  <div class="pipeline-card">
+    <div class="pipeline-title">Flujo de ejecución</div>
+    <div class="pipeline">
+      <div class="p-step">
+        <div class="p-dot waiting" id="dot-1">1</div>
+        <div class="p-label">Diagnóstico</div>
+        <div class="p-sublabel">perfil JSON</div>
+      </div>
+      <div class="p-arrow" id="arrow-1"></div>
+      <div class="p-step">
+        <div class="p-dot waiting" id="dot-2">2</div>
+        <div class="p-label">Validador</div>
+        <div class="p-sublabel">coherencia</div>
+      </div>
+      <div class="p-arrow" id="arrow-2"></div>
+      <div class="p-step">
+        <div class="p-dot waiting" id="dot-3">3</div>
+        <div class="p-label">Contexto</div>
+        <div class="p-sublabel">enriquecido</div>
+      </div>
+      <div class="p-arrow" id="arrow-3"></div>
+      <div class="p-step">
+        <div class="p-dot waiting" id="dot-4">💬</div>
+        <div class="p-label">Clara</div>
+        <div class="p-sublabel">lista</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CTA -->
+  <div class="cta-card">
+    <div class="cta-label">Elige un escenario de prueba</div>
+    <div class="escenarios">
+      <button class="btn-escenario active" id="btn-sofia" onclick="seleccionarEscenario('sofia', this)">Sofía — Freiberufler sin Steuernummer</button>
+      <button class="btn-escenario" id="btn-mateo" onclick="seleccionarEscenario('mateo', this)">Mateo — Contradicción de perfil</button>
+      <button class="btn-escenario" id="btn-ana" onclick="seleccionarEscenario('ana', this)">Ana — Perfil correcto</button>
+    </div>
+    <button class="btn-run" id="btn-run" onclick="ejecutarSistema()">
+      Ejecutar sistema completo →
+    </button>
+    <button class="btn-reset" id="btn-reset" onclick="resetear()" style="display:none">
+      Ejecutar otro escenario
+    </button>
+  </div>
+
+  <!-- LOG DE EJECUCIÓN -->
+  <div class="log-card">
+    <div class="log-header">
+      <div class="log-title">Log de ejecución</div>
+      <div class="log-badge" id="log-badge">En espera</div>
+    </div>
+    <div class="log-body" id="log-body">
+      <div style="color:var(--gris);font-size:13px;text-align:center;padding:20px 0;">
+        Pulsa "Ejecutar sistema completo" para ver el orquestador en acción.
+      </div>
+    </div>
+  </div>
+
+  <!-- RESULTADO FINAL -->
+  <div class="result-card" id="result-card">
+    <div class="result-header">
+      <div class="result-icon ok" id="result-icon">✓</div>
+      <div>
+        <div class="result-title" id="result-title">Sistema ejecutado</div>
+        <div class="result-desc" id="result-desc">Contexto listo para Clara</div>
+      </div>
+    </div>
+    <div class="result-body">
+      <div class="context-label">Contexto completo que recibe Clara</div>
+      <div class="context-box" id="context-box"></div>
+      <button class="btn-lanzar-clara" onclick="abrirClara()">
+        <span>Abrir Clara con este contexto</span>
+        <span>→</span>
+      </button>
+    </div>
+  </div>
+
+</div>
+
+<!-- Dev panel -->
+<div class="dev-panel">
+  <div class="dev-header" onclick="toggleDev()">
+    <span>Ver código del orquestador — cómo coordina los agentes</span>
+    <span id="dev-icon">▼</span>
+  </div>
+  <div class="dev-body" id="dev-body">
+    <div class="dev-code" id="dev-code">El orquestador ejecutará aquí cuando pulses "Ejecutar sistema completo".
+
+CLAVE DE APRENDIZAJE:
+El orquestador no es un agente de Claude.
+Es código JavaScript que coordina cuándo y cómo llamar a cada agente.
+Controla el flujo, maneja errores y pasa el contexto entre agentes.</div>
+  </div>
+</div>
+
+<script>
+// ============================================================
+// ORQUESTADOR DE KLARO
+//
+// El orquestador NO llama a Claude directamente.
+// Es código puro que coordina los 3 agentes en secuencia:
+//   1. Agente Diagnóstico → genera perfil JSON
+//   2. Agente Validador   → valida coherencia del perfil
+//   3. Ensambla contexto  → combina perfil + validación
+//   4. Lanza Clara        → con todo el contexto listo
+//
+// Esto es el patrón "pipeline" de orquestación.
+// ============================================================
+
+// Escenarios de prueba
+const ESCENARIOS = {
+  sofia: {
+    nombre: "Sofía",
+    respuestas: {
+      tipo_autonomo: "Freiberufler",
+      inicio_actividad: "menos_6_meses",
+      ingresos_anuales: "22000_a_80000",
+      clientes_extranjero: "clientes_ue",
+      tiene_steuernummer: "no"
+    }
+  },
+  mateo: {
+    nombre: "Mateo",
+    respuestas: {
+      tipo_autonomo: "Freiberufler",
+      inicio_actividad: "6_a_18_meses",
+      ingresos_anuales: "mas_80000",
+      clientes_extranjero: "clientes_ue",
+      tiene_steuernummer: "si",
+      actividad: "tienda_online"
+    }
+  },
+  ana: {
+    nombre: "Ana",
+    respuestas: {
+      tipo_autonomo: "Freiberufler",
+      inicio_actividad: "menos_6_meses",
+      ingresos_anuales: "22000_a_80000",
+      clientes_extranjero: "solo_alemania",
+      tiene_steuernummer: "si"
+    }
+  }
+};
+
+// System prompts de cada agente
+const SYSTEM_DIAGNOSTICO = `Eres Clara, la asesora fiscal de Klaro.
+Analiza las respuestas del diagnóstico de un freelancer hispanohablante en Alemania.
+Responde ÚNICAMENTE con JSON válido, sin texto adicional:
+{
+  "perfil": {
+    "tipo": "Freiberufler | Gewerbetreibender | Por determinar",
+    "nivel_urgencia": "alto | medio | bajo",
+    "resumen": "una frase corta"
+  },
+  "impuestos_aplicables": [
+    { "nombre": "nombre", "periodicidad": "trimestral | anual", "urgencia": "alta | media | baja" }
+  ],
+  "proximos_pasos": [
+    { "paso": "descripción accionable", "prioridad": "urgente | importante | recomendado" }
+  ],
+  "alertas": [
+    { "tipo": "error | advertencia | info", "mensaje": "mensaje claro" }
+  ],
+  "mensaje_motivacional": "frase cálida"
+}`;
+
+const SYSTEM_VALIDADOR = `Eres un validador fiscal del sistema fiscal alemán.
+Detecta inconsistencias en el perfil de un freelancer hispanohablante en Alemania.
+Responde ÚNICAMENTE con JSON válido, sin texto adicional:
+{
+  "score_coherencia": 0-100,
+  "nivel": "ok | advertencia | error",
+  "titulo": "resumen en una frase",
+  "descripcion": "descripción breve",
+  "alertas": [
+    { "tipo": "error | advertencia | ok", "mensaje": "descripción", "accion": "qué hacer" }
+  ],
+  "contexto_para_clara": "instrucción específica para Clara"
+}`;
+
+// Estado del sistema
+let escenarioActual = 'sofia';
+let resultadoDiagnostico = null;
+let resultadoValidacion = null;
+let ejecutando = false;
+
+function seleccionarEscenario(nombre, btn) {
+  escenarioActual = nombre;
+  document.querySelectorAll('.btn-escenario').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+// ============================================================
+// FUNCIÓN PRINCIPAL: ejecutarSistema
+// Aquí está la lógica del orquestador — coordina todo en secuencia
+// ============================================================
+async function ejecutarSistema() {
+  if (ejecutando) return;
+  ejecutando = true;
+
+  const escenario = ESCENARIOS[escenarioActual];
+  const logBody = document.getElementById('log-body');
+  logBody.innerHTML = '';
+
+  document.getElementById('btn-run').disabled = true;
+  document.getElementById('result-card').classList.remove('visible');
+  document.getElementById('log-badge').textContent = 'Ejecutando...';
+  document.getElementById('log-badge').style.color = 'var(--naranja)';
+
+  // Actualizar dev panel con el código del orquestador
+  actualizarDevPanel();
+
+  // ============================================================
+  // PASO 1: Agente Diagnóstico
+  // ============================================================
+  setDot(1, 'running');
+  addLog('info', `Iniciando diagnóstico para ${escenario.nombre}...`);
+  await sleep(400);
+
+  const mensajeDiagnostico = construirMensajeDiagnostico(escenario.respuestas);
+
+  try {
+    resultadoDiagnostico = await llamarAgente(
+      SYSTEM_DIAGNOSTICO,
+      mensajeDiagnostico,
+      1000
+    );
+    setDot(1, 'done');
+    setArrow(1, 'done');
+    addLog('ok', `Diagnóstico completado — Perfil: ${resultadoDiagnostico.perfil?.tipo || 'detectado'}`);
+    addLog('info', `Urgencia: ${resultadoDiagnostico.perfil?.nivel_urgencia || 'media'} · ${resultadoDiagnostico.alertas?.length || 0} alerta(s)`);
+  } catch(err) {
+    // Demo sin API key
+    resultadoDiagnostico = generarDiagnosticoDemo(escenario.respuestas);
+    setDot(1, 'done');
+    setArrow(1, 'done');
+    addLog('ok', `Diagnóstico (demo) — ${resultadoDiagnostico.perfil?.tipo}`);
+  }
+
+  await sleep(500);
+
+  // ============================================================
+  // PASO 2: Agente Validador
+  // Recibe el output del Diagnóstico como input
+  // ============================================================
+  setDot(2, 'running');
+  addLog('info', 'Validando coherencia del perfil...');
+  await sleep(400);
+
+  const mensajeValidador = construirMensajeValidador(escenario.respuestas, resultadoDiagnostico);
+
+  try {
+    resultadoValidacion = await llamarAgente(
+      SYSTEM_VALIDADOR,
+      mensajeValidador,
+      800
+    );
+    const nivel = resultadoValidacion.nivel;
+    setDot(2, nivel === 'error' ? 'error' : 'done');
+    setArrow(2, 'done');
+    addLog(nivel === 'error' ? 'error' : nivel === 'advertencia' ? 'warn' : 'ok',
+      `Validación: ${resultadoValidacion.titulo} (score: ${resultadoValidacion.score_coherencia}%)`);
+  } catch(err) {
+    resultadoValidacion = generarValidacionDemo(escenario.respuestas);
+    const nivel = resultadoValidacion.nivel;
+    setDot(2, nivel === 'error' ? 'error' : 'done');
+    setArrow(2, 'done');
+    addLog(nivel === 'error' ? 'error' : 'warn',
+      `Validación (demo): ${resultadoValidacion.titulo}`);
+  }
+
+  await sleep(500);
+
+  // ============================================================
+  // PASO 3: Ensamblar contexto enriquecido
+  // El orquestador combina los outputs de los dos agentes
+  // ============================================================
+  setDot(3, 'running');
+  addLog('info', 'Ensamblando contexto para Clara...');
+  await sleep(600);
+
+  const contextoFinal = ensamblarContexto(escenario, resultadoDiagnostico, resultadoValidacion);
+  setDot(3, 'done');
+  setArrow(3, 'done');
+  addLog('ok', 'Contexto ensamblado — Clara sabe exactamente qué priorizar');
+
+  await sleep(400);
+
+  // ============================================================
+  // PASO 4: Clara lista
+  // ============================================================
+  setDot(4, 'done');
+  addLog('ok', `Clara está lista para ${escenario.nombre} con contexto completo`);
+
+  // Mostrar resultado
+  document.getElementById('log-badge').textContent = 'Completado';
+  document.getElementById('log-badge').style.color = 'var(--verde)';
+
+  mostrarResultadoFinal(resultadoValidacion, contextoFinal);
+
+  document.getElementById('btn-run').style.display = 'none';
+  document.getElementById('btn-reset').style.display = 'block';
+  ejecutando = false;
+}
+
+// ============================================================
+// FUNCIONES DE CADA AGENTE
+// ============================================================
+
+function construirMensajeDiagnostico(respuestas) {
+  return `Freelancer hispanohablante en Alemania. Respuestas del diagnóstico:
+- Tipo de actividad: ${respuestas.tipo_autonomo}
+- Inicio de actividad: ${respuestas.inicio_actividad}
+- Ingresos anuales: ${respuestas.ingresos_anuales}
+- Clientes: ${respuestas.clientes_extranjero}
+- Steuernummer: ${respuestas.tiene_steuernummer}
+${respuestas.actividad ? `- Actividad principal: ${respuestas.actividad}` : ''}
+Genera el plan fiscal personalizado.`;
+}
+
+function construirMensajeValidador(respuestas, diagnostico) {
+  // La clave: el validador recibe el output del diagnóstico como contexto
+  return `Valida este perfil fiscal:
+
+PERFIL:
+- Tipo: ${respuestas.tipo_autonomo}
+- Inicio: ${respuestas.inicio_actividad}
+- Ingresos: ${respuestas.ingresos_anuales}
+- Clientes: ${respuestas.clientes_extranjero}
+- Steuernummer: ${respuestas.tiene_steuernummer}
+${respuestas.actividad ? `- Actividad: ${respuestas.actividad}` : ''}
+
+DIAGNÓSTICO PREVIO:
+- Perfil detectado: ${diagnostico.perfil?.tipo}
+- Urgencia: ${diagnostico.perfil?.nivel_urgencia}
+- Alertas: ${diagnostico.alertas?.map(a => a.mensaje).join(', ')}
+
+Detecta inconsistencias y genera el contexto para Clara.`;
+}
+
+function ensamblarContexto(escenario, diagnostico, validacion) {
+  // El orquestador combina ambos outputs en un único contexto para Clara
+  return `=== PERFIL DE USUARIO (${escenario.nombre}) ===
+Tipo: ${diagnostico.perfil?.tipo}
+Urgencia: ${diagnostico.perfil?.nivel_urgencia}
+Resumen: ${diagnostico.perfil?.resumen}
+
+=== VALIDACIÓN DEL PERFIL ===
+Score de coherencia: ${validacion.score_coherencia}%
+Nivel: ${validacion.nivel}
+${validacion.alertas?.map(a => `- [${a.tipo.toUpperCase()}] ${a.mensaje}`).join('\n')}
+
+=== IMPUESTOS APLICABLES ===
+${diagnostico.impuestos_aplicables?.map(i => `- ${i.nombre} (${i.periodicidad})`).join('\n')}
+
+=== PRÓXIMOS PASOS ===
+${diagnostico.proximos_pasos?.map(p => `- [${p.prioridad.toUpperCase()}] ${p.paso}`).join('\n')}
+
+=== INSTRUCCIÓN PARA CLARA ===
+${validacion.contexto_para_clara}`;
+}
+
+async function llamarAgente(systemPrompt, mensaje, maxTokens) {
+  const response = await fetch("https://api.anthropic.com/v1/messages", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      model: "claude-sonnet-4-20250514",
+      max_tokens: maxTokens,
+      system: systemPrompt,
+      messages: [{ role: "user", content: mensaje }]
+    })
+  });
+  const data = await response.json();
+  if (data.error) throw new Error(data.error.message);
+  const texto = data.content?.[0]?.text || "";
+  return JSON.parse(texto.replace(/```json|```/g, "").trim());
+}
+
+// ============================================================
+// DEMOS SIN API KEY
+// ============================================================
+function generarDiagnosticoDemo(r) {
+  const sinSteuer = r.tiene_steuernummer === 'no';
+  const esKlein = r.ingresos_anuales === 'menos_22000';
+  return {
+    perfil: {
+      tipo: r.tipo_autonomo === 'Freiberufler' ? 'Freiberufler' : 'Gewerbetreibender',
+      nivel_urgencia: sinSteuer ? 'alto' : 'medio',
+      resumen: `${r.tipo_autonomo} con ${sinSteuer ? 'urgencia alta' : 'situación estable'}`
+    },
+    impuestos_aplicables: [
+      !esKlein && { nombre: "UStVA — IVA trimestral", periodicidad: "trimestral", urgencia: "alta" },
+      { nombre: "Einkommensteuer — IRPF", periodicidad: "anual", urgencia: "media" },
+      { nombre: "EÜR — cuenta de resultados", periodicidad: "anual", urgencia: "baja" },
+    ].filter(Boolean),
+    proximos_pasos: [
+      sinSteuer && { paso: "Solicitar Steuernummer en el Finanzamt", prioridad: "urgente" },
+      { paso: "Registrarse en ELSTER", prioridad: "importante" },
+    ].filter(Boolean),
+    alertas: [
+      sinSteuer && { tipo: "error", mensaje: "Sin Steuernummer no puedes facturar legalmente" },
+      esKlein && { tipo: "info", mensaje: "Puedes acogerte al régimen Kleinunternehmer" },
+    ].filter(Boolean),
+    mensaje_motivacional: "Paso a paso, esto es manejable."
+  };
+}
+
+function generarValidacionDemo(r) {
+  const problemas = [];
+  let score = 100;
+  if (r.tipo_autonomo === 'Freiberufler' && r.actividad === 'tienda_online') {
+    problemas.push({ tipo: 'error', mensaje: 'Freiberufler + tienda online es una contradicción', accion: 'Deberías registrarte como Gewerbetreibender' });
+    score -= 40;
+  }
+  if (r.inicio_actividad === 'mas_2_anhos' && r.tiene_steuernummer === 'no') {
+    problemas.push({ tipo: 'error', mensaje: 'Llevas más de 2 años sin Steuernummer', accion: 'Regularizar urgentemente' });
+    score -= 35;
+  }
+  if (r.tiene_steuernummer === 'no' && problemas.length === 0) {
+    problemas.push({ tipo: 'advertencia', mensaje: 'Sin Steuernummer no puedes facturar', accion: 'Solicítala en tu Finanzamt' });
+    score -= 20;
+  }
+  if (problemas.length === 0) {
+    problemas.push({ tipo: 'ok', mensaje: 'Perfil coherente y correcto', accion: null });
+  }
+  const nivel = score >= 80 ? 'ok' : score >= 50 ? 'advertencia' : 'error';
+  return {
+    score_coherencia: Math.max(0, score),
+    nivel,
+    titulo: nivel === 'ok' ? 'Perfil validado correctamente' : nivel === 'advertencia' ? 'Perfil con alertas' : 'Inconsistencias críticas',
+    descripcion: `${problemas.length} punto(s) revisado(s)`,
+    alertas: problemas,
+    contexto_para_clara: nivel === 'error'
+      ? 'El usuario tiene inconsistencias críticas. Empieza explicando el problema más urgente.'
+      : nivel === 'advertencia'
+      ? 'El usuario tiene alertas menores. Menciónalas al inicio y guíale por sus obligaciones.'
+      : 'Perfil correcto. Puedes ir directamente a las obligaciones fiscales.'
+  };
+}
+
+// ============================================================
+// UI HELPERS
+// ============================================================
+function mostrarResultadoFinal(validacion, contexto) {
+  const card = document.getElementById('result-card');
+  card.classList.add('visible');
+
+  const iconoMap = { ok: '✓', advertencia: '⚠', error: '✕' };
+  const claseMap = { ok: 'ok', advertencia: 'warn', error: 'error' };
+  document.getElementById('result-icon').textContent = iconoMap[validacion.nivel] || '✓';
+  document.getElementById('result-icon').className = `result-icon ${claseMap[validacion.nivel] || 'ok'}`;
+  document.getElementById('result-title').textContent = 'Sistema ejecutado — Clara lista';
+  document.getElementById('result-desc').textContent = validacion.titulo;
+  document.getElementById('context-box').textContent = contexto;
+}
+
+function abrirClara() {
+  addLog('info', 'Abriendo klaro-clara-agente.html con el contexto...');
+  alert('En producción: aquí se abriría Clara con el contexto ya inyectado.\nEl contexto está en el JSON del dev panel.');
+}
+
+function resetear() {
+  resultadoDiagnostico = null;
+  resultadoValidacion = null;
+  ejecutando = false;
+  document.getElementById('log-body').innerHTML = '<div style="color:var(--gris);font-size:13px;text-align:center;padding:20px 0;">Pulsa "Ejecutar sistema completo" para ver el orquestador en acción.</div>';
+  document.getElementById('log-badge').textContent = 'En espera';
+  document.getElementById('log-badge').style.color = '';
+  document.getElementById('result-card').classList.remove('visible');
+  document.getElementById('btn-run').style.display = 'block';
+  document.getElementById('btn-run').disabled = false;
+  document.getElementById('btn-reset').style.display = 'none';
+  [1,2,3,4].forEach(i => setDot(i, 'waiting'));
+  [1,2,3].forEach(i => {
+    const a = document.getElementById(`arrow-${i}`);
+    if (a) { a.className = 'p-arrow'; }
+  });
+  document.getElementById('dot-4').textContent = '💬';
+}
+
+function setDot(n, estado) {
+  const dot = document.getElementById(`dot-${n}`);
+  if (!dot) return;
+  dot.className = `p-dot ${estado}`;
+  if (estado === 'done' && n < 4) dot.textContent = '✓';
+  if (estado === 'running') dot.textContent = n < 4 ? n : '💬';
+  if (estado === 'error') dot.textContent = '⚠';
+}
+
+function setArrow(n, estado) {
+  const arrow = document.getElementById(`arrow-${n}`);
+  if (arrow) arrow.className = `p-arrow ${estado}`;
+}
+
+function addLog(tipo, mensaje) {
+  const logBody = document.getElementById('log-body');
+  const tiempo = new Date().toLocaleTimeString('es', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+  const entry = document.createElement('div');
+  entry.className = 'log-entry';
+  entry.innerHTML = `
+    <div class="log-dot ${tipo}"></div>
+    <div class="log-time">${tiempo}</div>
+    <div>${mensaje}</div>
+  `;
+  logBody.appendChild(entry);
+  logBody.scrollTop = logBody.scrollHeight;
+}
+
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+function actualizarDevPanel() {
+  const codigo = `// ============================================================
+// ORQUESTADOR DE KLARO — Patrón pipeline
+// ============================================================
+
+async function ejecutarSistema(escenario) {
+
+  // PASO 1: Agente Diagnóstico
+  // Input:  respuestas del usuario (5 preguntas)
+  // Output: perfil JSON con impuestos, pasos, alertas
+  const diagnostico = await llamarAgente(
+    SYSTEM_DIAGNOSTICO,
+    construirMensajeDiagnostico(escenario.respuestas)
+  );
+
+  // PASO 2: Agente Validador
+  // Input:  respuestas + output del Diagnóstico
+  // Output: score de coherencia + alertas + contexto para Clara
+  const validacion = await llamarAgente(
+    SYSTEM_VALIDADOR,
+    construirMensajeValidador(escenario.respuestas, diagnostico)
+  );
+
+  // PASO 3: Ensamblar contexto
+  // El orquestador (no Claude) combina los dos outputs
+  // Este es el contexto que recibe Clara en su system prompt
+  const contextoFinal = ensamblarContexto(
+    escenario,
+    diagnostico,
+    validacion
+  );
+
+  // PASO 4: Lanzar Clara con todo el contexto listo
+  lanzarClara(contextoFinal);
+}
+
+// NOTA CLAVE:
+// El orquestador no llama a Claude directamente.
+// Solo coordina cuándo y cómo llamar a cada agente,
+// y decide qué hacer con los resultados.
+// Esto es código JavaScript puro, no IA.`;
+  document.getElementById('dev-code').textContent = codigo;
+}
+
+function toggleDev() {
+  const body = document.getElementById('dev-body');
+  const icon = document.getElementById('dev-icon');
+  body.classList.toggle('open');
+  icon.textContent = body.classList.contains('open') ? '▲' : '▼';
+}
+</script>
+</body>
+</html>
