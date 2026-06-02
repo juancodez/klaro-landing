@@ -1,5 +1,7 @@
 const { createClient } = require('@supabase/supabase-js');
 
+const FREE_MSG_LIMIT = 5;
+
 const SYSTEM = `Eres Clara, la asesora fiscal inteligente de Klaro. Tu único propósito es ayudar a freelancers y autónomos hispanohablantes que trabajan en Alemania con sus obligaciones fiscales alemanas.
 
 DOMINIO — solo respondes sobre impuestos alemanes para autónomos:
@@ -52,15 +54,22 @@ module.exports = async function handler(req, res) {
     return res.status(400).json({ error: 'messages array required' });
   }
 
-  // Fix 1: fetch full fiscal profile from Supabase using service role key
+  // Fetch fiscal profile + enforce free-tier paywall server-side
   let fullProfile = userProfile || null;
   if (userId && process.env.SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY) {
     try {
       const sb = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY);
-      const [{ data: prof }, { data: fp }] = await Promise.all([
-        sb.from('profiles').select('full_name, city, tax_number').eq('id', userId).maybeSingle(),
-        sb.from('fiscal_profiles').select('tipo_autonomo, is_kleinunternehmer, ingresos_anuales, clientes_extranjero, actividad, tiene_steuernummer').eq('user_id', userId).maybeSingle(),
+      const [{ data: prof }, { data: fp }, { count: msgCount }] = await Promise.all([
+        sb.from('profiles').select('full_name, city, tax_number, plan').eq('id', userId).maybeSingle(),
+        sb.from('fiscal_profiles').select('tipo_autonomo, is_kleinunternehmer, ingresos_anuales, clientes_extranjero, actividad, tiene_steuernummer, inicio_actividad').eq('user_id', userId).maybeSingle(),
+        sb.from('chat_messages').select('*', { count: 'exact', head: true }).eq('user_id', userId).eq('role', 'user'),
       ]);
+
+      // Block free users who hit the limit
+      if ((prof?.plan ?? 'free') !== 'plus' && (msgCount ?? 0) >= FREE_MSG_LIMIT) {
+        return res.status(402).json({ limitReached: true, count: msgCount });
+      }
+
       fullProfile = { ...(prof || {}), ...(fp || {}) };
     } catch (e) { /* non-critical — fall back to frontend-provided profile */ }
   }
@@ -77,6 +86,7 @@ module.exports = async function handler(req, res) {
     if (p.ingresos_anuales)     ctx.push(`• Ingresos anuales estimados: ${p.ingresos_anuales} €`);
     if (p.is_kleinunternehmer != null) ctx.push(`• Kleinunternehmer: ${p.is_kleinunternehmer ? 'sí' : 'no'}`);
     if (p.clientes_extranjero != null) ctx.push(`• Clientes en el extranjero: ${p.clientes_extranjero ? 'sí' : 'no'}`);
+    if (p.inicio_actividad)       ctx.push(`• Inicio de actividad: ${p.inicio_actividad}`);
     const hasTax = p.tax_number || p.tiene_steuernummer;
     ctx.push(`• Steuernummer: ${hasTax ? 'registrada' : 'aún no registrada'}`);
     if (ctx.length > 0) {

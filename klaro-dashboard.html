@@ -106,6 +106,80 @@
 </div>
 
 <!-- ═══════════════════════════════════════════════════════════════════
+     WELCOME ONBOARDING — shown once on first login, before fiscal setup
+════════════════════════════════════════════════════════════════════ -->
+<div id="welcome-onboarding" class="hidden fixed inset-0 z-[110] items-center justify-center px-4" style="background:rgba(30,27,23,0.65);backdrop-filter:blur(4px)">
+  <div class="w-full max-w-sm rounded-2xl p-7 relative" style="background:#fff8f1;border:1px solid rgba(164,55,0,.1);box-shadow:0 24px 64px rgba(164,55,0,.2)">
+
+    <!-- Step dots -->
+    <div class="flex justify-center gap-1.5 mb-6" id="ob-dots">
+      <span class="w-2 h-2 rounded-full" style="background:#a43700" data-dot="0"></span>
+      <span class="w-2 h-2 rounded-full" style="background:rgba(164,55,0,.2)" data-dot="1"></span>
+      <span class="w-2 h-2 rounded-full" style="background:rgba(164,55,0,.2)" data-dot="2"></span>
+      <span class="w-2 h-2 rounded-full" style="background:rgba(164,55,0,.2)" data-dot="3"></span>
+    </div>
+
+    <!-- Step 0: Bienvenida -->
+    <div id="ob-step-0" class="text-center">
+      <div class="w-16 h-16 rounded-2xl mx-auto mb-4 flex items-center justify-center" style="background:linear-gradient(135deg,rgba(164,55,0,.12),rgba(255,184,48,.12));border:1px solid rgba(164,55,0,.15)">
+        <svg width="32" height="30" viewBox="0 0 20 19" xmlns="http://www.w3.org/2000/svg" style="fill-rule:evenodd;clip-rule:evenodd"><path d="M13.006,11.97c-0.192,0.068 -0.391,0.12 -0.596,0.155l-3.004,-4.643l2.47,-2.707c0.376,0.01 0.738,0.076 1.079,0.19l3.095,-3.41l0.555,0.504l-2.936,3.234c0.566,0.337 1.034,0.82 1.353,1.398l4.336,-1.116l0.187,0.726l-4.227,1.088c0.043,0.14 0.078,0.284 0.104,0.431c0.038,0.213 0.058,0.432 0.058,0.656c0,0.358 -0.051,0.704 -0.146,1.032c-0.003,0.012 -0.007,0.023 -0.01,0.035l3.983,1.696l-0.294,0.69l-3.978,-1.694c-0.307,0.567 -0.758,1.046 -1.304,1.386l2.624,3.821l-0.618,0.424l-2.686,-3.912c-0.015,0.005 -0.03,0.011 -0.045,0.016Zm-1.824,-11.97l4.655,0l-6.717,7.362l7.235,11.182l-4.655,0l-5.174,-8.564l-2.796,2.973l0,5.591l-3.732,0l0,-18.544l3.732,0l0,8.235l7.451,-8.235Z" fill="#a43700"/></svg>
+      </div>
+      <h2 class="text-xl font-black text-[#1e1b17] mb-2" style="font-family:'DM Serif Display',serif">¡Bienvenida a Klaro!</h2>
+      <p class="text-sm leading-relaxed mb-6" style="color:#594139">Tu asistente fiscal para freelancers hispanohablantes en Alemania. Con Klaro, tus impuestos en orden — en español.</p>
+      <button onclick="welcomeNext()" class="w-full py-3 rounded-xl text-sm font-bold text-white transition-all active:scale-95" style="background:#a43700">Siguiente →</button>
+    </div>
+
+    <!-- Step 1: Clara -->
+    <div id="ob-step-1" class="hidden text-center">
+      <div class="w-16 h-16 rounded-full mx-auto mb-4 flex items-center justify-center" style="background:linear-gradient(135deg,#a43700,#c45200)">
+        <svg class="w-8 h-8 text-white" fill="none" viewBox="0 0 24 24" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      </div>
+      <h2 class="text-xl font-black text-[#1e1b17] mb-2" style="font-family:'DM Serif Display',serif">Conoce a Clara</h2>
+      <p class="text-sm leading-relaxed mb-4" style="color:#594139">Tu asesora fiscal IA, siempre disponible en español. Responde dudas sobre IVA, gastos deducibles, plazos del Finanzamt y mucho más — sin esperas ni citas.</p>
+      <ul class="text-left space-y-2 mb-6">
+        <li class="flex items-center gap-2 text-sm" style="color:#1e1b17"><span style="color:#a43700;font-weight:700">✓</span> UStVA, Einkommensteuer, EÜR</li>
+        <li class="flex items-center gap-2 text-sm" style="color:#1e1b17"><span style="color:#a43700;font-weight:700">✓</span> Gastos deducibles y Vorsteuer</li>
+        <li class="flex items-center gap-2 text-sm" style="color:#1e1b17"><span style="color:#a43700;font-weight:700">✓</span> Freiberufler vs. Gewerbetreibender</li>
+        <li class="flex items-center gap-2 text-sm" style="color:#1e1b17"><span style="color:#a43700;font-weight:700">✓</span> Reverse Charge y clientes de la UE</li>
+      </ul>
+      <button onclick="welcomeNext()" class="w-full py-3 rounded-xl text-sm font-bold text-white transition-all active:scale-95" style="background:#a43700">Siguiente →</button>
+    </div>
+
+    <!-- Step 2: Disclaimer -->
+    <div id="ob-step-2" class="hidden">
+      <div class="w-14 h-14 rounded-2xl mx-auto mb-4 flex items-center justify-center" style="background:rgba(255,184,48,.15);border:1px solid rgba(255,184,48,.3)">
+        <svg class="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="#c45200" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg>
+      </div>
+      <h2 class="text-xl font-black text-[#1e1b17] mb-2 text-center" style="font-family:'DM Serif Display',serif">Una nota importante</h2>
+      <p class="text-sm leading-relaxed mb-4 text-center" style="color:#594139">Clara es una herramienta informativa, no una <strong>Steuerberaterin</strong> (asesora fiscal oficial).</p>
+      <div class="rounded-xl p-4 mb-6 space-y-2" style="background:rgba(255,184,48,.08);border:1px solid rgba(255,184,48,.25)">
+        <p class="text-sm font-semibold" style="color:#1e1b17">✅ Clara puede:</p>
+        <p class="text-xs leading-relaxed" style="color:#594139">Explicar conceptos, plazos y trámites fiscales alemanes en español con orientación práctica.</p>
+        <p class="text-sm font-semibold mt-3" style="color:#1e1b17">⚠️ Clara no reemplaza:</p>
+        <p class="text-xs leading-relaxed" style="color:#594139">Una consulta con un Steuerberater para casos complejos, auditorías o decisiones con alto impacto fiscal.</p>
+      </div>
+      <button onclick="welcomeNext()" class="w-full py-3 rounded-xl text-sm font-bold text-white transition-all active:scale-95" style="background:#a43700">Entendido →</button>
+    </div>
+
+    <!-- Step 3: Start diagnosis -->
+    <div id="ob-step-3" class="hidden text-center">
+      <div class="w-16 h-16 rounded-2xl mx-auto mb-4 flex items-center justify-center" style="background:linear-gradient(135deg,rgba(164,55,0,.12),rgba(255,184,48,.12));border:1px solid rgba(164,55,0,.15)">
+        <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="#a43700" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+      </div>
+      <h2 class="text-xl font-black text-[#1e1b17] mb-2" style="font-family:'DM Serif Display',serif">Configura tu perfil fiscal</h2>
+      <p class="text-sm leading-relaxed mb-2" style="color:#594139">Cuéntanos sobre tu situación en 7 preguntas rápidas. Con eso, Klaro y Clara se adaptan a ti — y tus cálculos serán precisos desde el primer día.</p>
+      <p class="text-xs mb-6" style="color:rgba(89,65,57,.6)">Tarda menos de 2 minutos.</p>
+      <button id="ob-finish-btn" onclick="welcomeFinish()" class="w-full py-3 rounded-xl text-sm font-bold text-white transition-all active:scale-95 flex items-center justify-center gap-2" style="background:#a43700">
+        <span>Empezar diagnóstico</span>
+        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+      </button>
+      <button onclick="welcomeSkip()" class="mt-3 text-xs" style="color:rgba(89,65,57,.5);background:none;border:none;cursor:pointer">Saltar por ahora</button>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════
      ONBOARDING OVERLAY — shown once, skipped if fiscal_profiles exists
 ════════════════════════════════════════════════════════════════════ -->
 <div id="onboarding-overlay" class="hidden fixed inset-0 z-[100] flex items-center justify-center" style="background:rgba(30,27,23,0.65);backdrop-filter:blur(4px)">
@@ -333,6 +407,12 @@
         <circle cx="12" cy="12" r="10"></circle><path d="M12 8v4l3 3"></path>
       </svg>
       Impuestos
+    </a>
+    <a href="klaro-documentos.html" class="flex items-center gap-3 px-4 py-3 rounded-xl text-[#594139] font-medium hover:bg-[#a43700]/5 transition-all text-sm">
+      <svg class="w-[18px] h-[18px] flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline>
+      </svg>
+      Documentos
     </a>
     <a href="klaro-clara.html" class="flex items-center gap-3 px-4 py-3 rounded-xl text-[#594139] font-medium hover:bg-[#a43700]/5 transition-all text-sm">
       <svg class="w-[18px] h-[18px] flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -950,8 +1030,15 @@ function _renderChart(invoices, expenses) {
   const _rawName = session.user.user_metadata?.full_name || session.user.email.split('@')[0];
   if (greetEl) greetEl.textContent = `¡Hola, ${_rawName.split(' ')[0]}! 👋`;
 
-  // Check onboarding (show overlay if no fiscal_profiles row)
-  if (typeof _obInit === 'function') _obInit(uid);
+  // Welcome onboarding: show if new user, then hand off to fiscal diagnosis
+  const { data: _wProf } = await _sb.from('profiles').select('onboarding_completed').eq('id', uid).maybeSingle();
+  if (!_wProf?.onboarding_completed) {
+    const _wo = document.getElementById('welcome-onboarding');
+    if (_wo) { _wo.classList.remove('hidden'); _wo.classList.add('flex'); }
+    window._obUid = uid; // store uid for obFinish/obSkip
+  } else {
+    if (typeof _obInit === 'function') _obInit(uid);
+  }
 
   // Dynamic deadlines
   const _y = new Date().getFullYear();
@@ -971,10 +1058,12 @@ function _renderChart(invoices, expenses) {
     _statMesEl.textContent = _mn.charAt(0).toUpperCase() + _mn.slice(1);
   }
 
+  // Fetch fiscal profile (used for IVA card + UStVA deadline)
+  const { data: _fp } = await _sb.from('fiscal_profiles').select('is_kleinunternehmer').eq('user_id', uid).maybeSingle();
+
   // stat-iva-vence: next UStVA deadline; hidden for Kleinunternehmer
   const _ivaVenceEl = document.getElementById('stat-iva-vence');
   if (_ivaVenceEl) {
-    const { data: _fp } = await _sb.from('fiscal_profiles').select('is_kleinunternehmer').eq('user_id', uid).maybeSingle();
     if (_fp?.is_kleinunternehmer) {
       _ivaVenceEl.style.display = 'none';
     } else {
@@ -996,7 +1085,7 @@ function _renderChart(invoices, expenses) {
 
   // Fetch invoices and expenses in parallel (client_name needed for invoice list)
   const [{ data: invoices, error: invErr }, { data: expenses, error: expErr }] = await Promise.all([
-    _sb.from('invoices').select('amount, status, date, client_name, due_date').eq('user_id', uid),
+    _sb.from('invoices').select('amount, status, tax_rate, date, client_name, due_date').eq('user_id', uid),
     _sb.from('expenses').select('amount, date').eq('user_id', uid),
   ]);
   if (invErr || expErr) showErrToast();
@@ -1009,9 +1098,6 @@ function _renderChart(invoices, expenses) {
   const totalPendiente = inv.filter(i => ['sent','pending'].includes(i.status)).reduce((s,i) => s + (parseFloat(i.amount)||0), 0);
   const totalGastos    = exp.reduce((s,e) => s + (parseFloat(e.amount)||0), 0);
   const beneficio      = totalIngresos - totalGastos;
-  // IVA: facturado − Vorsteuer (IVA deducible de gastos)
-  const ivaPendiente   = Math.max(0, totalIngresos * 0.19 - totalGastos * 0.19);
-
   const elIngresos  = document.getElementById('stat-ingresos');
   const elGastos    = document.getElementById('stat-gastos');
   const elBeneficio = document.getElementById('stat-beneficio');
@@ -1019,7 +1105,17 @@ function _renderChart(invoices, expenses) {
   if (elIngresos)  elIngresos.textContent  = fmt(totalIngresos);
   if (elGastos)    elGastos.textContent    = fmt(totalGastos);
   if (elBeneficio) elBeneficio.textContent = fmt(beneficio);
-  if (elIva)       elIva.textContent       = fmt(ivaPendiente);
+
+  // IVA: respect Kleinunternehmer §19 — no IVA applies
+  if (_fp?.is_kleinunternehmer) {
+    if (elIva) { elIva.textContent = 'N/A'; elIva.title = 'Kleinunternehmer §19 UStG — sin IVA'; }
+  } else {
+    const ivaFacturado = inv.filter(i => i.status === 'paid')
+      .reduce((s, i) => s + (parseFloat(i.amount) || 0) * ((parseFloat(i.tax_rate) || 19) / 100), 0);
+    const vorsteuer = totalGastos * 0.19;
+    const ivaPendiente = Math.max(0, ivaFacturado - vorsteuer);
+    if (elIva) elIva.textContent = fmt(ivaPendiente);
+  }
 
   // Pending income line below ingresos stat
   const elPending = document.getElementById('stat-ingresos-pending');
@@ -1544,7 +1640,36 @@ async function updateVencimientos(uid) {
   };
 })();
 </script>
+<!-- ── WELCOME ONBOARDING JS ─────────────────────────────── -->
+<script>
+(function () {
+  var _wStep = 0;
+
+  window.welcomeNext = function () {
+    document.getElementById('ob-step-' + _wStep).classList.add('hidden');
+    _wStep++;
+    document.getElementById('ob-step-' + _wStep).classList.remove('hidden');
+    document.querySelectorAll('[data-dot]').forEach(function (d) {
+      d.style.background = parseInt(d.dataset.dot) === _wStep ? '#a43700' : 'rgba(164,55,0,.2)';
+    });
+  };
+
+  async function _closeWelcome() {
+    var uid = window._obUid;
+    if (uid) await _sb.from('profiles').update({ onboarding_completed: true }).eq('id', uid);
+    var el = document.getElementById('welcome-onboarding');
+    el.classList.add('hidden'); el.classList.remove('flex');
+    if (typeof _obInit === 'function' && uid) _obInit(uid);
+  }
+
+  window.welcomeFinish = async function () {
+    var btn = document.getElementById('ob-finish-btn');
+    if (btn) btn.disabled = true;
+    await _closeWelcome();
+  };
+
+  window.welcomeSkip = async function () { await _closeWelcome(); };
+})();
+</script>
 </body>
 </html>
-
-

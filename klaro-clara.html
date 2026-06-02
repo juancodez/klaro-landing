@@ -106,6 +106,12 @@
       </svg>
       Impuestos
     </a>
+    <a href="klaro-documentos.html" class="flex items-center gap-3 px-4 py-3 rounded-xl text-[#594139] font-medium hover:bg-[#a43700]/5 transition-all text-sm">
+      <svg class="w-[18px] h-[18px] flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline>
+      </svg>
+      Documentos
+    </a>
     <a href="klaro-clara.html" class="nav-active flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm transition-all">
       <svg class="w-[18px] h-[18px] flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
@@ -242,7 +248,7 @@
             onkeydown="handleKey(event)"
             oninput="autoResize(this)"
           ></textarea>
-          <button onclick="sendMessage()" class="w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0 transition-all active:scale-95" style="background:#a43700">
+          <button id="send-btn" onclick="sendMessage()" class="w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0 transition-all active:scale-95" style="background:#a43700">
             <svg class="w-[14px] h-[14px] text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
           </button>
         </div>
@@ -456,11 +462,15 @@
 
   // ── Free-tier limit UI ────────────────────────────────────────────────
   function _updateLimitUI() {
-    const el = document.getElementById('msg-counter');
+    const el    = document.getElementById('msg-counter');
+    const input = document.getElementById('chat-input');
+    const btn   = document.getElementById('send-btn');
     if (!el) return;
     const remaining = Math.max(0, FREE_MSG_LIMIT - _msgCount);
     if (_msgCount >= FREE_MSG_LIMIT) {
-      el.innerHTML = '<span style="color:#dc2626;font-weight:700">Límite gratuito alcanzado · <a href="klaro-profile.html" style="color:#a43700;text-decoration:underline">Ver planes →</a></span>';
+      el.innerHTML = '<button onclick="showUpgradeModal()" style="color:#a43700;font-weight:700;text-decoration:underline;background:none;border:none;cursor:pointer;font-size:inherit">Ver Klaro Plus →</button>';
+      if (input) { input.disabled = true; input.placeholder = 'Actualiza a Plus para seguir hablando con Clara'; }
+      if (btn)   btn.disabled = true;
     } else {
       el.textContent = remaining + ' mensaje' + (remaining === 1 ? '' : 's') + ' gratis restante' + (remaining === 1 ? '' : 's');
     }
@@ -660,9 +670,9 @@
     const text  = (override ?? input.value).trim();
     if (!text || isLoading) return;
 
-    // Free-tier limit
+    // Free-tier preflight (frontend gate — backend re-validates)
     if (_msgCount >= FREE_MSG_LIMIT) {
-      appendClara('Has usado tus 5 mensajes gratuitos. Para continuar, actualiza tu plan → klaro-profile.html');
+      showUpgradeModal();
       return;
     }
 
@@ -693,7 +703,16 @@
       removeTyping();
 
       if (!res.ok) {
-        // Server error — show canned response so user isn't stuck
+        const errData = await res.json().catch(() => ({}));
+        if (res.status === 402 || errData.limitReached) {
+          removeTyping();
+          _msgCount = FREE_MSG_LIMIT; // sync frontend counter
+          _updateLimitUI();
+          showUpgradeModal();
+          isLoading = false;
+          return;
+        }
+        // Other server error — show canned response so user isn't stuck
         const reply = getCannedResponse(text);
         chatHistory.push({ role: 'assistant', content: reply });
         appendClara(reply);
@@ -814,6 +833,102 @@
       }
     });
   })();
+</script>
+<!-- ── UPGRADE MODAL ──────────────────────────────────────────── -->
+<div id="upgrade-modal" class="hidden fixed inset-0 z-50 items-center justify-center p-4"
+  style="background:rgba(30,27,23,.55);backdrop-filter:blur(4px)"
+  onclick="if(event.target===this)closeUpgradeModal()">
+  <div class="relative w-full max-w-sm rounded-2xl p-7 text-center"
+    style="background:#fff8f1;border:1px solid rgba(164,55,0,.12);box-shadow:0 24px 64px rgba(164,55,0,.18)">
+
+    <!-- Close -->
+    <button onclick="closeUpgradeModal()" class="absolute top-4 right-4 w-7 h-7 rounded-lg flex items-center justify-center transition-colors hover:bg-[#a43700]/10" style="color:#594139">
+      <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+
+    <!-- Icon -->
+    <div class="w-14 h-14 rounded-2xl mx-auto mb-4 flex items-center justify-center"
+      style="background:linear-gradient(135deg,rgba(232,98,42,.15),rgba(255,184,48,.15));border:1px solid rgba(232,98,42,.2)">
+      <svg class="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="#a43700" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+      </svg>
+    </div>
+
+    <h2 class="text-lg font-black text-[#1e1b17] mb-1" style="font-family:'DM Serif Display',serif">Has usado tus 5 mensajes gratis</h2>
+    <p class="text-sm mb-5" style="color:#594139">Actualiza a <strong>Klaro Plus</strong> para hablar con Clara sin límites y acceder a todas las funciones fiscales.</p>
+
+    <!-- Features -->
+    <ul class="text-left space-y-2.5 mb-6 px-1">
+      <li class="flex items-center gap-2.5 text-sm" style="color:#1e1b17">
+        <span class="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0" style="background:rgba(164,55,0,.1)">
+          <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="#a43700" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+        </span>
+        Mensajes ilimitados con Clara
+      </li>
+      <li class="flex items-center gap-2.5 text-sm" style="color:#1e1b17">
+        <span class="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0" style="background:rgba(164,55,0,.1)">
+          <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="#a43700" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+        </span>
+        Historial de conversaciones completo
+      </li>
+      <li class="flex items-center gap-2.5 text-sm" style="color:#1e1b17">
+        <span class="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0" style="background:rgba(164,55,0,.1)">
+          <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="#a43700" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+        </span>
+        Exportación PDF de resumen fiscal
+      </li>
+      <li class="flex items-center gap-2.5 text-sm" style="color:#1e1b17">
+        <span class="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0" style="background:rgba(164,55,0,.1)">
+          <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="#a43700" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+        </span>
+        Facturas ilimitadas · soporte prioritario
+      </li>
+    </ul>
+
+    <!-- Price + CTA -->
+    <div class="mb-4">
+      <button onclick="goToCheckout()" id="clara-checkout-btn"
+        class="block w-full py-3 rounded-xl font-bold text-white text-sm transition-all active:scale-95"
+        style="background:linear-gradient(135deg,#a43700,#c45200);box-shadow:0 4px 16px rgba(164,55,0,.3)">
+        Actualizar a Plus · €5/mes
+      </button>
+    </div>
+    <button onclick="closeUpgradeModal()" class="text-xs" style="color:rgba(89,65,57,.5)">
+      Ahora no — volver al chat
+    </button>
+  </div>
+</div>
+
+<script>
+  function showUpgradeModal() {
+    const m = document.getElementById('upgrade-modal');
+    m.classList.remove('hidden');
+    m.classList.add('flex');
+  }
+  function closeUpgradeModal() {
+    const m = document.getElementById('upgrade-modal');
+    m.classList.add('hidden');
+    m.classList.remove('flex');
+  }
+  async function goToCheckout() {
+    const btn = document.getElementById('clara-checkout-btn');
+    btn.textContent = 'Redirigiendo…';
+    btn.disabled = true;
+    const { data: { session } } = await _sb.auth.getSession();
+    if (!session) { window.location.replace('login.html'); return; }
+    const res = await fetch('/api/checkout', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userId: session.user.id }),
+    });
+    const data = await res.json();
+    if (data.url) {
+      window.location.href = data.url;
+    } else {
+      btn.textContent = 'Actualizar a Plus · €5/mes';
+      btn.disabled = false;
+    }
+  }
 </script>
 </body>
 </html>

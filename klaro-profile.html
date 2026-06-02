@@ -133,6 +133,12 @@
       </svg>
       Impuestos
     </a>
+    <a href="klaro-documentos.html" class="flex items-center gap-3 px-4 py-3 rounded-xl text-[#594139] font-medium hover:bg-[#a43700]/5 transition-all text-sm">
+      <svg class="w-[18px] h-[18px] flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline>
+      </svg>
+      Documentos
+    </a>
     <a href="klaro-clara.html"
        class="flex items-center gap-3 px-4 py-3 rounded-xl text-[#594139] font-medium hover:bg-[#a43700]/5 transition-all text-sm">
       <svg class="w-[18px] h-[18px] flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -589,65 +595,72 @@
         <!-- Plan card -->
         <div class="rounded-2xl p-6"
              style="background:#fff8f1;border:1px solid rgba(164,55,0,0.07);box-shadow:0 1px 6px rgba(164,55,0,.04)">
+
+          <!-- Payment success banner -->
+          <div id="payment-success-banner" class="hidden mb-4 rounded-xl px-4 py-3 text-xs font-semibold flex items-center gap-2"
+            style="background:#F0FDF4;color:#059669;border:1px solid rgba(5,150,105,.2)">
+            <svg class="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            ¡Bienvenido a Klaro Plus! Tu suscripción ya está activa.
+          </div>
+
           <div class="flex items-center justify-between mb-4">
             <h3 class="text-sm font-bold text-[#1e1b17]">Plan actual</h3>
-            <span class="text-[10px] font-black px-2.5 py-1 rounded-lg"
-                  style="background:rgba(164,55,0,.1);color:#a43700">BETA FREE</span>
+            <span id="plan-badge" class="text-[10px] font-black px-2.5 py-1 rounded-lg"
+                  style="background:rgba(164,55,0,.1);color:#a43700">FREE</span>
           </div>
           <div class="space-y-2.5 mb-5">
             <div class="flex items-center gap-2.5">
-              <div class="w-4 h-4 rounded-full flex items-center justify-center flex-shrink-0"
-                   style="background:rgba(34,197,94,.15)">
-                <svg class="w-2.5 h-2.5 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
-                  <polyline points="20 6 9 17 4 12"/>
-                </svg>
+              <div class="w-4 h-4 rounded-full flex items-center justify-center flex-shrink-0" style="background:rgba(34,197,94,.15)">
+                <svg class="w-2.5 h-2.5 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
               </div>
               <p class="text-xs" style="color:#594139">Dashboard fiscal completo</p>
             </div>
             <div class="flex items-center gap-2.5">
-              <div class="w-4 h-4 rounded-full flex items-center justify-center flex-shrink-0"
-                   style="background:rgba(34,197,94,.15)">
-                <svg class="w-2.5 h-2.5 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
-                  <polyline points="20 6 9 17 4 12"/>
-                </svg>
-              </div>
-              <p class="text-xs" style="color:#594139">Clara — asesora IA en español</p>
-            </div>
-            <div class="flex items-center gap-2.5">
-              <div class="w-4 h-4 rounded-full flex items-center justify-center flex-shrink-0"
-                   style="background:rgba(34,197,94,.15)">
-                <svg class="w-2.5 h-2.5 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
-                  <polyline points="20 6 9 17 4 12"/>
-                </svg>
+              <div class="w-4 h-4 rounded-full flex items-center justify-center flex-shrink-0" style="background:rgba(34,197,94,.15)">
+                <svg class="w-2.5 h-2.5 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
               </div>
               <p class="text-xs" style="color:#594139">Facturas y gastos sin límite</p>
             </div>
-            <div class="flex items-center gap-2.5">
-              <div class="w-4 h-4 rounded-full flex items-center justify-center flex-shrink-0"
-                   style="background:rgba(164,55,0,.1)">
-                <svg class="w-2.5 h-2.5 text-[#a43700]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
-                  <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
-                </svg>
+            <div id="plan-clara-row" class="flex items-center gap-2.5">
+              <div id="plan-clara-icon" class="w-4 h-4 rounded-full flex items-center justify-center flex-shrink-0" style="background:rgba(164,55,0,.1)">
+                <svg class="w-2.5 h-2.5 text-[#a43700]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
               </div>
-              <p class="text-xs text-[#9997a0]">Exportación PDF/DATEV — Pro</p>
+              <p id="plan-clara-label" class="text-xs text-[#9997a0]">Clara ilimitada — Plus</p>
             </div>
             <div class="flex items-center gap-2.5">
-              <div class="w-4 h-4 rounded-full flex items-center justify-center flex-shrink-0"
-                   style="background:rgba(164,55,0,.1)">
-                <svg class="w-2.5 h-2.5 text-[#a43700]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
-                  <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
-                </svg>
+              <div class="w-4 h-4 rounded-full flex items-center justify-center flex-shrink-0" style="background:rgba(164,55,0,.1)">
+                <svg class="w-2.5 h-2.5 text-[#a43700]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
               </div>
-              <p class="text-xs text-[#9997a0]">Envío directo a ELSTER — Pro</p>
+              <p class="text-xs text-[#9997a0]">Exportación PDF/DATEV — Plus</p>
             </div>
           </div>
-          <button class="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-sm font-bold text-white transition-all hover:opacity-90 active:scale-95"
-                  style="background:linear-gradient(135deg,#a43700,#e8622a);box-shadow:0 2px 12px rgba(164,55,0,.25)">
-            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-              <path d="M12 2l2.09 4.26L18 7.27l-3 2.92.7 4.14L12 12.77l-3.7 1.56.7-4.14L6 7.27l3.91-1.01L12 2z"/>
-            </svg>
-            Ver planes Pro
-          </button>
+
+          <!-- Free plan CTA -->
+          <div id="plan-cta-free">
+            <button onclick="startCheckout()" id="upgrade-btn"
+              class="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-sm font-bold text-white transition-all hover:opacity-90 active:scale-95"
+              style="background:linear-gradient(135deg,#a43700,#e8622a);box-shadow:0 2px 12px rgba(164,55,0,.25)">
+              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+              </svg>
+              <span id="upgrade-btn-text">Actualizar a Plus · €5/mes</span>
+            </button>
+            <p class="text-center text-[10px] mt-2" style="color:rgba(89,65,57,.45)">Sin permanencia · cancela cuando quieras</p>
+          </div>
+
+          <!-- Plus plan CTA -->
+          <div id="plan-cta-plus" class="hidden">
+            <button onclick="openBillingPortal()" id="portal-btn"
+              class="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-sm font-bold transition-all hover:opacity-90 active:scale-95"
+              style="background:rgba(164,55,0,.08);color:#a43700;border:1px solid rgba(164,55,0,.15)">
+              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+              </svg>
+              <span id="portal-btn-text">Gestionar suscripción</span>
+            </button>
+            <p class="text-center text-[10px] mt-2" style="color:rgba(89,65,57,.45)">Facturación, cancelación y recibos en Stripe</p>
+          </div>
+
           <p class="text-center text-[10px] mt-2.5" style="color:rgba(89,65,57,.5)" id="member-since">Miembro desde enero 2026</p>
         </div>
 
@@ -977,7 +990,83 @@
         kleinEl.style.color = isKlein ? '#16a34a' : '#a43700';
       }
     }
+
+    // ── Plan display ──────────────────────────────────────────────
+    renderPlan(p.plan || 'free');
+
+    // Show success banner if returning from Stripe checkout
+    if (new URLSearchParams(window.location.search).get('payment') === 'success') {
+      var banner = document.getElementById('payment-success-banner');
+      if (banner) { banner.classList.remove('hidden'); banner.classList.add('flex'); }
+      // Clean URL without reloading
+      history.replaceState(null, '', window.location.pathname);
+    }
   })();
+
+  // ── Plan helpers ──────────────────────────────────────────────
+  function renderPlan(plan) {
+    var isPlus = plan === 'plus';
+    var badge = document.getElementById('plan-badge');
+    if (badge) {
+      badge.textContent = isPlus ? 'PLUS ✦' : 'FREE';
+      badge.style.background = isPlus ? 'rgba(255,184,48,.15)' : 'rgba(164,55,0,.1)';
+      badge.style.color = isPlus ? '#d97706' : '#a43700';
+    }
+    document.getElementById('plan-cta-free').classList.toggle('hidden', isPlus);
+    document.getElementById('plan-cta-plus').classList.toggle('hidden', !isPlus);
+    if (isPlus) {
+      var icon = document.getElementById('plan-clara-icon');
+      var label = document.getElementById('plan-clara-label');
+      if (icon) { icon.style.background = 'rgba(34,197,94,.15)'; icon.innerHTML = '<svg class="w-2.5 h-2.5 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>'; }
+      if (label) { label.className = 'text-xs'; label.style.color = '#594139'; label.textContent = 'Clara ilimitada — activa'; }
+    }
+  }
+
+  async function startCheckout() {
+    var btn = document.getElementById('upgrade-btn');
+    var txt = document.getElementById('upgrade-btn-text');
+    btn.disabled = true;
+    txt.textContent = 'Redirigiendo…';
+    var sessionData = await _sb.auth.getSession();
+    var session = sessionData.data.session;
+    if (!session) { window.location.replace('login.html'); return; }
+    var res = await fetch('/api/checkout', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userId: session.user.id }),
+    });
+    var data = await res.json();
+    if (data.url) {
+      window.location.href = data.url;
+    } else {
+      txt.textContent = 'Actualizar a Plus · €5/mes';
+      btn.disabled = false;
+      alert(data.error || 'Error al iniciar el pago. Intenta de nuevo.');
+    }
+  }
+
+  async function openBillingPortal() {
+    var btn = document.getElementById('portal-btn');
+    var txt = document.getElementById('portal-btn-text');
+    btn.disabled = true;
+    txt.textContent = 'Abriendo portal…';
+    var sessionData = await _sb.auth.getSession();
+    var session = sessionData.data.session;
+    if (!session) { window.location.replace('login.html'); return; }
+    var res = await fetch('/api/billing-portal', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userId: session.user.id }),
+    });
+    var data = await res.json();
+    if (data.url) {
+      window.location.href = data.url;
+    } else {
+      txt.textContent = 'Gestionar suscripción';
+      btn.disabled = false;
+      alert(data.error || 'Error al abrir el portal. Intenta de nuevo.');
+    }
+  }
 
   // ── Kleinunternehmer toggle ──────────────────────────────────────────
   var kleinunternehmerActive = false;
