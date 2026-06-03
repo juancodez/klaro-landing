@@ -52,6 +52,7 @@
     textarea { field-sizing: content; min-height: 36px; max-height: 120px; }
   </style>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="analytics.js"></script>
   <script src="auth.js"></script>
   <script src="notifications.js"></script>
 </head>
@@ -670,6 +671,7 @@
     const text  = (override ?? input.value).trim();
     if (!text || isLoading) return;
 
+    track('clara_message_sent', { character_count: text.length });
     // Free-tier preflight (frontend gate — backend re-validates)
     if (_msgCount >= FREE_MSG_LIMIT) {
       showUpgradeModal();

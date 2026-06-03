@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
 <meta charset="UTF-8">
@@ -230,6 +230,7 @@
     line-height: 1.6; max-height: 300px; overflow-y: auto;
   }
 </style>
+  <script src="analytics.js"></script>
 </head>
 <body>
 
@@ -754,5 +755,6 @@ function toggleDev() {
   icon.textContent = body.classList.contains('open') ? '▲' : '▼';
 }
 </script>
+  <script>track('feature_opened', {feature: 'validador'});</script>
 </body>
 </html>

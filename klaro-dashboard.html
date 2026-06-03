@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
@@ -73,6 +73,7 @@
     .dl-row:hover { background: rgba(164,55,0,.035); }
   </style>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="analytics.js"></script>
   <script src="auth.js"></script>
   <script src="notifications.js"></script>
 </head>
@@ -1671,5 +1672,6 @@ async function updateVencimientos(uid) {
   window.welcomeSkip = async function () { await _closeWelcome(); };
 })();
 </script>
+  <script>track('feature_opened', {feature: 'dashboard'});</script>
 </body>
 </html>

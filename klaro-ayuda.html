@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
@@ -62,6 +62,7 @@
     .no-results.visible { display: block; }
   </style>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="analytics.js"></script>
   <script src="auth.js"></script>
 </head>
 <body class="bg-[#f4ede5] text-[#1e1b17] overflow-hidden h-screen flex">
@@ -489,5 +490,6 @@
     });
   })();
 </script>
+  <script>track('feature_opened', {feature: 'ayuda'});</script>
 </body>
 </html>

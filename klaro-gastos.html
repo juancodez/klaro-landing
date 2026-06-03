@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
@@ -52,6 +52,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="analytics.js"></script>
   <script src="auth.js"></script>
 </head>
 <body class="bg-[#f4ede5] text-[#1e1b17] overflow-hidden h-screen flex">
@@ -1169,5 +1170,6 @@
   loadGastoProfile();
 </script>
 
+  <script>track('feature_opened', {feature: 'gastos'});</script>
 </body>
 </html>

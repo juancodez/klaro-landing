@@ -31,6 +31,13 @@ _sb.auth.onAuthStateChange((event, session) => {
     return;
   }
 
+  if (typeof window.identifyUser === 'function') {
+    window.identifyUser(session.user.id, {
+      email: session.user.email,
+      created_at: session.user.created_at,
+    });
+  }
+
   // Fast fill from session — no extra round-trip
   const email    = session.user.email;
   const metaName = (session.user.user_metadata || {}).full_name || '';

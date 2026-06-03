@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
@@ -85,6 +85,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="analytics.js"></script>
   <script src="auth.js"></script>
   <script src="notifications.js"></script>
 </head>
@@ -1821,5 +1822,6 @@
     Zahlbar innerhalb von 14 Tagen nach Rechnungsdatum. · Generado con Klaro · <span id="pi-footer-year"></span>
   </div>
 </div>
+  <script>track('feature_opened', {feature: 'facturas'});</script>
 </body>
 </html>

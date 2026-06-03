@@ -69,6 +69,7 @@
     .section-row:hover { background: rgba(164,55,0,.025); }
   </style>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="analytics.js"></script>
   <script src="auth.js"></script>
   <script src="notifications.js"></script>
 </head>
@@ -1243,6 +1244,7 @@
     }
   })();
 </script>
+  <script>track('feature_opened', {feature: 'profile'});</script>
 </body>
 </html>
 
