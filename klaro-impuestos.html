@@ -982,7 +982,7 @@ async function loadDeclarationsTimeline(uid) {
   // Load user's filed declarations from Supabase
   let filed = [];
   try {
-    const { data } = await db.from('tax_declarations').select('*').eq('user_id', uid).order('due_date');
+    const { data } = await _sb.from('tax_declarations').select('*').eq('user_id', uid).order('due_date');
     filed = data || [];
   } catch(e) { /* table may not exist yet */ }
 
@@ -1035,7 +1035,7 @@ async function loadDeclarationsTimeline(uid) {
 }
 
 async function markAsFiled(type, quarter, year) {
-  const { data: { user } } = await db.auth.getUser();
+  const { data: { user } } = await _sb.auth.getUser();
   if (!user) return;
 
   const PERIOD_MAP = { 1:[1,3], 2:[4,6], 3:[7,9], 4:[10,12] };
@@ -1044,7 +1044,7 @@ async function markAsFiled(type, quarter, year) {
   const dueDate = quarter ? DEADLINE_MAP[quarter] : new Date(year+1, 6, 31);
 
   try {
-    await db.from('tax_declarations').upsert({
+    await _sb.from('tax_declarations').upsert({
       user_id: user.id,
       declaration_type: type,
       quarter: quarter || null,
@@ -1067,7 +1067,7 @@ async function markAsFiled(type, quarter, year) {
 (async function loadTaxData() {
   await new Promise(r => setTimeout(r, 200));
 
-  const { data: { session } } = await db.auth.getSession();
+  const { data: { session } } = await _sb.auth.getSession();
   if (!session) return;
   const uid = session.user.id;
 
@@ -1095,9 +1095,9 @@ async function markAsFiled(type, quarter, year) {
   };
 
   const [{ data: invAll }, { data: expAll }, { data: fpData }] = await Promise.all([
-    db.from('invoices').select('amount, status, date, tax_rate').eq('user_id', uid),
-    db.from('expenses').select('amount, date').eq('user_id', uid),
-    db.from('fiscal_profiles').select('is_kleinunternehmer').eq('user_id', uid).maybeSingle(),
+    _sb.from('invoices').select('amount, status, date, tax_rate').eq('user_id', uid),
+    _sb.from('expenses').select('amount, date').eq('user_id', uid),
+    _sb.from('fiscal_profiles').select('is_kleinunternehmer').eq('user_id', uid).maybeSingle(),
   ]);
 
   const inv = invAll || [];
