@@ -453,8 +453,8 @@
         else appendClara(m.content);
         chatHistory.push({ role: m.role, content: m.content });
       });
-      // Count existing AI responses for free-tier limit
-      _msgCount = (msgs || []).filter(m => m.role === 'assistant').length;
+      // Plus users bypass the counter; free users count from history
+      _msgCount = (userProfile?.plan === 'plus') ? 0 : (msgs || []).filter(m => m.role === 'assistant').length;
       _updateLimitUI();
     } catch (e) {
       showErrToast();
@@ -467,6 +467,12 @@
     const input = document.getElementById('chat-input');
     const btn   = document.getElementById('send-btn');
     if (!el) return;
+    if (userProfile?.plan === 'plus') {
+      el.innerHTML = '<span style="color:#22c55e;font-weight:600">✦ Clara ilimitada</span>';
+      if (input) { input.disabled = false; }
+      if (btn)   btn.disabled = false;
+      return;
+    }
     const remaining = Math.max(0, FREE_MSG_LIMIT - _msgCount);
     if (_msgCount >= FREE_MSG_LIMIT) {
       el.innerHTML = '<button onclick="showUpgradeModal()" style="color:#a43700;font-weight:700;text-decoration:underline;background:none;border:none;cursor:pointer;font-size:inherit">Ver Klaro Plus →</button>';
@@ -673,7 +679,7 @@
 
     track('clara_message_sent', { character_count: text.length });
     // Free-tier preflight (frontend gate — backend re-validates)
-    if (_msgCount >= FREE_MSG_LIMIT) {
+    if (userProfile?.plan !== 'plus' && _msgCount >= FREE_MSG_LIMIT) {
       showUpgradeModal();
       return;
     }
