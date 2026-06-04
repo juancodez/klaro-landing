@@ -1031,14 +1031,18 @@ function _renderChart(invoices, expenses) {
   const _rawName = session.user.user_metadata?.full_name || session.user.email.split('@')[0];
   if (greetEl) greetEl.textContent = `¡Hola, ${_rawName.split(' ')[0]}! 👋`;
 
-  // Welcome onboarding: show if new user, then hand off to fiscal diagnosis
-  const { data: _wProf } = await _sb.from('profiles').select('onboarding_completed').eq('id', uid).maybeSingle();
-  if (!_wProf?.onboarding_completed) {
+  // Welcome onboarding: show only for brand-new users (no flag AND no fiscal profile)
+  const [{ data: _wProf }, { data: _fpExist }] = await Promise.all([
+    _sb.from('profiles').select('onboarding_completed').eq('id', uid).maybeSingle(),
+    _sb.from('fiscal_profiles').select('user_id').eq('user_id', uid).maybeSingle(),
+  ]);
+  window._obUid = uid;
+  if (!_wProf?.onboarding_completed && !_fpExist) {
     const _wo = document.getElementById('welcome-onboarding');
     if (_wo) { _wo.classList.remove('hidden'); _wo.classList.add('flex'); }
-    window._obUid = uid; // store uid for obFinish/obSkip
-  } else {
-    if (typeof _obInit === 'function') _obInit(uid);
+  } else if (_fpExist && !_wProf?.onboarding_completed) {
+    // Heal stale flag silently for users who completed diagnosis but flag was never set
+    _sb.from('profiles').update({ onboarding_completed: true }).eq('id', uid).then(() => {});
   }
 
   // Dynamic deadlines
