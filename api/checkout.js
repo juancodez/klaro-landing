@@ -1,7 +1,7 @@
 const { createClient } = require('@supabase/supabase-js');
 const WebSocket = require('ws');
 
-const ORIGIN = 'https://klaro-landing.vercel.app';
+const ORIGIN = 'https://klaro-es.com';
 const sbOpts = { realtime: { transport: WebSocket } };
 
 module.exports = async function handler(req, res) {

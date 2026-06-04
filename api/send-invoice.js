@@ -120,7 +120,7 @@ function buildHtml({ clientName, clientCompany, clientAddress, invoiceNumber, de
         <!-- Footer -->
         <hr style="border:none;border-top:1px solid #e0bfb4;margin:24px 0 16px">
         <p style="font-size:10px;color:#a0897f;margin:0;text-align:center">
-          Erstellt mit <a href="https://klaro-landing.vercel.app" style="color:#a43700;text-decoration:none">Klaro</a>
+          Erstellt mit <a href="https://klaro-es.com" style="color:#a43700;text-decoration:none">Klaro</a>
           · Fiskalassistenz für Freelancer in Deutschland
         </p>
       </div>
