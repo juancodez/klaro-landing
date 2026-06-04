@@ -1,5 +1,8 @@
 const { createClient } = require('@supabase/supabase-js');
+const WebSocket = require('ws');
 const crypto = require('crypto');
+
+const sbOpts = { realtime: { transport: WebSocket } };
 
 // Vercel: disable body parser so we get raw bytes for Stripe signature verification
 module.exports.config = { api: { bodyParser: false } };
@@ -37,7 +40,7 @@ module.exports = async function handler(req, res) {
   }
 
   const event = JSON.parse(rawBody.toString('utf8'));
-  const sb = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY);
+  const sb = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY, sbOpts);
 
   if (event.type === 'checkout.session.completed') {
     const session = event.data.object;

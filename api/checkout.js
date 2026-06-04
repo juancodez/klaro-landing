@@ -1,6 +1,8 @@
 const { createClient } = require('@supabase/supabase-js');
+const WebSocket = require('ws');
 
 const ORIGIN = 'https://klaro-landing.vercel.app';
+const sbOpts = { realtime: { transport: WebSocket } };
 
 module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -16,7 +18,7 @@ module.exports = async function handler(req, res) {
   const priceId  = process.env.STRIPE_PRICE_ID;
   if (!stripeKey || !priceId) return res.status(500).json({ error: 'Stripe not configured' });
 
-  const sb = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY);
+  const sb = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY, sbOpts);
 
   // Get user email
   const { data: authData } = await sb.auth.admin.getUserById(userId);

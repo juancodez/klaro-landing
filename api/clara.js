@@ -1,5 +1,7 @@
 const { createClient } = require('@supabase/supabase-js');
+const WebSocket = require('ws');
 
+const sbOpts = { realtime: { transport: WebSocket } };
 const FREE_MSG_LIMIT = 5;
 
 const SYSTEM = `Eres Clara, la asistente personal de Klaro para freelancers y autónomos hispanohablantes que viven y trabajan en Alemania. Eres como una amiga muy informada — cercana, directa, práctica — que conoce a fondo el sistema alemán y habla su idioma.
@@ -66,7 +68,7 @@ module.exports = async function handler(req, res) {
   let fullProfile = userProfile || null;
   if (userId && process.env.SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY) {
     try {
-      const sb = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY);
+      const sb = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY, sbOpts);
       const [{ data: prof }, { data: fp }, { count: msgCount }] = await Promise.all([
         sb.from('profiles').select('full_name, city, tax_number, plan').eq('id', userId).maybeSingle(),
         sb.from('fiscal_profiles').select('tipo_autonomo, is_kleinunternehmer, ingresos_anuales, clientes_extranjero, actividad, tiene_steuernummer, inicio_actividad').eq('user_id', userId).maybeSingle(),
@@ -130,7 +132,7 @@ module.exports = async function handler(req, res) {
     // Fix 2: persist conversation to chat_messages (non-blocking)
     if (userId && replyText && process.env.SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY) {
       const lastUserMsg = messages[messages.length - 1]?.content;
-      const sb = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY);
+      const sb = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY, sbOpts);
       sb.from('chat_messages').insert([
         { user_id: userId, role: 'user',      content: lastUserMsg },
         { user_id: userId, role: 'assistant', content: replyText },
