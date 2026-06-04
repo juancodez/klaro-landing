@@ -151,15 +151,20 @@ max_indexes = 5
 enabled = true
 # The base URL of your website. Used as an allow-list for redirects and for constructing URLs used
 # in emails.
-site_url = "https://klaro-landing.vercel.app"
+site_url = "https://klaro-es.com"
 # The public URL that Auth serves on. Defaults to the API external URL with `/auth/v1` appended.
 # external_url = ""
 # A list of *exact* URLs that auth providers are permitted to redirect to post authentication.
 additional_redirect_urls = [
+  "https://klaro-es.com",
+  "https://klaro-es.com/klaro-dashboard.html",
+  "https://klaro-es.com/new-password.html",
+  "https://klaro-es.com/*",
+  "https://www.klaro-es.com",
+  "https://www.klaro-es.com/klaro-dashboard.html",
   "https://klaro-landing.vercel.app",
   "https://klaro-landing.vercel.app/klaro-dashboard.html",
-  "https://klaro-landing.vercel.app/new-password.html",
-  "https://klaro-landing.vercel.app/*"
+  "https://klaro-landing.vercel.app/new-password.html"
 ]
 # How long tokens are valid for, in seconds. Defaults to 3600 (1 hour), maximum 604,800 (1 week).
 jwt_expiry = 3600
@@ -331,6 +336,13 @@ max_frequency = "5s"
 # Use an external OAuth provider. The full list of providers are: `apple`, `azure`, `bitbucket`,
 # `discord`, `facebook`, `github`, `gitlab`, `google`, `keycloak`, `linkedin_oidc`, `notion`, `twitch`,
 # `twitter`, `x`, `slack`, `spotify`, `workos`, `zoom`.
+[auth.external.google]
+enabled = true
+client_id = "env(SUPABASE_AUTH_EXTERNAL_GOOGLE_CLIENT_ID)"
+secret = "env(SUPABASE_AUTH_EXTERNAL_GOOGLE_SECRET)"
+redirect_uri = ""
+skip_nonce_check = false
+
 [auth.external.apple]
 enabled = false
 client_id = ""
