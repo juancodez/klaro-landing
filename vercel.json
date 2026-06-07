@@ -5,6 +5,7 @@
     "api/declarations.js":    { "maxDuration": 10 },
     "api/tasks.js":           { "maxDuration": 10 },
     "api/send-invoice.js":    { "maxDuration": 10 },
+    "api/send-welcome.js":    { "maxDuration": 10 },
     "api/analyze-receipt.js": { "maxDuration": 10 },
     "api/checkout.js":        { "maxDuration": 10 },
     "api/billing-portal.js":  { "maxDuration": 10 },
